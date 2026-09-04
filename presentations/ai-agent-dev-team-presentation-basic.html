@@ -1,0 +1,868 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#f4f0e8">
+<title>AI Agent：开发者的硅基队友 / 基础篇</title>
+<link rel="icon" href="data:,">
+<style>
+:root{--paper:#f4f0e8;--ink:#202321;--muted:#68716d;--line:#d9d3c7;--soft:#ebe5da;--orange:#e26d3e;--teal:#177b78;--yellow:#e9b84c;--white:#fffdf8;--mono:"SFMono-Regular",Consolas,"Liberation Mono",monospace;--sans:Inter,"PingFang SC","Noto Sans SC","Microsoft YaHei",sans-serif}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:#d4cec2;color:var(--ink);font-family:var(--sans);line-height:1.45}button{font:inherit}.deck{width:100%}.slide{position:relative;width:min(100%,1600px);min-height:100svh;aspect-ratio:16/9;margin:0 auto;padding:clamp(34px,5.5vw,92px) clamp(28px,7vw,112px);background:var(--paper);border-bottom:1px solid var(--line);display:flex;flex-direction:column;justify-content:center;overflow:hidden}.slide:nth-child(even){background:var(--white)}.slide::after{content:"";position:absolute;left:0;right:0;bottom:0;height:5px;background:var(--orange);transform:scaleX(0);transform-origin:left;transition:transform .25s}.slide.active::after{transform:scaleX(1)}.topline{position:absolute;top:24px;left:clamp(28px,7vw,112px);right:clamp(28px,7vw,112px);display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:12px;letter-spacing:.08em;text-transform:uppercase}.eyebrow{display:inline-flex;align-items:center;gap:8px;color:var(--teal);font-size:12px;letter-spacing:.16em;text-transform:uppercase;font-weight:800}.eyebrow::before{content:"";width:24px;height:2px;background:var(--orange)}h1,h2,h3,p{margin-top:0}h1{font-size:clamp(44px,6.4vw,104px);line-height:1.02;letter-spacing:0;font-weight:850;max-width:940px;margin-bottom:22px}h2{font-size:clamp(30px,4.2vw,64px);line-height:1.08;letter-spacing:0;font-weight:820;max-width:1050px;margin-bottom:20px}h3{font-size:clamp(18px,1.8vw,28px);line-height:1.15;margin-bottom:9px;font-weight:800}p{font-size:clamp(15px,1.35vw,22px);color:var(--muted);max-width:920px}.lead{font-size:clamp(19px,2.1vw,32px);line-height:1.32;color:var(--ink);max-width:930px}.accent{color:var(--orange)}.teal{color:var(--teal)}.muted{color:var(--muted)}.rule{height:1px;background:var(--line);width:100%;margin:24px 0}.cover{background:var(--ink);color:var(--white)}.cover::before{content:"01";position:absolute;right:7vw;top:12vh;font-family:var(--mono);font-size:clamp(90px,18vw,280px);line-height:1;color:#363b38;font-weight:700}.cover::after{background:var(--yellow)}.cover .topline{color:#abb4ae}.cover h1{position:relative;max-width:980px}.cover .lead{color:#d4dbd5}.cover .eyebrow{color:var(--yellow)}.cover .eyebrow::before{background:var(--yellow)}.cover-meta{display:flex;gap:12px;align-items:center;margin-top:30px;color:#abb4ae;font-size:14px}.cover-meta span{padding:7px 10px;border:1px solid #4c544f;border-radius:999px}.cover-mark{position:absolute;right:9vw;bottom:12vh;width:150px;height:150px;border:1px solid #59645d;display:grid;place-items:center;color:var(--yellow);font-family:var(--mono);font-size:36px}.split{display:grid;grid-template-columns:1.05fr .95fr;gap:clamp(30px,6vw,100px);align-items:center}.split-tight{display:grid;grid-template-columns:.8fr 1.2fr;gap:48px;align-items:center}.statement{font-size:clamp(28px,4.5vw,72px);line-height:1.08;font-weight:800;max-width:620px}.statement small{display:block;font-size:.34em;line-height:1.4;color:var(--muted);font-weight:500;margin-top:22px}.panel{border:1px solid var(--line);background:rgba(255,253,248,.66);padding:clamp(20px,2.5vw,38px);border-radius:4px}.dark-panel{background:#2a302d;border-color:#414a44;color:var(--white)}.dark-panel p{color:#bac3bc}.quote{border-left:4px solid var(--orange);padding-left:22px;font-size:clamp(22px,2.6vw,40px);line-height:1.2;color:var(--ink);max-width:860px}.quote strong{color:var(--orange)}.flow{display:grid;grid-template-columns:repeat(5,1fr);gap:0;align-items:stretch;margin-top:26px}.flow-item{position:relative;padding:20px 18px;border:1px solid var(--line);background:var(--white);min-height:150px}.flow-item:not(:last-child)::after{content:"";position:absolute;z-index:2;right:-10px;top:50%;width:18px;height:18px;border-top:2px solid var(--orange);border-right:2px solid var(--orange);transform:translateY(-50%) rotate(45deg);background:var(--white)}.flow-num{font-family:var(--mono);font-size:13px;color:var(--orange);margin-bottom:22px}.flow-item h3{font-size:clamp(16px,1.45vw,22px)}.flow-item p{font-size:clamp(13px,1.1vw,17px);line-height:1.35}.before-after{display:grid;grid-template-columns:1fr 54px 1fr;align-items:center;gap:18px;margin-top:28px}.state{padding:28px;border:1px solid var(--line);background:var(--white);min-height:180px}.state h3{color:var(--muted)}.state.after{border-color:var(--orange);background:#fff5ee}.state.after h3{color:var(--orange)}.arrow{font-size:28px;color:var(--orange);text-align:center}.tool-map{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-top:22px}.tool{border-top:4px solid var(--teal);padding:16px 15px;background:var(--soft);min-height:150px}.tool:nth-child(2){border-color:var(--orange)}.tool:nth-child(3){border-color:var(--yellow)}.tool:nth-child(4){border-color:#5b7195}.tool:nth-child(5){border-color:#8a6370}.tool b{display:block;font-size:15px;margin-bottom:8px}.tool span{font-size:13px;color:var(--muted);line-height:1.4}.task{display:flex;flex-direction:column;justify-content:center;min-height:150px}.task .big{font-size:clamp(30px,4vw,64px);font-weight:850;line-height:1;color:var(--orange)}.task .label{font-size:14px;color:var(--muted);margin-top:8px}.code-card{background:#252b28;color:#eef3ed;border-radius:4px;padding:22px 24px;font:clamp(12px,1.1vw,17px)/1.65 var(--mono);white-space:pre-wrap}.code-card .comment{color:#8a9f92}.code-card .key{color:#f2bd68}.code-card .cmd{color:#85d4c4}.prompt-stack{display:grid;gap:12px;margin-top:22px}.prompt{display:grid;grid-template-columns:36px 1fr;gap:12px;align-items:start;padding:15px 18px;background:var(--soft);border-left:3px solid var(--teal)}.prompt:nth-child(2){border-color:var(--orange)}.prompt:nth-child(3){border-color:var(--yellow)}.prompt .n{font-family:var(--mono);color:var(--muted)}.prompt p{margin:0;color:var(--ink);font:14px/1.55 var(--mono)}.grid-8{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:20px}.mini{background:var(--soft);padding:18px;border-top:3px solid var(--teal);min-height:102px}.mini:nth-child(2n){border-color:var(--orange)}.mini:nth-child(3n){border-color:var(--yellow)}.mini b{font-size:15px;display:block;margin-bottom:6px}.mini span{font-size:13px;color:var(--muted)}.loop{display:flex;justify-content:center;align-items:center;gap:10px;flex-wrap:wrap;margin:34px 0}.loop-item{border:1px solid var(--line);background:var(--white);padding:17px 20px;min-width:120px;text-align:center}.loop-item strong{display:block;font-size:15px}.loop-item span{font-size:12px;color:var(--muted)}.loop-arrow{color:var(--orange);font-size:24px}.evidence{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:24px}.evidence .panel{min-height:118px}.evidence b{font-family:var(--mono);font-size:13px;color:var(--teal)}.evidence p{font-size:14px;margin:8px 0 0}.skill-steps{display:grid;grid-template-columns:repeat(6,1fr);gap:0;margin-top:25px}.skill-step{padding:18px 14px;background:var(--soft);border:1px solid var(--paper);min-height:145px}.skill-step:first-child{background:#dcebe6}.skill-step:last-child{background:#fff0e7}.skill-step b{font-family:var(--mono);font-size:12px;color:var(--teal)}.skill-step h3{font-size:16px;margin:18px 0 7px}.skill-step p{font-size:12px;line-height:1.4}.repo{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:center;margin-top:22px}.tree{font:15px/1.9 var(--mono);padding:22px 28px;background:#252b28;color:#eef3ed}.tree .folder{color:#f2bd68}.tree .file{color:#9bd7ca}.context-list{display:grid;gap:8px}.context-list div{padding:13px 16px;background:var(--soft);font-size:14px;border-left:3px solid var(--teal)}.guardrail{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-top:26px}.guard{padding:22px;border:1px solid var(--line);background:var(--white);min-height:180px}.guard:first-child{border-top:4px solid var(--teal)}.guard:nth-child(2){border-top:4px solid var(--yellow)}.guard:nth-child(3){border-top:4px solid var(--orange)}.guard-label{font-family:var(--mono);color:var(--muted);font-size:12px}.guard h3{margin:18px 0 9px}.guard p{font-size:14px}.ladder{display:flex;align-items:end;gap:8px;height:190px;margin-top:24px}.rung{flex:1;position:relative;background:var(--soft);border-top:4px solid var(--teal);padding:12px;min-height:60px}.rung:nth-child(2){min-height:90px;border-color:#4d9f97}.rung:nth-child(3){min-height:120px;border-color:var(--yellow)}.rung:nth-child(4){min-height:150px;border-color:var(--orange)}.rung:nth-child(5){min-height:180px;border-color:#b34b39}.rung b{display:block;font-size:13px}.rung span{display:block;color:var(--muted);font-size:11px;margin-top:7px}.route{display:grid;grid-template-columns:repeat(5,1fr);gap:0;margin-top:26px}.route-step{border-top:3px solid var(--orange);padding:18px 16px 0;min-height:145px}.route-step:nth-child(2){border-color:var(--yellow)}.route-step:nth-child(3){border-color:var(--teal)}.route-step:nth-child(4){border-color:#5b7195}.route-step:nth-child(5){border-color:#8a6370}.route-step b{font-family:var(--mono);font-size:12px;color:var(--muted)}.route-step h3{font-size:18px;margin-top:14px}.route-step p{font-size:13px}.footer-line{display:flex;justify-content:space-between;align-items:end;margin-top:30px;color:var(--muted);font-size:13px}.controls{position:fixed;z-index:20;right:20px;bottom:18px;display:flex;gap:6px;align-items:center;padding:6px;background:rgba(32,35,33,.9);border-radius:4px}.controls button{width:34px;height:30px;border:0;background:transparent;color:#f4f0e8;cursor:pointer;font-size:17px}.controls button:hover,.controls button:focus-visible{background:var(--orange);outline:none}.controls .counter{min-width:55px;text-align:center;color:#d9d3c7;font:11px var(--mono)}[contenteditable=true]:focus{outline:2px solid var(--orange);outline-offset:4px}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}@media(max-width:1024px){.slide{padding:62px 7vw}.flow-item{min-height:130px}.grid-8{grid-template-columns:repeat(4,1fr)}.tool-map{grid-template-columns:repeat(5,1fr)}.repo{gap:24px}}@media(max-width:768px){body{background:var(--paper)}.slide{aspect-ratio:auto;min-height:100svh;padding:66px 22px 52px;justify-content:flex-start}.topline{top:20px;left:22px;right:22px}.cover{justify-content:center}.cover::before{right:12px;top:17vh;font-size:100px}.cover-mark{right:24px;bottom:22px;width:90px;height:90px;font-size:22px}.split,.split-tight,.before-after,.repo{grid-template-columns:1fr;gap:22px}.flow,.tool-map,.route{grid-template-columns:1fr;gap:8px}.flow-item{min-height:auto}.flow-item:not(:last-child)::after{right:auto;top:auto;bottom:-9px;left:50%;transform:translateX(-50%) rotate(135deg)}.tool{min-height:auto}.grid-8{grid-template-columns:repeat(2,1fr)}.evidence{grid-template-columns:1fr}.skill-steps{grid-template-columns:repeat(2,1fr)}.guardrail{grid-template-columns:1fr}.ladder{height:auto;display:grid;grid-template-columns:1fr}.rung,.rung:nth-child(n){min-height:auto}.footer-line{align-items:start;gap:14px;flex-direction:column}.controls{right:10px;bottom:10px}}@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.slide::after{transition:none}}@media print{body{background:#fff}.slide{width:100%;height:100vh;min-height:0;aspect-ratio:auto;page-break-after:always;border:0}.controls{display:none}.slide.active::after{display:none}}
+</style>
+<style>
+.evolution{display:grid;grid-template-columns:repeat(6,1fr);gap:0;margin-top:24px}.evo{padding:17px 14px;background:var(--soft);border:1px solid var(--paper);min-height:205px}.evo:nth-child(1){background:#e7e1d7}.evo:nth-child(2){background:#dcebe6}.evo:nth-child(3){background:#e2ece8}.evo:nth-child(4){background:#fff0e7}.evo:nth-child(5){background:#f9e5d8}.evo:nth-child(6){background:#ece1e5}.evo b{font:700 11px var(--mono);color:var(--muted)}.evo h3{font-size:17px;margin:20px 0 9px}.evo p{font-size:12px;line-height:1.4}.evo .cap{display:block;margin-top:16px;color:var(--teal);font-size:12px;font-weight:750}.change-table{display:grid;gap:7px;margin-top:24px}.change-row{display:grid;grid-template-columns:.85fr 1.2fr 1.35fr;align-items:stretch}.change-row>div{padding:13px 15px;background:var(--soft);font-size:13px;border-left:1px solid var(--paper)}.change-row.head>div{background:var(--dark);color:var(--white);font:700 11px var(--mono);border:0}.change-row>div:first-child{font-weight:800;color:var(--orange)}.change-row p{font-size:12px;margin:0;line-height:1.4}.change-note{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:20px}.change-note .panel{padding:18px 20px}.change-note p{font-size:14px;margin:0}.change-note strong{color:var(--orange)}
+.tree{white-space:pre-wrap}
+.cases{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:18px}.case{padding:15px;background:var(--soft);border-left:4px solid var(--teal);min-height:100px}.case:nth-child(2){border-color:var(--orange)}.case:nth-child(3){border-color:var(--yellow)}.case:nth-child(4){border-color:#5b7195}.case:nth-child(5){border-color:#8a6370}.case:nth-child(6){border-color:#4d9f97}.case b{font-size:15px}.case span{display:block;font:11px/1.35 var(--mono);color:var(--muted);margin:6px 0}.case p{font-size:12px;line-height:1.35;margin:0}
+.skill-catalog h2{font-size:clamp(30px,3.5vw,54px);margin-bottom:12px}.skill-catalog .split{margin-top:12px!important}.skill-catalog .panel{padding:20px 26px}.skill-catalog .panel h3{font-size:22px}.skill-catalog .panel p{font-size:14px;margin-bottom:10px}.skill-catalog .cases{margin-top:12px}.skill-catalog .case{min-height:86px;padding:12px}.skill-catalog .case span{margin:4px 0}.skill-catalog .footer-line{margin-top:14px}
+.change-row.head>div,.change-row.head>div:first-child{background:#2a302d;color:#fffdf8}
+.model-slide h2{font-size:clamp(30px,3.8vw,58px);margin-bottom:14px}.model-chart{display:block;width:100%;height:auto;max-height:250px;object-fit:contain;object-position:center;border:1px solid var(--line);background:#111923}.model-chart.tall{max-height:430px;background:#fff}.chart-caption{font-size:11px;color:var(--muted);margin-top:7px}.model-points{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:16px}.model-point{padding:15px;background:var(--soft);border-top:3px solid var(--teal);min-height:105px}.model-point:nth-child(2){border-color:var(--orange)}.model-point:nth-child(3){border-color:var(--yellow)}.model-point b{display:block;font-size:14px;margin-bottom:7px}.model-point p{font-size:12px;line-height:1.4;margin:0}.tool-choice{display:grid;grid-template-columns:1.05fr .95fr;gap:28px;align-items:stretch;margin-top:18px}.tool-choice .panel{padding:20px 24px}.tool-choice h3{font-size:21px;margin-bottom:12px}.tool-choice p{font-size:14px}.choice-list{display:grid;gap:9px}.choice-list div{padding:12px 14px;background:var(--soft);border-left:3px solid var(--teal);font-size:14px}.choice-list div:nth-child(2){border-color:var(--orange)}.choice-list div:nth-child(3){border-color:var(--yellow)}.choice-list div:nth-child(4){border-color:#5b7195}.model-foot{margin-top:14px;font-size:13px;color:var(--muted)}
+@media(max-width:768px){.evolution{grid-template-columns:1fr 1fr;gap:8px}.evo{min-height:auto}.change-row{grid-template-columns:1fr;gap:0}.change-row>div{border-left:0;border-bottom:1px solid var(--paper)}.change-row.head{display:none}.change-row>div:first-child{padding-bottom:6px}.change-row>div:nth-child(2),.change-row>div:nth-child(3){padding-top:6px}.change-note{grid-template-columns:1fr}}
+@media(max-width:768px){.cases{grid-template-columns:1fr;gap:9px}.case{min-height:auto}}
+@media(max-width:768px){.model-chart{max-height:none}.model-points,.tool-choice{grid-template-columns:1fr;gap:9px}.tool-choice{margin-top:10px}.model-point{min-height:auto}.tool-choice .panel{padding:18px}.model-slide .footer-line{margin-top:14px}}
+</style>
+<style>
+.source-link{color:var(--teal);text-decoration:underline;text-underline-offset:3px}.hallucination-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:20px}.hall-card{padding:22px;background:var(--soft);border-top:4px solid var(--orange)}.hall-card.fix{border-color:var(--teal);background:#e5efeb}.hall-card h3{font-size:22px;margin-bottom:16px}.hall-item{display:grid;grid-template-columns:88px 1fr;gap:12px;padding:12px 0;border-top:1px solid rgba(32,35,33,.12)}.hall-item:first-of-type{border-top:0}.hall-item b{font-size:14px;color:var(--orange)}.hall-card.fix .hall-item b{color:var(--teal)}.hall-item p{font-size:13px;line-height:1.4;margin:0}.rag-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:22px}.rag-card{padding:20px 17px;background:var(--soft);border-top:4px solid #6aa99d;min-height:250px}.rag-card:nth-child(2){border-color:#6d98d1;background:#edf1f8}.rag-card:nth-child(3){border-color:#987ab3;background:#f0ebf5}.rag-card b{display:block;font-size:18px;margin-bottom:8px}.rag-card>span{display:block;color:var(--muted);font-size:13px;margin-bottom:18px}.rag-steps{display:grid;gap:7px}.rag-steps div{padding:9px 11px;background:rgba(255,255,255,.66);font-size:13px;border-left:3px solid currentColor}.rag-card:nth-child(1) .rag-steps div{color:#4c978c}.rag-card:nth-child(2) .rag-steps div{color:#5b82bd}.rag-card:nth-child(3) .rag-steps div{color:#896ba7}.rag-card p{font-size:12px;line-height:1.4;margin-top:16px}.rag-foot{display:flex;justify-content:space-between;align-items:center;margin-top:18px;color:var(--muted);font-size:13px}.rag-foot .source-link{font-size:12px}
+.content-map{margin-top:20px}.content-map-head{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);padding-bottom:8px;color:var(--muted);font:700 12px var(--mono);letter-spacing:.12em}.content-map-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px 28px;margin-top:12px}.content-map-group{border-bottom:1px solid var(--line);padding-bottom:10px}.content-map-group h3{margin:0 0 7px;color:var(--teal);font:800 14px var(--sans)}.content-map-row{display:flex;justify-content:space-between;gap:12px;padding:3px 0;font-size:12px;line-height:1.25}.content-map-row b{flex:0 0 auto;color:var(--orange);font:700 11px var(--mono)}.content-map-note{margin:14px 0 0;padding-top:10px;border-top:1px solid var(--line);color:var(--muted);font-size:13px;line-height:1.35}.content-map-note strong{color:var(--ink)}
+@media(max-width:768px){.hallucination-grid,.rag-grid{grid-template-columns:1fr;gap:9px}.hall-card{padding:18px}.rag-card{min-height:auto}.rag-foot{align-items:flex-start;gap:12px;flex-direction:column}}
+.slide.toc-slide{justify-content:flex-start;padding-top:58px}.toc-slide .eyebrow,.toc-slide>h2{display:none}.toc-slide .content-map{margin-top:0}.content-map-grid{gap:14px 18px}.content-map-group{padding-bottom:8px}.content-map-group h3{font-size:13px}.content-map-row{font-size:11px;padding:2px 0}
+@media(max-width:768px){.toc-slide{padding-top:72px;padding-bottom:96px}.content-map-head{font-size:10px}.content-map-grid{grid-template-columns:repeat(2,1fr);gap:14px 12px}.content-map-group h3{font-size:12px}.content-map-row{font-size:10px;line-height:1.2}.content-map-row b{font-size:10px}}
+.communication-slide .observability-table-wrap,.runtime-example-slide .observability-table-wrap{flex:0 0 auto}.slide.communication-slide{padding-bottom:40px}.slide.runtime-example-slide{padding-top:clamp(66px,5vw,82px);padding-bottom:42px}.runtime-example-slide .obs-arch{margin-top:12px}.runtime-example-slide .obs-arch .code-card,.runtime-example-slide .obs-arch .panel{padding:14px 16px}.runtime-example-slide .obs-points{gap:5px}.runtime-example-slide .obs-points li{padding:8px 11px}.runtime-example-slide .token-equation{margin-top:12px;padding:10px 14px;font-size:13px;line-height:1.4}.runtime-example-slide .token-note{margin-top:12px;font-size:clamp(17px,1.7vw,23px)}.runtime-example-slide .chart-caption{font-size:10px;margin-top:5px}
+@media(max-width:768px){.slide.toc-slide{padding-top:72px;padding-bottom:96px}.slide.runtime-example-slide{padding-top:74px;padding-bottom:96px}.runtime-example-slide .obs-arch{margin-top:10px}.runtime-example-slide .obs-arch .code-card,.runtime-example-slide .obs-arch .panel{padding:10px 12px}.runtime-example-slide .obs-points li{padding:7px 9px}.runtime-example-slide .token-equation{font-size:10px;padding:8px 10px}.runtime-example-slide .token-note{font-size:16px}.runtime-example-slide .chart-caption{font-size:9px}}
+.loop-image-slide{justify-content:center}.loop-image{display:block;width:100%;max-height:590px;object-fit:contain;background:#fff;border:1px solid var(--line)}.loop-image-slide .chart-caption{margin-top:10px}.rag-image{display:block;width:100%;max-height:500px;object-fit:contain;background:#fff;border:1px solid var(--line)}.rag-image-slide .rag-foot{margin-top:14px}
+@media(max-width:768px){.loop-image{max-height:none}.rag-image{max-height:none}}
+.advanced-slide h2{font-size:clamp(30px,3.6vw,56px);margin-bottom:10px}.pattern-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:16px}.pattern-card{padding:18px 16px;background:var(--soft);border-top:4px solid var(--teal);min-height:330px}.pattern-card:nth-child(2){border-color:var(--orange);background:#fff0e7}.pattern-card:nth-child(3){border-color:#6d98d1;background:#edf1f8}.pattern-card h3{font-size:20px;margin-bottom:7px}.pattern-meta{display:block;color:var(--muted);font-size:12px;line-height:1.4;margin-bottom:12px}.ascii-chart{margin:0;padding:13px 10px;background:#252b28;color:#eaf1eb;border-radius:3px;font:12px/1.45 var(--mono);white-space:pre;overflow:hidden}.pattern-card:nth-child(1) .ascii-chart{color:#9bd7ca}.pattern-card:nth-child(2) .ascii-chart{color:#f2bd68}.pattern-card:nth-child(3) .ascii-chart{color:#9fc1ed}.pattern-takeaway{margin:12px 0 0;font-size:12px;line-height:1.4;color:var(--muted)}.advanced-foot{display:flex;justify-content:space-between;align-items:end;margin-top:16px;color:var(--muted);font-size:13px}.advanced-table-wrap{margin-top:12px;overflow-x:auto;border:1px solid var(--line);background:var(--white)}.advanced-table{width:100%;min-width:940px;border-collapse:collapse;table-layout:fixed;font-size:12px;line-height:1.35}.advanced-table th{padding:10px 11px;background:#2a302d;color:#fffdf8;text-align:left;font:700 11px var(--mono)}.advanced-table td{padding:9px 11px;border-top:1px solid var(--line);vertical-align:top}.advanced-table tbody tr:nth-child(even){background:var(--soft)}.advanced-table td:first-child{width:18%;font-weight:800;color:var(--orange)}.advanced-table td:nth-child(2){width:28%}.advanced-table td:nth-child(3){width:13%;color:var(--teal);font-weight:700}.advanced-table td:nth-child(4){width:13%;color:#5b7195;font-weight:700}.advanced-table td:nth-child(5){width:28%}.stars{letter-spacing:1px;color:var(--orange);white-space:nowrap}.advanced-source{color:var(--teal);text-decoration:underline;text-underline-offset:3px;font-size:12px}.advanced-table-slide h2{font-size:clamp(28px,3.2vw,50px)}
+@media(max-width:768px){.pattern-grid{grid-template-columns:1fr;gap:9px}.pattern-card{min-height:auto;padding:17px 15px}.advanced-foot{align-items:flex-start;gap:12px;flex-direction:column}.advanced-table-slide .advanced-table-wrap{margin-top:8px}.advanced-table{font-size:11px}.advanced-table th{font-size:10px}.advanced-table td{padding:8px 9px}}
+</style>
+<style>
+.slide{justify-content:flex-start;padding-top:clamp(76px,7vw,116px)}h1{font-size:clamp(40px,5.2vw,82px);margin-bottom:16px}h2{font-size:clamp(27px,3.25vw,50px);margin-bottom:14px}.advanced-slide h2,.advanced-table-slide h2,.model-slide h2,.skill-catalog h2{font-size:clamp(27px,3.25vw,50px);margin-bottom:12px}.cover{justify-content:flex-start;padding-top:clamp(92px,9vw,142px)}
+.summary-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:18px;max-width:1250px}.summary-item{padding:13px 14px;background:#303a35;border-top:3px solid var(--yellow);min-height:104px}.summary-item:nth-child(2){border-color:var(--orange)}.summary-item:nth-child(3){border-color:var(--teal)}.summary-item:nth-child(4){border-color:#9bb8a8}.summary-item b{display:block;color:var(--yellow);font:700 12px var(--mono)}.summary-item p{margin:7px 0 0;color:#d3dbd4;font-size:13px;line-height:1.35}.cover.final{background:var(--paper);color:var(--ink)}.cover.final .topline{color:var(--muted)}.cover.final h2{color:var(--ink);margin-bottom:12px}.cover.final .quote{color:var(--ink)!important}.cover.final .cover-meta{color:var(--muted)}.cover.final .cover-meta span{border-color:var(--line)}
+.about-slide h2{margin-bottom:8px}.about-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:clamp(30px,7vw,110px);align-items:center;margin-top:18px}.about-copy{max-width:720px}.about-name{font-size:clamp(30px,3.2vw,48px);font-weight:820;line-height:1.1;margin-bottom:14px}.about-role{font-size:clamp(18px,1.8vw,28px);color:var(--orange);margin-bottom:17px}.about-bio{font-size:clamp(16px,1.5vw,23px);line-height:1.55;color:var(--muted);max-width:720px}.about-contact{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}.about-contact span{padding:8px 12px;border:1px solid var(--line);background:var(--soft);font:13px var(--mono);color:var(--ink)}.about-qr{justify-self:end;width:min(100%,300px);margin:0;padding:10px;background:var(--white);border:1px solid var(--line)}.about-qr img{display:block;width:100%;height:auto}.about-qr figcaption{margin-top:8px;color:var(--muted);font-size:11px;line-height:1.35;text-align:center}
+.toc-block{margin-top:20px}.toc-heading{font:700 12px var(--mono);letter-spacing:.14em;color:var(--teal);margin-bottom:8px}.toc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.toc-item{padding:11px 14px 10px;border-top:3px solid var(--teal);background:var(--soft);min-height:88px}.toc-item:nth-child(2){border-color:var(--orange)}.toc-item:nth-child(3){border-color:var(--yellow)}.toc-item:nth-child(4){border-color:#5b7195}.toc-item:nth-child(5){border-color:#8a6370}.toc-item:nth-child(6){border-color:#4d9f97}.toc-num{font:700 12px var(--mono);color:var(--muted)}.toc-item strong{display:block;margin:9px 0 4px;font-size:15px}.toc-item span{display:block;color:var(--muted);font-size:12px;line-height:1.35}.about-slide .footer-line{margin-top:20px}
+.toc-slide h2{max-width:1050px}.toc-slide .toc-block{margin-top:24px}.toc-slide .toc-item{min-height:118px;padding:14px}.toc-slide .toc-item strong{font-size:18px;margin-top:15px}.spec-slide h2{max-width:1050px}.spec-contract,.spec-template,.spec-goal{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:18px}.spec-contract .panel,.spec-template .panel,.spec-goal .panel{padding:18px 20px}.spec-points{display:grid;gap:8px;margin:0;padding:0;list-style:none}.spec-points li{position:relative;padding-left:20px;font-size:14px;line-height:1.4}.spec-points li::before{content:"•";position:absolute;left:0;color:var(--orange);font-size:20px;font-weight:800}.spec-contract .dark-panel .spec-points li::before{color:var(--yellow)}.spec-template{grid-template-columns:1.15fr .85fr}.spec-template .code-card{font-size:clamp(11px,1vw,15px);line-height:1.5;padding:18px 20px}.spec-template-note{padding:16px 18px;background:#fff0e7;border-left:4px solid var(--orange);font-size:14px;line-height:1.5}.spec-template-note strong{color:var(--orange)}.spec-lifecycle{display:grid;grid-template-columns:repeat(7,1fr);gap:0;margin-top:22px}.spec-step{padding:13px 10px;background:var(--soft);border-top:3px solid var(--teal);min-height:112px}.spec-step:nth-child(2){border-color:#4d9f97}.spec-step:nth-child(3){border-color:var(--yellow)}.spec-step:nth-child(4){border-color:var(--orange)}.spec-step:nth-child(5){border-color:#5b7195}.spec-step:nth-child(6){border-color:#8a6370}.spec-step:nth-child(7){border-color:#b34b39}.spec-step b{font:700 11px var(--mono);color:var(--muted)}.spec-step strong{display:block;margin:14px 0 6px;font-size:14px}.spec-step span{display:block;color:var(--muted);font-size:11px;line-height:1.35}.spec-phase-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px}.spec-file-tree{font:13px/1.65 var(--mono);padding:16px 18px;background:#252b28;color:#eef3ed;white-space:pre-wrap}.spec-file-tree .folder{color:#f2bd68}.spec-file-tree .file{color:#9bd7ca}.spec-goal .code-card{font-size:clamp(11px,1vw,15px);line-height:1.55;padding:18px 20px}.goal-points{display:grid;gap:8px;margin:0;padding:0;list-style:none}.goal-points li{padding:11px 14px;background:var(--soft);border-left:3px solid var(--teal);font-size:14px;line-height:1.4}.goal-points li:nth-child(2){border-color:var(--orange)}.goal-points li:nth-child(3){border-color:var(--yellow)}.goal-points li:nth-child(4){border-color:#5b7195}.goal-note{margin-top:18px;padding-left:18px;border-left:4px solid var(--orange);font-size:clamp(19px,2vw,28px);line-height:1.25;max-width:980px}.goal-note strong{color:var(--orange)}.agent-loop-slide h2,.token-slide h2{max-width:1100px}.agent-loop-track{display:grid;grid-template-columns:repeat(6,1fr);gap:0;margin-top:22px}.agent-loop-step{padding:15px 12px;background:var(--soft);border-top:3px solid var(--teal);min-height:130px}.agent-loop-step:nth-child(2){border-color:#4d9f97}.agent-loop-step:nth-child(3){border-color:var(--yellow)}.agent-loop-step:nth-child(4){border-color:var(--orange)}.agent-loop-step:nth-child(5){border-color:#5b7195}.agent-loop-step:nth-child(6){border-color:#b34b39}.agent-loop-step b{font:700 11px var(--mono);color:var(--muted)}.agent-loop-step strong{display:block;margin:15px 0 6px;font-size:15px}.agent-loop-step span{display:block;color:var(--muted);font-size:12px;line-height:1.35}.agent-iteration{display:grid;grid-template-columns:1.05fr .95fr;gap:14px;margin-top:20px}.agent-iteration .code-card{font-size:clamp(11px,1vw,15px);line-height:1.55;padding:18px 20px}.agent-iteration .panel{padding:18px 20px}.token-budget-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:22px}.token-budget-card{padding:18px;background:var(--soft);border-top:4px solid var(--teal);min-height:190px}.token-budget-card:nth-child(2){border-color:var(--orange)}.token-budget-card:nth-child(3){border-color:var(--yellow)}.token-budget-card strong{display:block;font-size:20px;margin-bottom:9px}.token-budget-card p{font-size:14px;line-height:1.45}.token-budget-card .big{font:700 24px var(--mono);color:var(--orange);display:block;margin-top:16px}.token-equation{margin-top:18px;padding:15px 18px;background:#252b28;color:#eef3ed;font:16px var(--mono)}.token-scenarios{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:20px}.token-scenario{padding:18px 20px;border:1px solid var(--line);background:var(--white)}.token-scenario:first-child{border-top:4px solid var(--orange)}.token-scenario:last-child{border-top:4px solid var(--teal)}.token-scenario h3{font-size:21px;margin-bottom:10px}.token-scenario p{font-size:14px;line-height:1.45}.token-flow{margin-top:14px;font:13px/1.6 var(--mono);color:var(--muted)}.token-flow strong{color:var(--orange)}.token-priority{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:22px}.token-priority-item{padding:15px 12px;background:var(--soft);border-top:3px solid var(--orange);min-height:150px}.token-priority-item:nth-child(2){border-color:var(--teal)}.token-priority-item:nth-child(3){border-color:var(--yellow)}.token-priority-item:nth-child(4){border-color:#5b7195}.token-priority-item:nth-child(5){border-color:#8a6370}.token-priority-item b{font:700 11px var(--mono);color:var(--muted)}.token-priority-item strong{display:block;margin:15px 0 7px;font-size:15px}.token-priority-item span{display:block;color:var(--muted);font-size:12px;line-height:1.4}.token-note{margin-top:20px;padding-left:18px;border-left:4px solid var(--orange);font-size:clamp(19px,2vw,28px);line-height:1.25}.token-note strong{color:var(--orange)}
+.best-practice-slide h2{max-width:980px}.best-practice-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:18px}.best-practice-list{margin:0;padding:0;list-style:none;display:grid;gap:9px}.best-practice-list li{position:relative;padding:13px 16px 13px 37px;background:var(--soft);font-size:14px;line-height:1.42}.best-practice-list li::before{content:"•";position:absolute;left:16px;top:10px;color:var(--orange);font-size:22px;font-weight:800}.best-practice-list li strong{color:var(--ink)}.best-practice-list li:nth-child(2)::before{color:var(--teal)}.best-practice-list li:nth-child(3)::before{color:var(--yellow)}.best-practice-list li:nth-child(4)::before{color:#5b7195}.best-practice-note{margin-top:18px;padding-left:18px;border-left:4px solid var(--orange);font-size:clamp(19px,2vw,28px);line-height:1.2;max-width:940px}.best-practice-note strong{color:var(--orange)}.best-practice-example{display:grid;grid-template-columns:1fr 1.1fr;gap:14px;margin-top:18px;align-items:stretch}.best-practice-example .code-card{padding:16px 18px;font-size:clamp(11px,1vw,15px);line-height:1.5}.best-practice-example-copy{padding:15px 17px;background:#fff0e7;border-left:4px solid var(--orange);font-size:14px;line-height:1.45}.best-practice-example-copy strong{color:var(--orange)}
+@media(max-width:768px){.slide{padding-top:74px}.cover{justify-content:flex-start;padding-top:96px}.cover h1{font-size:clamp(38px,11vw,56px)}h2{font-size:clamp(26px,8vw,38px)}.summary-grid{grid-template-columns:1fr;gap:7px}.summary-item{min-height:auto}.about-grid{grid-template-columns:1fr;gap:22px}.about-qr{justify-self:start;width:min(100%,260px)}.toc-grid{grid-template-columns:repeat(2,1fr);gap:8px}.toc-item{min-height:92px;padding:10px 11px}.toc-item strong{font-size:14px;line-height:1.2}.toc-item span{font-size:11px}.about-slide{padding-bottom:96px}.spec-contract,.spec-template,.spec-goal,.agent-iteration,.token-scenarios{grid-template-columns:1fr}.spec-template .code-card{font-size:10px;line-height:1.3;padding:13px 15px}.spec-template-note{padding:12px 14px;font-size:12px;line-height:1.35}.spec-lifecycle{grid-template-columns:repeat(2,1fr);gap:8px}.spec-step{min-height:80px;padding:9px 10px}.spec-step strong{margin:8px 0 3px;font-size:13px}.spec-step span{font-size:10px}.spec-phase-grid{grid-template-columns:1fr;gap:8px}.spec-file-tree{font-size:9px;line-height:1.1;padding:8px 10px}.spec-phase-grid .panel{padding:8px 10px}.spec-phase-grid .spec-points{grid-template-columns:repeat(2,1fr);gap:2px}.spec-phase-grid .spec-points li{font-size:9px;line-height:1.12;padding-left:14px}.spec-slide,.agent-loop-slide,.token-slide{padding-bottom:96px}.agent-loop-track{grid-template-columns:repeat(2,1fr);gap:8px}.agent-loop-step{min-height:88px;padding:10px}.agent-loop-step strong{margin:8px 0 4px;font-size:13px}.agent-loop-step span{font-size:10px}.agent-iteration .code-card{font-size:10px;line-height:1.35;padding:13px 15px}.agent-iteration .panel{padding:13px 15px}.token-budget-grid,.token-priority{grid-template-columns:1fr;gap:8px}.token-budget-card{min-height:auto;padding:14px 15px}.token-budget-card strong{font-size:18px}.token-budget-card p{font-size:12px}.token-budget-card .big{font-size:20px;margin-top:8px}.token-equation{font-size:12px;line-height:1.4}.token-scenario{padding:14px 15px}.token-scenario h3{font-size:18px}.token-scenario p,.token-flow{font-size:12px}.token-priority-item{min-height:auto;padding:13px 14px}.token-priority-item strong{margin:8px 0 4px}.token-priority-item span{font-size:11px}.token-note{font-size:21px;margin-bottom:110px}.best-practice-grid{grid-template-columns:1fr}.best-practice-example{grid-template-columns:1fr}.best-practice-note{font-size:21px;margin-bottom:110px}.best-practice-slide{padding-bottom:96px}}
+</style>
+<style>
+.observability-slide h2{max-width:1120px}.observability-table-wrap{overflow-x:auto;margin-top:18px;border:1px solid var(--line)}.observability-table{width:100%;min-width:1120px;border-collapse:collapse;font-size:11px;line-height:1.3;background:var(--white)}.observability-table th,.observability-table td{padding:9px 10px;border:1px solid var(--line);text-align:left;vertical-align:top}.observability-table th{background:#2a302d;color:var(--white);font:700 11px var(--mono)}.observability-table td:first-child{font-weight:800;color:var(--orange);white-space:nowrap}.observability-table td:not(:first-child){color:var(--muted)}.obs-arch{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:20px}.obs-arch .code-card{font-size:clamp(11px,1vw,15px);line-height:1.45;padding:18px 20px}.obs-arch .panel{padding:18px 20px}.obs-points{display:grid;gap:8px;margin:0;padding:0;list-style:none}.obs-points li{padding:11px 14px;background:var(--soft);border-left:3px solid var(--teal);font-size:13px;line-height:1.4}.obs-points li:nth-child(2){border-color:var(--orange)}.obs-points li:nth-child(3){border-color:var(--yellow)}.obs-points li:nth-child(4){border-color:#5b7195}.obs-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:20px}.obs-metric{padding:14px;background:var(--soft);border-top:3px solid var(--teal);min-height:116px}.obs-metric:nth-child(2n){border-color:var(--orange)}.obs-metric:nth-child(3n){border-color:var(--yellow)}.obs-metric b{display:block;font-size:14px;margin-bottom:7px}.obs-metric span{display:block;color:var(--muted);font-size:12px;line-height:1.4}.obs-loop{display:grid;grid-template-columns:1.1fr .9fr;gap:14px;margin-top:20px;align-items:stretch}.obs-loop .code-card{font-size:clamp(11px,1vw,15px);line-height:1.5;padding:18px 20px}.obs-principle{padding:18px 20px;background:#fff0e7;border-left:4px solid var(--orange);font-size:clamp(18px,1.9vw,27px);line-height:1.25}.obs-principle strong{color:var(--orange)}
+@media(max-width:768px){.observability-table-wrap{margin-top:12px}.observability-table{min-width:1050px;font-size:10px}.observability-table th,.observability-table td{padding:7px 8px}.obs-arch,.obs-loop{grid-template-columns:1fr;gap:9px}.obs-arch .code-card,.obs-arch .panel,.obs-loop .code-card,.obs-principle{padding:13px 15px}.obs-arch .code-card{font-size:10px;line-height:1.3}.obs-arch .panel{padding:9px 11px}.obs-points{grid-template-columns:repeat(2,1fr);gap:5px}.obs-points li{font-size:10px;padding:8px 9px}.obs-metrics{grid-template-columns:repeat(2,1fr);gap:8px}.obs-metric{min-height:auto;padding:11px 12px}.obs-metric b{font-size:12px}.obs-metric span{font-size:10px}.observability-slide{padding-bottom:96px}.observability-slide .token-equation{font-size:10px;line-height:1.25;margin-top:10px}.observability-slide .token-note{font-size:16px;line-height:1.2;margin-top:10px}.obs-loop{margin-top:12px}.obs-principle{font-size:18px}.token-budget-grid,.token-scenarios{grid-template-columns:repeat(2,1fr);gap:8px}.token-budget-card{padding:12px 11px}.token-budget-card strong{font-size:15px}.token-budget-card p{font-size:10px}.token-budget-card .big{font-size:15px}.token-priority{grid-template-columns:repeat(2,1fr);gap:8px}.token-priority-item{padding:12px 11px}.token-priority-item b{font-size:10px}.token-priority-item strong{font-size:13px}.token-priority-item span{font-size:10px}.token-slide .token-note{font-size:16px}}
+</style>
+<style>
+.judgment-slide h2{max-width:1080px}.judgment-slide .guardrail{margin-top:20px}.judgment-slide .guard{min-height:205px}.judgment-slide .guard h3{font-size:21px}.judgment-slide .guard p{font-size:14px;line-height:1.5}.judgment-note{margin-top:20px;padding-left:18px;border-left:4px solid var(--orange);font-size:clamp(18px,1.9vw,27px);line-height:1.3;max-width:1120px}.judgment-note strong{color:var(--orange)}
+@media(max-width:768px){.judgment-slide .guard{min-height:auto;padding:16px 15px}.judgment-slide .guard h3{font-size:18px;margin:10px 0 6px}.judgment-slide .guard p{font-size:12px;line-height:1.35}.judgment-note{font-size:18px;margin-top:12px;margin-bottom:96px}}
+</style>
+<style>
+@media(max-width:768px){.spec-slide[data-title="大型 Spec 的拆分"] .spec-step{min-height:70px;padding:7px 8px}.spec-slide[data-title="大型 Spec 的拆分"] .spec-step strong{margin:6px 0 2px}}
+</style>
+<style>
+.pattern-reference-slide h2{max-width:1080px}.pattern-reference-layout{display:grid;grid-template-columns:1.08fr .92fr;gap:clamp(22px,4vw,64px);align-items:center;margin-top:8px}.pattern-reference-media{min-width:0}.pattern-reference-media img{display:block;width:100%;height:clamp(300px,34vw,470px);object-fit:contain;background:#fff;border:1px solid var(--line)}.pattern-reference-media .chart-caption{margin-top:7px}.pattern-reference-points{display:grid;gap:10px;margin:0;padding:0;list-style:none}.pattern-reference-points li{padding:14px 16px;background:var(--soft);border-left:3px solid var(--teal);font-size:14px;line-height:1.42}.pattern-reference-points li:nth-child(2){border-color:var(--orange)}.pattern-reference-points li:nth-child(3){border-color:var(--yellow)}.pattern-reference-points li:nth-child(4){border-color:#5b7195}.pattern-reference-points li:nth-child(5){border-color:#8a6370}.pattern-reference-points strong{color:var(--ink)}.pattern-reference-note{margin-top:14px;color:var(--muted);font-size:12px;line-height:1.35}.pattern-reference-note .source-link{margin-left:8px}.rag-pipeline-media{display:grid;gap:10px}.rag-pipeline-media img{height:clamp(150px,15.5vw,220px)}.rag-pipeline-media .chart-caption{margin-top:0}.rag-pipeline-slide .pattern-reference-points li{font-size:13px;padding:12px 14px}.rag-pipeline-slide .pattern-reference-note{margin-top:10px}@media(max-width:768px){.pattern-reference-layout{grid-template-columns:1fr;gap:12px}.pattern-reference-media img{height:auto;max-height:none}.rag-pipeline-media img{height:auto}.pattern-reference-points{gap:7px}.pattern-reference-points li{font-size:12px;padding:10px 12px}.pattern-reference-note{font-size:10px;margin-bottom:96px}}
+</style>
+</head>
+<body>
+<main class="deck" id="deck" aria-label="AI Agent：开发者的硅基队友">
+<section class="slide cover active" data-title="封面">
+  <div class="topline"><span>AI Agent / Developer workflow</span><span>开发者分享</span></div>
+  <div class="eyebrow">从工具到队友</div>
+  <h1 data-pretext contenteditable="true">AI Agent：<br>开发者的“硅基队友”</h1>
+  <p class="lead" data-pretext contenteditable="true">从 AI 工具到 AI 队友：企业 IT 的 AI Coding 实战</p>
+  <div class="cover-meta"><span>真实任务</span><span>工具调用</span><span>人审边界</span></div>
+  <div class="cover-mark">AI<br>×<br>IT</div>
+</section>
+
+<section class="slide toc-slide" data-title="目录">
+  <div class="topline"><span>CONTENT MAP</span><span>44 PAGES / DETAILED INDEX</span></div>
+  <div class="content-map">
+    <div class="content-map-grid">
+      <div class="content-map-group"><h3>01 / 基础与方法</h3><div class="content-map-row"><span>关于我</span><b>P3</b></div><div class="content-map-row"><span>从答案到任务</span><b>P4</b></div><div class="content-map-row"><span>先看任务</span><b>P5</b></div><div class="content-map-row"><span>Agent loop</span><b>P6</b></div><div class="content-map-row"><span>第一次使用</span><b>P7</b></div><div class="content-map-row"><span>马上能用</span><b>P8</b></div><div class="content-map-row"><span>可靠性</span><b>P9</b></div><div class="content-map-row"><span>维护老系统</span><b>P10</b></div></div>
+      <div class="content-map-group"><h3>02 / Skill 与团队经验</h3><div class="content-map-row"><span>把经验变成 Skill</span><b>P11</b></div><div class="content-map-row"><span>Skill Best Practise</span><b>P12</b></div><div class="content-map-row"><span>Skill Best Practise / Quality</span><b>P13</b></div></div>
+      <div class="content-map-group"><h3>03 / Spec、Loop 与 Token</h3><div class="content-map-row"><span>Spec-Driven Development</span><b>P14</b></div><div class="content-map-row"><span>最小 Feature Spec</span><b>P15</b></div><div class="content-map-row"><span>大型 Spec 的拆分</span><b>P16</b></div><div class="content-map-row"><span>用 /goal 执行 Spec</span><b>P17</b></div><div class="content-map-row"><span>Agent loop：新功能开发</span><b>P18</b></div><div class="content-map-row"><span>Agent loop：一次迭代如何推进</span><b>P19</b></div><div class="content-map-row"><span>Token 使用优化：预算</span><b>P20</b></div><div class="content-map-row"><span>Token 使用优化：Codex 与 Claude Code</span><b>P21</b></div><div class="content-map-row"><span>Token 使用优化：自建 Agent</span><b>P22</b></div></div>
+      <div class="content-map-group"><h3>04 / LLM Observability</h3><div class="content-map-row"><span>三层运行时</span><b>P23</b></div><div class="content-map-row"><span>AutoGen 接入观测层</span><b>P24</b></div><div class="content-map-row"><span>从 Trace 到 Guardrail</span><b>P25</b></div></div>
+      <div class="content-map-group"><h3>05 / 运行边界与开发方式</h3><div class="content-map-row"><span>边界与人审</span><b>P26</b></div><div class="content-map-row"><span>Prompt Engineering 到 Graph Engineering</span><b>P27</b></div><div class="content-map-row"><span>工作方式变化</span><b>P28</b></div><div class="content-map-row"><span>三个产品开发反馈循环</span><b>P29</b></div><div class="content-map-row"><span>从工具到工作流</span><b>P30</b></div><div class="content-map-row"><span>LLM 幻觉</span><b>P31</b></div></div>
+      <div class="content-map-group"><h3>06 / 知识、模型与 Multi-Agent</h3><div class="content-map-row"><span>RAG：把知识接入 Agent</span><b>P32</b></div><div class="content-map-row"><span>RAG：蒸馏层</span><b>P33</b></div><div class="content-map-row"><span>LLM 选择</span><b>P34</b></div><div class="content-map-row"><span>选择正确的 Agent 模式</span><b>P35</b></div><div class="content-map-row"><span>Agent 设计模式框架</span><b>P36</b></div><div class="content-map-row"><span>国内开发者的工具选择</span><b>P37</b></div><div class="content-map-row"><span>高阶 Agent 模式：循环型</span><b>P38</b></div><div class="content-map-row"><span>高阶 Agent 模式：编排型</span><b>P39</b></div><div class="content-map-row"><span>代码与判断</span><b>P40</b></div><div class="content-map-row"><span>多个 Agent 如何通信</span><b>P41</b></div><div class="content-map-row"><span>AutoGen：消息协作</span><b>P42</b></div><div class="content-map-row"><span>LangChain / LangGraph：状态协作</span><b>P43</b></div><div class="content-map-row"><span>结束</span><b>P44</b></div></div>
+    </div>
+    <p class="content-map-note">本次 AI Agent 开发者团队分享分为两场：<strong>基础篇</strong>与<strong>进阶篇</strong>。</p>
+  </div>
+</section>
+
+<section class="slide about-slide" data-title="关于我">
+  <div class="topline"><span>03 / 44</span><span>About me</span></div>
+  <div class="eyebrow">关于我</div>
+  <h2>从真实工作出发，<span class="accent">把 AI 变成队友。</span></h2>
+  <div class="about-grid">
+    <div class="about-copy">
+      <div class="about-name">Wade 邓维</div>
+      <div class="about-role">MaybeAI 联创 &amp; 技术负责人</div>
+      <p class="about-bio">帮助过多家年营收几千万到亿的跨境电商企业落地 AI。</p>
+      <div class="about-contact"><span>X: @no7wade</span><span>Wechat: @no7wade</span></div>
+    </div>
+    <figure class="about-qr"><img src="assets/roadtoagi-qr.png" alt="RoadToAGI 频道二维码"><figcaption>RoadToAGI · Scan QR code to view my channel</figcaption></figure>
+  </div>
+  <p class="footer-line"><span>AI Agent：开发者的硅基队友</span><span>03</span></p>
+</section>
+
+<section class="slide" data-title="从答案到任务">
+  <div class="topline"><span>04 / 44</span><span>重新认识 AI</span></div>
+  <div class="eyebrow">认知变化</div>
+  <h2>聊天 AI 是好的开始，<br><span class="accent">但不应该是终点。</span></h2>
+  <div class="before-after">
+    <div class="state"><h3>过去：问一个问题</h3><p class="lead">我有一个问题<br>↓<br>AI 给我一个答案</p></div>
+    <div class="arrow">→</div>
+    <div class="state after"><h3>现在：完成一件事</h3><p class="lead">我有一个目标<br>↓<br>AI 读、改、跑、验证</p></div>
+  </div>
+  <p class="footer-line"><span>企业 IT 的日常不是“我不知道答案”，而是“我有一件事要完成”。</span><span>04</span></p>
+</section>
+
+<section class="slide" data-title="先看任务">
+  <div class="topline"><span>05 / 44</span><span>工具选择</span></div>
+  <div class="eyebrow">不要先选工具</div>
+  <h2>先看任务，再选择<br><span class="teal">最合适的 AI 方式。</span></h2>
+  <div class="tool-map">
+    <div class="tool"><b>直接 Call LLM</b><span>分类、摘要、翻译、信息抽取</span></div>
+    <div class="tool"><b>Python / Shell</b><span>文件、数据、日志、批处理</span></div>
+    <div class="tool"><b>Workflow / RPA</b><span>固定流程、跨系统搬运</span></div>
+    <div class="tool"><b>Coding Agent</b><span>读代码、改 Bug、补测试</span></div>
+    <div class="tool"><b>Agent</b><span>复杂目标、多步骤动态决策</span></div>
+  </div>
+  <div class="rule"></div>
+  <div class="split-tight">
+    <div class="statement">“哪个 AI 工具最好？”<small>换成：这个任务是什么？什么方式最适合让 AI 完成它？</small></div>
+    <div class="panel"><p><strong>选择够用的模型。</strong><br>推理强不等于适合高频小任务。代码、速度、上下文、成本和工具调用能力，都要放回真实工作里比较。</p></div>
+  </div>
+</section>
+
+<section class="slide" data-title="Agent loop">
+  <div class="topline"><span>06 / 44</span><span>基本原理</span></div>
+  <div class="eyebrow">Agent 为什么能干活</div>
+  <h2>它不是更会聊天，<br>而是多了一个<span class="accent">行动闭环。</span></h2>
+  <div class="flow">
+    <div class="flow-item"><div class="flow-num">01</div><h3>目标</h3><p>你说清楚要达到什么结果。</p></div>
+    <div class="flow-item"><div class="flow-num">02</div><h3>规划</h3><p>AI 拆解任务，决定先做什么。</p></div>
+    <div class="flow-item"><div class="flow-num">03</div><h3>工具</h3><p>读文件、搜索、运行命令、跑测试。</p></div>
+    <div class="flow-item"><div class="flow-num">04</div><h3>证据</h3><p>看到真实结果，而不是凭空猜。</p></div>
+    <div class="flow-item"><div class="flow-num">05</div><h3>下一步</h3><p>根据结果继续行动，直到验收。</p></div>
+  </div>
+  <div class="quote" style="margin-top:34px">传统聊天：<strong>回答后结束</strong>。<br>Agent：<strong>做一步、看结果、再决定下一步。</strong></div>
+</section>
+
+<section class="slide" data-title="第一次使用">
+  <div class="topline"><span>07 / 44</span><span>第一次真正使用 Agent</span></div>
+  <div class="eyebrow">从一个真实任务开始</div>
+  <h2>给订单模块增加一个<span class="accent">导出功能。</span></h2>
+  <div class="split" style="margin-top:20px">
+    <div class="prompt-stack">
+      <div class="prompt"><span class="n">01</span><p>先理解项目，找到订单导出相关代码。告诉我准备怎么改，先不要修改。</p></div>
+      <div class="prompt"><span class="n">02</span><p>方案可以，开始修改。只修改订单模块，不改变数据库结构。</p></div>
+      <div class="prompt"><span class="n">03</span><p>修改完成后运行测试，告诉我结果。失败就分析原因并修复。</p></div>
+    </div>
+    <div class="code-card"><span class="comment">// AI 的工作轨迹</span>
+<span class="cmd">read files</span> → <span class="cmd">search code</span>
+      ↓
+<span class="cmd">edit</span> → <span class="cmd">run tests</span>
+      ↓
+<span class="key">inspect evidence</span> → <span class="key">fix</span>
+      ↓
+<span class="cmd">report result</span></div>
+  </div>
+  <p class="footer-line"><span>先让 AI 理解，再允许它修改。把任务交给它，把边界留在你手里。</span><span>07</span></p>
+</section>
+
+<section class="slide" data-title="马上能用">
+  <div class="topline"><span>08 / 44</span><span>日常 IT 工作</span></div>
+  <div class="eyebrow">今天就能开始</div>
+  <h2>把 AI 放进你已经在做的工作里。</h2>
+  <div class="grid-8">
+    <div class="mini"><b>查 Bug</b><span>先分析原因，再提出修改。</span></div><div class="mini"><b>看日志</b><span>找异常、归类、形成假设。</span></div>
+    <div class="mini"><b>查 SQL</b><span>参数、数据、执行结果一起看。</span></div><div class="mini"><b>改配置</b><span>限定文件和允许的变化。</span></div>
+    <div class="mini"><b>看老代码</b><span>解释调用链，不急着重构。</span></div><div class="mini"><b>写脚本</b><span>让 LLM 先生成可运行版本。</span></div>
+    <div class="mini"><b>补文档</b><span>把项目上下文写下来。</span></div><div class="mini"><b>补测试</b><span>让结果有验收标准。</span></div>
+  </div>
+  <div class="panel" style="margin-top:24px"><p class="lead" style="margin:0"><strong>三句提示词：</strong>先理解。给边界。让它验证。</p></div>
+</section>
+
+<section class="slide" data-title="可靠性">
+  <div class="topline"><span>09 / 44</span><span>让 AI 写得更可靠</span></div>
+  <div class="eyebrow">不是一次写对</div>
+  <h2>AI 写得快，<span class="accent">验证机制</span>决定它能不能交付。</h2>
+  <div class="loop">
+    <div class="loop-item"><strong>需求</strong><span>明确结果</span></div><div class="loop-arrow">→</div>
+    <div class="loop-item"><strong>AI 修改</strong><span>产生变化</span></div><div class="loop-arrow">→</div>
+    <div class="loop-item"><strong>运行测试</strong><span>拿到证据</span></div><div class="loop-arrow">→</div>
+    <div class="loop-item"><strong>失败反馈</strong><span>暴露问题</span></div><div class="loop-arrow">→</div>
+    <div class="loop-item"><strong>修复再测</strong><span>直到验收</span></div>
+  </div>
+  <div class="split-tight">
+    <div class="quote">允许 AI 犯错，<br><strong>不允许没有证据。</strong></div>
+    <div class="panel"><h3>项目上下文也要沉淀</h3><p>README：项目是什么、怎么运行。<br>AGENTS.md：哪些目录能改、测试怎么跑、哪些操作必须确认。</p></div>
+  </div>
+</section>
+
+<section class="slide" data-title="维护老系统">
+  <div class="topline"><span>10 / 44</span><span>维护型开发者</span></div>
+  <div class="eyebrow">第二双眼睛</div>
+  <h2>Debug 不是让 AI 猜 Bug，<br>而是让它<span class="teal">沿证据链定位。</span></h2>
+  <div class="evidence">
+    <div class="panel"><b>01 / 输入</b><p>用户现象、发生时间、请求参数、环境差异。</p></div>
+    <div class="panel"><b>02 / 日志</b><p>错误堆栈、上下游请求、异常频率、关联 ID。</p></div>
+    <div class="panel"><b>03 / 假设</b><p>可能原因、涉及模块、需要验证的关键点。</p></div>
+    <div class="panel"><b>04 / 验证</b><p>复现、查询数据、运行测试、确认修复没有副作用。</p></div>
+  </div>
+  <div class="quote" style="margin-top:28px">找证据 → 提出假设 → 验证假设。<strong>一次解决问题是干活，方法沉淀下来才是队友。</strong></div>
+</section>
+
+<section class="slide" data-title="Skill">
+  <div class="topline"><span>11 / 44</span><span>把经验变成 Skill</span></div>
+  <div class="eyebrow">从个人能力到团队能力</div>
+  <h2>Skill 不是 Prompt 收藏夹，<br>而是<span class="accent">可执行、可验收、可复用</span>的方法。</h2>
+  <div class="skill-steps">
+    <div class="skill-step"><b>01</b><h3>场景</h3><p>什么时候使用？</p></div><div class="skill-step"><b>02</b><h3>输入</h3><p>需要什么材料？</p></div>
+    <div class="skill-step"><b>03</b><h3>流程</h3><p>按什么步骤执行？</p></div><div class="skill-step"><b>04</b><h3>停止条件</h3><p>什么情况不能继续？</p></div>
+    <div class="skill-step"><b>05</b><h3>输出</h3><p>最后交付什么？</p></div><div class="skill-step"><b>06</b><h3>验收</h3><p>怎么判断成功？</p></div>
+  </div>
+  <p class="footer-line"><span>把“我会做”变成“系统可以稳定替我做”。</span><span>11</span></p>
+</section>
+
+<section class="slide best-practice-slide" data-title="Skill Best Practise">
+  <div class="topline"><span>12 / 44</span><span>Skill Best Practise</span></div>
+  <div class="eyebrow">触发之前，模型只看到元数据</div>
+  <h2>Skill Best Practise：先被正确<span class="accent">发现，</span><br>再被正确执行。</h2>
+  <div class="best-practice-grid">
+    <ul class="best-practice-list">
+      <li><strong>保持简洁。</strong>删掉模型已经知道的常识；每一段都要值得占用上下文。</li>
+      <li><strong>匹配自由度。</strong>启发式任务给高自由度；有固定模式用模板；脆弱操作给精确步骤。</li>
+      <li><strong>做好元数据。</strong>启动时预加载 name + description；它们决定 Skill 是否会被发现和触发。</li>
+      <li><strong>让内容可维护。</strong>引用走一层、文件名描述性强；旧方法单独归档，避免主流程过时。</li>
+    </ul>
+    <ul class="best-practice-list">
+      <li><strong>使用渐进式披露。</strong>主 SKILL.md 保持精简，完整细节放到按需加载的参考文件。</li>
+      <li><strong>统一术语与示例。</strong>同一个概念只用一个称呼，示例要具体；同时给出一个默认路径，不要罗列过多选项。</li>
+    </ul>
+  </div>
+  <div class="best-practice-example">
+    <div class="code-card"><span class="comment"># discoverability metadata</span>
+name: analyzing-sales
+description: Analyzes sales data and builds reports. Use when users ask for revenue, pipeline, or performance analysis.</div>
+    <div class="best-practice-example-copy"><strong>读取顺序：</strong><br>启动时：预加载 <code>name</code> + <code>description</code><br>触发后：读取 <code>SKILL.md</code><br>按需：读取 <code>reference/</code> 等文件<br><br><strong>写作原则：</strong><code>description</code> 写能力 + 触发场景；步骤、边界和验收放进 <code>SKILL.md</code>。</div>
+  </div>
+</section>
+
+<section class="slide best-practice-slide" data-title="Skill Best Practise / Quality">
+  <div class="topline"><span>13 / 44</span><span>Skill Best Practise</span></div>
+  <div class="eyebrow">把质量变成可观察的反馈</div>
+  <h2>真正的质量来自<span class="teal">测试、验证与持续迭代。</span></h2>
+  <div class="best-practice-grid">
+    <ul class="best-practice-list">
+      <li><strong>复杂任务写工作流。</strong>用清晰、连续的步骤和 checklist，降低漏步骤的概率。</li>
+      <li><strong>建立反馈闭环。</strong>执行验证 → 修复问题 → 再次验证，直到验收通过。</li>
+      <li><strong>给关键操作设停止条件。</strong>高风险、破坏性或不可逆动作，先生成计划再执行。</li>
+      <li><strong>产出可验证的中间结果。</strong>批量修改、表单填充等任务先生成计划文件，再校验、执行、复核。</li>
+    </ul>
+    <ul class="best-practice-list">
+      <li><strong>脚本要解决问题。</strong>显式处理错误，解释关键参数，列出依赖；不要把难题丢回给模型。</li>
+      <li><strong>确定性操作优先用工具。</strong>能直接运行的 utility script，比每次临时生成代码更可靠。</li>
+      <li><strong>先做评估再写长文档。</strong>至少准备三个场景，先建立无 Skill 基线，再测试不同模型与真实任务。</li>
+      <li><strong>观察真实使用行为。</strong>关注漏读引用、反复探索、被忽略的内容，并吸收团队反馈持续改版。</li>
+    </ul>
+  </div>
+  <div class="best-practice-note">不要凭感觉写说明书，用真实使用行为<strong>观察 → 修正 → 再测试。</strong></div>
+</section>
+
+<section class="slide spec-slide" data-title="Spec-Driven Development">
+  <div class="topline"><span>14 / 44</span><span>Spec-Driven Development</span></div>
+  <div class="eyebrow">把意图写成可验证的契约</div>
+  <h2>Spec 不是实现计划，<br>而是<span class="accent">可验收的任务契约。</span></h2>
+  <div class="spec-contract">
+    <div class="panel"><h3>Spec 写什么 / WHAT</h3><ul class="spec-points"><li>为什么做：背景、目标、用户价值。</li><li>改哪里：范围、边界、明确不做什么。</li><li>要做到什么：行为、输入输出、错误和不变量。</li><li>怎么判断完成：场景、验收标准和验证方式。</li></ul></div>
+    <div class="panel dark-panel"><h3 style="color:var(--yellow)">Plan 写什么 / HOW</h3><ul class="spec-points"><li>选择哪些模块、文件和技术方案。</li><li>怎样拆任务、安排顺序和分配责任。</li><li>怎样落地实现、迁移、回滚和发布。</li><li>这些决定应基于仓库现状，而不是写死在 Spec 里。</li></ul></div>
+  </div>
+  <div class="quote" style="margin-top:22px">写下<strong>不能靠猜的决定</strong>，把<strong>可以从仓库发现的决定</strong>留给 Agent。</div>
+</section>
+
+<section class="slide spec-slide" data-title="最小 Feature Spec">
+  <div class="topline"><span>15 / 44</span><span>Spec-Driven Development</span></div>
+  <div class="eyebrow">足够严格，也足够容易维护</div>
+  <h2>一份够用的 Feature Spec，<br>先把<span class="teal">“什么必须为真”</span>写清楚。</h2>
+  <div class="spec-template">
+    <div class="code-card"><span class="comment"># specs/account-deletion.md</span>
+# Feature: Account deletion
+## Intent
+删除账号后不再拥有有效会话。
+## Scope
+- In: deletion and active sessions
+- Out: registration and billing history
+## Requirement
+- 删除后，所有 active sessions 立即失效。
+## Scenario
+Given active sessions → When deleted → Then reject
+## Acceptance
+- [ ] Existing sessions cannot authenticate
+- [ ] Registration flow is unchanged</div>
+    <div class="spec-template-note"><strong>WHAT：</strong>所有 active sessions 必须立即失效。<br><br><strong>HOW：</strong>是否新增 <code>revokeSessions()</code>、放在哪个 Service、使用什么存储，由 Agent 先检查仓库再提出 Plan。<br><br><strong>关系：</strong>Spec → Acceptance Criteria → Tests。测试是可执行的验证，不是 Spec 本身。</div>
+  </div>
+</section>
+
+<section class="slide spec-slide" data-title="大型 Spec 的拆分">
+  <div class="topline"><span>16 / 44</span><span>Spec-Driven Development</span></div>
+  <div class="eyebrow">大项目不要写一份巨型 SPEC</div>
+  <h2>把复杂目标拆成<span class="accent">阶段、局部文件和可验证结果。</span></h2>
+  <div class="spec-lifecycle">
+    <div class="spec-step"><b>01</b><strong>Intent</strong><span>为什么做</span></div><div class="spec-step"><b>02</b><strong>Specify</strong><span>写清契约</span></div><div class="spec-step"><b>03</b><strong>Clarify</strong><span>解决歧义</span></div><div class="spec-step"><b>04</b><strong>Plan</strong><span>决定如何做</span></div><div class="spec-step"><b>05</b><strong>Tasks</strong><span>拆成任务</span></div><div class="spec-step"><b>06</b><strong>Implement</strong><span>分阶段实现</span></div><div class="spec-step"><b>07</b><strong>Validate</strong><span>对照契约验收</span></div>
+  </div>
+  <div class="spec-phase-grid">
+    <div class="spec-file-tree"><span class="folder">project/</span>
+├── <span class="file">AGENTS.md</span>
+├── <span class="folder">specs/</span>
+│   ├── <span class="file">product.md</span>
+│   ├── <span class="file">architecture.md</span>
+│   ├── <span class="folder">auth/</span>
+│   │   └── <span class="file">auth.md</span>
+│   └── <span class="folder">billing/</span>
+│       ├── <span class="file">billing.md</span>
+│       └── <span class="file">invoice.md</span>
+└── <span class="folder">src/</span>
+    ├── <span class="folder">auth/</span>
+    └── <span class="folder">billing/</span></div>
+    <div class="panel"><ul class="spec-points"><li><code>AGENTS.md</code> 放项目级规则；<code>product.md</code> 与 <code>architecture.md</code> 放稳定的全局上下文。</li><li>领域 Spec 放在 <code>specs/auth/</code>、<code>specs/billing/</code>，靠近对应的业务边界。</li><li>Agent 一次只加载当前阶段、当前领域需要的文件，避免巨型上下文。</li><li>大型重构先切边界，再切迁移批次；不要一次改完整个系统。</li></ul></div>
+  </div>
+</section>
+
+<section class="slide spec-slide" data-title="用 /goal 执行 Spec">
+  <div class="topline"><span>17 / 44</span><span>Spec-Driven Development</span></div>
+  <div class="eyebrow">让 Agent 按阶段推进，而不是一次性冲刺</div>
+  <h2>用 <span class="teal">/goal</span> 把 Spec 变成有状态的执行循环。</h2>
+  <div class="spec-goal">
+    <div class="code-card"><span class="comment"># 示例：把目标、范围和验证一起交给 /goal</span>
+/goal
+读取 specs/checkout/
+按 Phase 1 → Phase 3 执行
+每个 Phase：Plan → Implement → Validate
+完成后汇报证据和剩余风险
+遇到范围或契约不清：先暂停提问</div>
+    <ul class="goal-points"><li><strong>指定入口：</strong>给出 Spec 文件或目录，不让 Agent 自己猜上下文。</li><li><strong>指定阶段：</strong>一次推进一个 Phase，完成验证后再继续。</li><li><strong>指定状态：</strong>每阶段记录完成项、证据、风险和下一步。</li><li><strong>指定停止条件：</strong>边界、权限、数据契约不清时先停，不要擅自扩大范围。</li></ul>
+  </div>
+  <div class="goal-note">/goal 不是替代 Spec 的魔法命令；它的价值是让<strong>目标、阶段、验证和停止条件</strong>持续可见。</div>
+</section>
+
+<section class="slide agent-loop-slide" data-title="Agent loop：新功能开发">
+  <div class="topline"><span>18 / 44</span><span>Agent loop / 新功能开发</span></div>
+  <div class="eyebrow">把一次交付变成可观察的迭代</div>
+  <h2>新功能不是“一次生成”，<br>而是<span class="accent">目标驱动的行动闭环。</span></h2>
+  <div class="agent-loop-track">
+    <div class="agent-loop-step"><b>01 / GOAL</b><strong>明确目标</strong><span>读取 Spec，确认范围、验收和停止条件。</span></div>
+    <div class="agent-loop-step"><b>02 / EXPLORE</b><strong>探索仓库</strong><span>搜索符号、依赖和现有测试，只取相关上下文。</span></div>
+    <div class="agent-loop-step"><b>03 / PLAN</b><strong>提出计划</strong><span>拆成小步骤，先让人确认高风险决定。</span></div>
+    <div class="agent-loop-step"><b>04 / IMPLEMENT</b><strong>执行修改</strong><span>按阶段编辑代码，每次变更保持可回退。</span></div>
+    <div class="agent-loop-step"><b>05 / VERIFY</b><strong>验证证据</strong><span>运行测试、检查 diff，对照 Acceptance Criteria。</span></div>
+    <div class="agent-loop-step"><b>06 / NEXT</b><strong>完成或继续</strong><span>满足条件就停止；失败则带着证据进入下一轮。</span></div>
+  </div>
+  <div class="token-note" style="margin-top:22px"><strong>核心：</strong>每一轮都回答“当前状态是什么、下一步为什么做、什么证据可以停止”。</div>
+</section>
+
+<section class="slide agent-loop-slide" data-title="Agent loop：一次迭代如何推进">
+  <div class="topline"><span>19 / 44</span><span>Agent loop / 一次迭代</span></div>
+  <div class="eyebrow">让每一步都能复盘</div>
+  <h2>以“订单导出”为例：<br>Agent 通过<span class="teal">证据 → 决策 → 验证</span>推进。</h2>
+  <div class="agent-iteration">
+    <div class="code-card"><span class="comment"># iteration 03: implement export endpoint</span>
+goal: add order export
+state: API contract clarified
+read: orders/service.ts, orders.test.ts
+plan: add CSV serializer + endpoint test
+edit: 2 files changed
+run: npm test -- orders
+evidence: 18 passed, diff reviewed
+decision: continue → add permission case</div>
+    <div class="panel"><ul class="obs-points">
+      <li><strong>进入：</strong>Spec 已明确输入、输出、权限和验收标准。</li>
+      <li><strong>行动：</strong>先搜索相关符号和测试，不读取整个仓库。</li>
+      <li><strong>反馈：</strong>工具结果只保留失败、差异和下一步需要的证据。</li>
+      <li><strong>停止：</strong>功能验收通过，或遇到契约、权限、数据风险时暂停。</li>
+    </ul></div>
+  </div>
+  <div class="agent-loop-track" style="grid-template-columns:repeat(4,1fr);margin-top:18px"><div class="agent-loop-step"><b>INPUT</b><strong>目标与上下文</strong><span>Spec + 当前状态</span></div><div class="agent-loop-step"><b>ACTION</b><strong>工具与修改</strong><span>一次小步</span></div><div class="agent-loop-step"><b>FEEDBACK</b><strong>结果与证据</strong><span>测试 / diff / 日志</span></div><div class="agent-loop-step"><b>DECISION</b><strong>继续或停止</strong><span>遵守边界</span></div></div>
+</section>
+
+<section class="slide token-slide" data-title="Token 使用优化：预算">
+  <div class="topline"><span>20 / 44</span><span>Token Engineering</span></div>
+  <div class="eyebrow">先看总账，再优化句子</div>
+  <h2>Token 成本不只来自 Prompt，<br>更来自<span class="accent">重复上下文 × Agent 循环次数。</span></h2>
+  <div class="token-budget-grid">
+    <div class="token-budget-card"><strong>Input tokens</strong><p>系统指令、历史对话、工具 Schema、代码、RAG 结果。</p><span class="big">重复发送 = 隐性成本</span></div>
+    <div class="token-budget-card"><strong>Output tokens</strong><p>回答、推理、工具参数和失败后的重试内容。</p><span class="big">max_output_tokens</span></div>
+    <div class="token-budget-card"><strong>Number of calls</strong><p>一次分类、提取、总结、格式化，是否真的需要四次调用？</p><span class="big">少循环，少重试</span></div>
+  </div>
+  <div class="token-equation">Total cost ≈ input tokens × input price + output tokens × output price × number of calls</div>
+  <div class="token-note"><strong>优先级：</strong>Prompt caching → context compaction → tool filtering → model routing → loop / call reduction。</div>
+</section>
+
+<section class="slide token-slide" data-title="Token 使用优化：Codex 与 Claude Code">
+  <div class="topline"><span>21 / 44</span><span>Token Engineering / Coding Agent</span></div>
+  <div class="eyebrow">你控制不了全部循环，就先控制进入上下文的内容</div>
+  <h2>Codex / Claude Code：<span class="accent">先压缩工具输出。</span></h2>
+  <div class="token-scenarios">
+    <div class="token-scenario"><h3>RTK 的位置</h3><div class="token-flow">Agent runs shell command<br>　　　 ↓ hook rewrites<br><strong>RTK</strong> executes the real CLI<br>　　　 ↓ filter / summarize / dedupe<br>compact output<br>　　　 ↓<br>LLM context</div><p>它不改变模型，只改变 Shell 输出进入上下文的形状：单个 Rust binary、100+ 命令、低开销。</p></div>
+    <div class="token-scenario"><h3>为什么会变短</h3><p><strong>Smart filtering：</strong>去掉注释、空白、模板和进度噪声。</p><p><strong>Grouping：</strong>按文件、目录、规则或错误类型聚合。</p><p><strong>Truncation：</strong>保留关键上下文，截掉重复长行。</p><p><strong>Deduplication：</strong>重复日志折叠为一条并附出现次数；测试通常只保留失败项。</p></div>
+  </div>
+  <div class="token-note"><strong>边界要说清：</strong>RTK 官方称最多可减少 90% 的 Bash 输出，但这不等于账单减少 90%。它只控制输入 Token 的一个来源；<code>rtk gain</code> 用 <code>bytes / 4</code> 估算 Token，百分比有意义，绝对值不是供应商账单。 <a class="source-link" href="https://github.com/rtk-ai/rtk" target="_blank" rel="noreferrer">官方仓库</a></div>
+</section>
+
+<section class="slide token-slide" data-title="Token 使用优化：自建 Agent">
+  <div class="topline"><span>22 / 44</span><span>Token Engineering / Own Agent</span></div>
+  <div class="eyebrow">自建 Agent 可以控制整个循环</div>
+  <h2>把 RTK 的思想升级为<span class="teal">Token-aware Tool Middleware。</span></h2>
+  <div class="token-priority">
+    <div class="token-priority-item"><b>01 / TOOL OUTPUT</b><strong>压缩结果</strong><span>truncate、summarize、deduplicate，只返回对下一步有用的信息。</span></div>
+    <div class="token-priority-item"><b>02 / CONTEXT</b><strong>按需取证</strong><span>RAG top 3–5、摘要旧历史、缓存稳定前缀和结果。</span></div>
+    <div class="token-priority-item"><b>03 / SCHEMA</b><strong>筛选工具</strong><span>按任务暴露工具组，减少无关 Schema 和错误调用。</span></div>
+    <div class="token-priority-item"><b>04 / MODEL</b><strong>任务路由</strong><span>简单分类用小模型，复杂规划和编码用强模型。</span></div>
+    <div class="token-priority-item"><b>05 / LOOP</b><strong>控制循环</strong><span>并行调用、限制重试、设置 max turns 和明确终止条件。</span></div>
+  </div>
+  <div class="token-equation">Tool → raw result → token optimizer → diff / cache / structured extraction → agent context</div>
+  <div class="token-note"><strong>两种场景的差别：</strong>Codex / Claude Code 主要让工具返回更少；自建 Agent 还可以决定“何时取、取什么、调用几次、何时停止”。</div>
+</section>
+
+<section class="slide observability-slide" data-title="LLM Observability：三层运行时">
+  <div class="topline"><span>23 / 44</span><span>LLM Observability</span></div>
+  <div class="eyebrow">观察 Agent，才能解释它为什么这样行动</div>
+  <h2>Runtime、Instrumentation、Evaluation<br>是三层不同的<span class="accent">职责。</span></h2>
+  <div class="observability-table-wrap"><table class="observability-table"><thead><tr><th>Problem / Layer</th><th>Claude Code</th><th>Codex</th><th>AutoGen</th><th>LangChain / LangGraph</th></tr></thead><tbody>
+    <tr><td>Persistent instructions</td><td>CLAUDE.md</td><td>AGENTS.md</td><td>System messages / agent config</td><td>Prompts / system messages</td></tr>
+    <tr><td>Reusable workflows</td><td>Skills</td><td>Skills / instructions</td><td>Agent / workflow / component</td><td>Tools + prompts / LangGraph nodes</td></tr>
+    <tr><td>Agent routing</td><td>Skill descriptions</td><td>Instructions + scope</td><td>Router agent / workflow logic</td><td>Conditional edges / router</td></tr>
+    <tr><td>Tracing</td><td>OpenTelemetry + telemetry</td><td>Less publicly exposed</td><td>Events / callbacks / OTel</td><td>LangSmith Tracing</td></tr>
+    <tr><td>Loop control</td><td>maxTurns + runtime limits</td><td>Runtime limits</td><td>max turns + termination</td><td>recursion limit + state control</td></tr>
+    <tr><td>Evaluation</td><td>External eval tooling</td><td>External eval tooling</td><td>Custom evaluator</td><td>LangSmith Evaluations</td></tr>
+    <tr><td>Guardrails</td><td>Hooks + permissions + sandbox</td><td>Sandbox + approvals</td><td>Tool guards / middleware</td><td>Middleware / guard nodes</td></tr>
+    <tr><td>Cost / tokens</td><td>Telemetry / usage</td><td>Usage reporting</td><td>Instrument LLM calls</td><td>LangSmith token tracking</td></tr>
+  </tbody></table></div>
+  <div class="token-note" style="margin-top:16px"><strong>关键分工：</strong>LangGraph 控制流程，LangSmith 观察与评估；AutoGen 也可以把事件接入 LangSmith / OpenTelemetry。</div>
+</section>
+
+<section class="slide observability-slide" data-title="LLM Observability：AutoGen 接入观测层">
+  <div class="topline"><span>24 / 44</span><span>LLM Observability / AutoGen</span></div>
+  <div class="eyebrow">Runtime 与 AgentOps 可以解耦</div>
+  <h2>AutoGen 负责运行，<br><span class="teal">LangSmith / OpenTelemetry 负责看清运行。</span></h2>
+  <div class="obs-arch">
+    <div class="code-card"><span class="comment"># AutoGen runtime</span>
+Your Application
+      ↓
+ AutoGen Runtime
+      │
+ ┌────┼────┐
+ ▼    ▼    ▼
+Agent Tool Workflow
+      │ events
+      ▼
+OpenTelemetry ──→ LangSmith</div>
+    <div class="panel"><ul class="obs-points"><li><strong>Agent / Tool：</strong>记录 message、decision、参数、结果、错误和耗时。</li><li><strong>LLM：</strong>记录 model、input/output tokens、latency 和 cost。</li><li><strong>Trace tree：</strong>把一次 run 里的 LLM、Tool、Hook、Subagent 关联起来。</li></ul></div>
+  </div>
+  <div class="token-equation">Agent Runtime ≠ Observability ≠ Evaluation<br>AutoGen / LangGraph / Custom → OpenTelemetry → LangSmith / Phoenix → Trace → Eval</div>
+  <div class="token-note"><strong>不要重造 AgentOps：</strong>自建系统应优先定义事件和 trace contract，再选择 LangSmith、Phoenix 或其他后端。</div>
+</section>
+
+<section class="slide observability-slide" data-title="LLM Observability：从 Trace 到 Guardrail">
+  <div class="topline"><span>25 / 44</span><span>LLM Observability / Quality Loop</span></div>
+  <div class="eyebrow">追踪不是终点，生产质量需要闭环</div>
+  <h2>Trace 发现模式，<span class="accent">Evaluation 证明问题，</span><br>Guardrail 防止复发。</h2>
+  <div class="obs-metrics">
+    <div class="obs-metric"><b>Skill Selection Accuracy</b><span>选中的 Skill / Agent 是否真的适合任务？</span></div>
+    <div class="obs-metric"><b>Skill Repetition Rate</b><span>同一能力是否被无意义地重复调用？</span></div>
+    <div class="obs-metric"><b>Skill Churn</b><span>A → B → A → B 是否代表路由不稳定？</span></div>
+    <div class="obs-metric"><b>Agent Loop Length</b><span>完成一个目标用了多少轮、多少工具调用？</span></div>
+    <div class="obs-metric"><b>Unnecessary Calls</b><span>哪些工具/技能调用没有改变下一步决策？</span></div>
+    <div class="obs-metric"><b>Successful Termination</b><span>是否按验收标准完成，而不是因达到上限退出？</span></div>
+  </div>
+  <div class="obs-loop"><div class="code-card">Trace: revenue-analysis → data-cleansing → revenue-analysis → data-cleansing<br><span class="comment">Evaluation: unnecessary repetition</span><br><span class="key">Guardrail:</span> max_same_skill_calls = 2<br><span class="cmd">Skill redesign:</span> add explicit exit condition<br><span class="key">Regression:</span> task X ≤ 5 skill invocations</div><div class="obs-principle"><strong>生产闭环</strong><br>Tracing → Evaluation → Guardrail → Skill redesign → Regression test<br><br><span style="font-size:.72em;color:var(--muted)">不要只记录“发生了什么”，还要记录 Agent “为什么选、为什么继续、为什么停止”。</span></div></div>
+</section>
+
+<section class="slide" data-title="边界与人审">
+  <div class="topline"><span>26 / 44</span><span>自主执行的边界</span></div>
+  <div class="eyebrow">企业真正要决定的事</div>
+  <h2>不是“AI 能不能做”，<br>而是“我们允许它做到哪一步”。</h2>
+  <div class="guardrail">
+    <div class="guard"><div class="guard-label">开发环境</div><h3>更自由</h3><p>读代码、改代码、运行测试。允许快速试错。</p></div>
+    <div class="guard"><div class="guard-label">测试环境</div><h3>可执行</h3><p>指定目录可写，指定命令可跑，关键结果需确认。</p></div>
+    <div class="guard"><div class="guard-label">生产环境</div><h3>只读优先</h3><p>读日志、查数据、给建议。危险操作与最终责任由人承担。</p></div>
+  </div>
+  <div class="ladder"><div class="rung"><b>全部人工</b><span>人做、AI 看</span></div><div class="rung"><b>AI 建议</b><span>人决定</span></div><div class="rung"><b>AI 执行</b><span>人确认</span></div><div class="rung"><b>关键步骤人审</b><span>边界内自动化</span></div><div class="rung"><b>全自动</b><span>仅适合低风险场景</span></div></div>
+</section>
+
+<section class="slide" data-title="Prompt Engineering 到 Graph Engineering">
+  <div class="topline"><span>27 / 44</span><span>从 Prompt Engineering 到 Graph Engineering</span></div>
+  <div class="eyebrow">下一阶段不是学更多名词</div>
+  <h2>LLM 越来越能<span class="accent">理解、行动、协同</span>，<br>我们的工作也就从“写提示词”上移到“设计系统”。</h2>
+  <div class="evolution">
+    <div class="evo"><b>01 / Prompt Engineering</b><h3>告诉它怎么做</h3><p>把一句话写得更清楚。</p><span class="cap">LLM：遵循指令</span></div>
+    <div class="evo"><b>02 / Context Engineering</b><h3>让它知道在哪做</h3><p>项目、规则、资料进入上下文。</p><span class="cap">LLM：利用上下文</span></div>
+    <div class="evo"><b>03 / Spec Engineering</b><h3>定义什么算完成</h3><p>输入、输出、边界、验收可观察。</p><span class="cap">LLM：拆解任务</span></div>
+    <div class="evo"><b>04 / Goal + Loop Engineering</b><h3>给目标，允许迭代</h3><p>做一步、看结果、再决定下一步。</p><span class="cap">LLM：规划与调用工具</span></div>
+    <div class="evo"><b>05 / Harness Engineering</b><h3>给它运行的护栏</h3><p>测试、权限、工具和反馈被固定下来。</p><span class="cap">LLM：在边界内执行</span></div>
+    <div class="evo"><b>06 / Graph Engineering</b><h3>设计任务图</h3><p>让多个步骤、Agent 和人协同。</p><span class="cap">LLM：协调复杂系统</span></div>
+  </div>
+  <div class="quote" style="margin-top:24px">每一次上移，都是因为上一层开始变成瓶颈：<strong>提示词不够，就补上下文；上下文不够，就补规格和反馈。</strong></div>
+</section>
+
+<section class="slide" data-title="工作方式变化">
+  <div class="topline"><span>28 / 44</span><span>能力变化，工作重点也变化</span></div>
+  <div class="eyebrow">从写 Prompt 到设计运行环境</div>
+  <h2>LLM 能力上升以后，<br>开发者不再只负责“产出文本”。</h2>
+  <div class="change-table">
+    <div class="change-row head"><div>阶段</div><div>LLM 能力变化</div><div>我们的工作重点 / 工作方式</div></div>
+    <div class="change-row"><div>Prompt Engineering</div><div><p>从听懂一句指令，到稳定遵循格式和语气。</p></div><div><p>练习表达任务，检查输出，反复改写提示词。</p></div></div>
+    <div class="change-row"><div>Context Engineering</div><div><p>能把项目资料、规则和历史信息放进判断。</p></div><div><p>整理上下文，维护 README、AGENTS.md、知识边界。</p></div></div>
+    <div class="change-row"><div>Spec Engineering</div><div><p>能把自然语言目标拆成步骤、约束和结果。</p></div><div><p>先定义输入、输出、异常和验收，再让 AI 执行。</p></div></div>
+    <div class="change-row"><div>Goal / Loop Engineering</div><div><p>能规划、调用工具、观察结果、修正路径。</p></div><div><p>从“写一次”改成管理反馈循环，盯证据和状态。</p></div></div>
+    <div class="change-row"><div>Harness Engineering</div><div><p>能在测试、权限和工具约束中完成任务。</p></div><div><p>设计运行环境：测试、权限、工具、回滚和人审。</p></div></div>
+    <div class="change-row"><div>Graph Engineering</div><div><p>能协调多个 Agent、工作流和依赖关系。</p></div><div><p>设计任务图、节点责任、交接、Eval 和系统级反馈。</p></div></div>
+  </div>
+  <div class="change-note"><div class="panel"><p><strong>LLM 的变化：</strong>从回答问题，到在上下文和约束里完成目标。</p></div><div class="panel"><p><strong>人的变化：</strong>从亲自做每一步，到设计目标、边界、反馈和协作图。</p></div></div>
+</section>
+
+<section class="slide loop-image-slide" data-title="三个产品开发反馈循环">
+  <div class="topline"><span>29 / 44</span><span>三个产品开发反馈循环</span></div>
+  <img class="loop-image" src="assets/product-development-loops.png" alt="三个产品开发反馈循环：Agentic Coding Loop、Developer Feedback Loop、External Feedback Loop">
+  <p class="chart-caption">循环越外层，反馈越慢，但越接近真实产品：分钟级执行，小时级校准，天级验证。</p>
+  <p class="footer-line"><span>把反馈周期设计出来，Agent 才会从“会写”变成“会交付”。</span><span>29</span></p>
+</section>
+
+<section class="slide" data-title="下一步">
+  <div class="topline"><span>30 / 44</span><span>从工具到工作流</span></div>
+  <div class="eyebrow">下一次工作就开始</div>
+  <h2>不要先学 Agent，<br><span class="accent">先让 AI 帮你完成一个真实任务。</span></h2>
+  <div class="route">
+    <div class="route-step"><b>01</b><h3>挑任务</h3><p>高频、重复、结果可判断。</p></div><div class="route-step"><b>02</b><h3>给边界</h3><p>限定目录、命令、环境。</p></div><div class="route-step"><b>03</b><h3>跑验证</h3><p>测试、日志、人工验收。</p></div><div class="route-step"><b>04</b><h3>写成 Skill</h3><p>把方法变成可复用流程。</p></div><div class="route-step"><b>05</b><h3>持续改进</h3><p>用真实反馈迭代。</p></div>
+  </div>
+  <p class="footer-line"><span>复杂任务再进入 Spec、Goal、Loop、Multi-Agent。</span><span>30</span></p>
+</section>
+
+<section class="slide" data-title="LLM 幻觉">
+  <div class="topline"><span>31 / 44</span><span>LLM 幻觉：原因与解决</span></div>
+  <div class="eyebrow">生成合理，不等于事实正确</div>
+  <h2>LLM 会“编造”，不是因为它想撒谎。<br><span class="accent">而是生成 ≠ 验证。</span></h2>
+  <div class="hallucination-grid">
+    <div class="hall-card"><h3>为什么会发生</h3>
+      <div class="hall-item"><b>概率生成</b><p>模型优先生成“像答案”的文本，不会自动为事实背书。</p></div>
+      <div class="hall-item"><b>上下文缺失</b><p>没有企业规则、真实数据或最新资料，只能依赖已有模式。</p></div>
+      <div class="hall-item"><b>边界模糊</b><p>问题太大、输入不完整、验收不清，模型容易补齐不存在的信息。</p></div>
+    </div>
+    <div class="hall-card fix"><h3>怎么解决</h3>
+      <div class="hall-item"><b>给它依据</b><p>接入文档、数据库、工具和可追溯来源，不让它凭空回答。</p></div>
+      <div class="hall-item"><b>让它可验收</b><p>要求引用、结构化输出、测试、规则检查和失败证据。</p></div>
+      <div class="hall-item"><b>保留人审</b><p>事实、数字、权限、法律、财务和业务规则不直接外包。</p></div>
+    </div>
+  </div>
+  <div class="quote" style="margin-top:22px">高风险判断不能只问“像不像答案”，要问：<strong>依据是什么？如何验证？谁负责？</strong></div>
+  <p class="footer-line"><span>参考：<a class="source-link" href="https://x.com/AndrewYNg/status/2071988145667928442" target="_blank" rel="noreferrer">3 key product development loops</a></span><span>31</span></p>
+</section>
+
+<section class="slide rag-image-slide" data-title="RAG">
+  <div class="topline"><span>32 / 44</span><span>RAG：把知识接入 Agent</span></div>
+  <div class="eyebrow">让回答有依据，让行动有上下文</div>
+  <h2>RAG 的演进：<span class="teal">从一次检索，到 Agent 按需取证并行动。</span></h2>
+  <img class="rag-image" src="assets/rag-layers.png" alt="RAG 三层架构：Naive RAG、Retrieval Layer、Agentic Layer">
+  <div class="rag-foot"><span>企业落地的关键：数据新鲜度、来源可追溯、权限和验收。</span><a class="source-link" href="https://x.com/akshay_pachaar/status/2083815836003996033" target="_blank" rel="noreferrer">参考 RAG 架构图</a></div>
+</section>
+
+<section class="slide pattern-reference-slide rag-pipeline-slide" data-title="RAG / 蒸馏层">
+  <div class="topline"><span>33 / 44</span><span>RAG：蒸馏层</span></div>
+  <div class="eyebrow">RAG 的质量，在检索之前就决定了</div>
+  <h2>先修复知识单元，<br><span class="accent">再去调向量检索。</span></h2>
+  <div class="pattern-reference-layout">
+    <div class="pattern-reference-media rag-pipeline-media">
+      <img src="assets/rag-naive-vs-distillation.png" alt="Naive RAG 与带蒸馏层的 RAG 流程对比">
+      <img src="assets/rag-real-world-pipeline.png" alt="从摄取到导出的七阶段真实 RAG 流程">
+      <div class="chart-caption">蒸馏层在向量化前，把文档变成更小、更干净、带治理信息的问答知识单元。</div>
+    </div>
+    <div>
+      <ul class="pattern-reference-points">
+        <li><strong>Chunk 是被忽略的前提。</strong>按 token 切出的文本没有想法边界、版本上下文或权限状态，检索容易返回不完整或互相冲突的证据。</li>
+        <li><strong>用问答包替代文本窗口。</strong>一条经过验证的事实，加上类型化治理字段，让索引单元匹配用户真实的提问方式。</li>
+        <li><strong>在向量化前做蒸馏。</strong>在所给基准中，语义去重最多将语料缩小 40 倍，查询 Token 减少 3 倍，检索距离改善约 2.3 倍。</li>
+        <li><strong>让治理字段随数据走。</strong>版本、密级、隐私和来源元数据跟随每个知识块，而不是依赖脆弱的编排层逻辑。</li>
+        <li><strong>七个阶段让故障可定位。</strong>范围定义、摄取、抽取、去重、自动打标、专家校验，最后导出到向量库。</li>
+      </ul>
+      <div class="pattern-reference-note">实践规则：先在上游清理并结构化知识单元，再让检索、重排和 Embedding 专注于匹配。</div>
+    </div>
+  </div>
+</section>
+
+<section class="slide model-slide" data-title="LLM 选择">
+  <div class="topline"><span>34 / 44</span><span>LLM 选择</span></div>
+  <div class="eyebrow">模型不是越强越好</div>
+  <h2>选模型，不是找“最强”，<br><span class="accent">而是找任务的最佳性价比。</span></h2>
+  <img class="model-chart" src="assets/codex-radar.png" alt="Codex Radar：不同模型的相对成本与 IQ 对比">
+  <div class="chart-caption">Codex Radar：横轴是相对综合成本，纵轴是 IQ。图表适合看相对位置，不是单一绝对榜单。</div>
+  <div class="model-points">
+    <div class="model-point"><b>高难任务</b><p>复杂 Debug、架构、Spec：优先看推理和代码理解能力。</p></div>
+    <div class="model-point"><b>高频任务</b><p>日志整理、摘要、简单修改：速度和成本更重要。</p></div>
+    <div class="model-point"><b>真实基准</b><p>用自己的任务比较代码、上下文、工具调用、速度和成本。</p></div>
+  </div>
+</section>
+
+<section class="slide pattern-reference-slide" data-title="选择正确的 Agent 模式">
+  <div class="topline"><span>35 / 44</span><span>Agentic Design Patterns / 决策树</span></div>
+  <div class="eyebrow">模式选择，从任务开始</div>
+  <h2>根据任务属性选择模式。<br><span class="accent">不要先从架构开始。</span></h2>
+  <div class="pattern-reference-layout">
+    <div class="pattern-reference-media"><img src="assets/agentic-design-decision-tree.png" alt="选择 Agent 设计模式的决策树"><div class="chart-caption">根据任务属性选择 Agent 设计模式的决策树。</div></div>
+    <div>
+      <ul class="pattern-reference-points">
+        <li><strong>1. 先看路径是否已知。</strong>如果流程确定且可预测，使用顺序工作流；只在需要理解或生成的地方调用模型。</li>
+        <li><strong>2. 按需增加能力。</strong>开放式任务需要工具和外部信息，接入 API、数据库、文档和系统操作。</li>
+        <li><strong>3. 区分规划与探索。</strong>阶段和依赖关系清晰时使用 Planning；结构在执行中逐渐形成时使用 ReAct。</li>
+        <li><strong>4. 有意识地为质量付费。</strong>质量标准明确、错误成本足够高时，再增加 Reflection 和额外延迟。</li>
+        <li><strong>5. 只为真实瓶颈扩展。</strong>只有专业化或规模问题确实存在时才使用 Multi-Agent，否则单 Agent 通常已经足够。</li>
+      </ul>
+      <div class="pattern-reference-note">模式是起点。随着反馈、约束和失败信号积累，持续重新评估。</div>
+    </div>
+  </div>
+</section>
+
+<section class="slide pattern-reference-slide" data-title="Agent 设计模式框架">
+  <div class="topline"><span>36 / 44</span><span>Agentic Design Patterns / 框架</span></div>
+  <div class="eyebrow">模式 = 能力与执行形态的组合</div>
+  <h2>用两种视角定位模式：<br><span class="teal">Agent 做什么，以及工作如何流动。</span></h2>
+  <div class="pattern-reference-layout">
+    <div class="pattern-reference-media"><img src="assets/agent-design-pattern-framework.png" alt="将认知功能映射到执行拓扑的 Agent 设计模式框架"><div class="chart-caption">Agent 设计模式框架：认知功能 × 执行拓扑。</div></div>
+    <div>
+      <ul class="pattern-reference-points">
+        <li><strong>纵向看认知功能。</strong>感知、记忆、推理、行动、反思、协作和治理，描述 Agent 正在完成什么工作。</li>
+        <li><strong>横向看执行拓扑。</strong>链式、路由、并行、循环、层级和编排，描述工作与控制如何流动。</li>
+        <li><strong>模式是可组合的积木。</strong>例如 RAG Pipeline、Tool Dispatch、Plan-and-Execute、Fan-Out / Gather 和 Hierarchical Delegation。</li>
+        <li><strong>跨切面能力保证可运营。</strong>Observability、Evaluation &amp; Validation、Security &amp; Identity 贯穿整个矩阵。</li>
+        <li><strong>设计含义：</strong>先定位所需能力和拓扑，再组合解决任务所需的最小模式集合。</li>
+      </ul>
+      <div class="pattern-reference-note">决策树负责选择起点，矩阵负责展示如何组合。</div>
+    </div>
+  </div>
+</section>
+
+<section class="slide model-slide" data-title="国内开发者的工具选择">
+  <div class="topline"><span>37 / 44</span><span>国内开发者的工具选择</span></div>
+  <div class="eyebrow">环境不同，工作方式可以保持一致</div>
+  <h2>不能稳定使用某个海外工具，<br><span class="teal">不等于不能开始 AI Coding。</span></h2>
+  <div class="tool-choice">
+    <div><img class="model-chart tall" src="assets/artificial-analysis-index.png" alt="Artificial Analysis Intelligence Index：模型能力与成本分布"><div class="chart-caption">Artificial Analysis Intelligence Index：用能力与成本的分布建立选择基线。</div></div>
+    <div class="choice-list">
+      <div><strong>Coding Agent</strong><br>Trae、WorkBuddy、Qwen Code、智谱等国内可落地选择。</div>
+      <div><strong>模型 / API</strong><br>按代码、推理、上下文、速度和成本选择“够用”的模型。</div>
+      <div><strong>模型路由</strong><br>用 CC Switch 或类似路由，把多个模型接入同一个工作环境。</div>
+      <div><strong>工作重点</strong><br>不要绑定一个品牌；让任务、权限、测试和验收保持稳定。</div>
+    </div>
+  </div>
+  <p class="model-foot">模型排行榜是输入，不是决策。先用真实任务跑 Benchmark，再决定工具组合。</p>
+</section>
+
+<section class="slide advanced-slide" data-title="高阶 Agent 模式：循环型">
+  <div class="topline"><span>38 / 44</span><span>高阶 Agent 模式 / 循环型</span></div>
+  <div class="eyebrow">高阶内容 01</div>
+  <h2>先看 Agent 如何<span class="accent">思考、行动、修正</span>。</h2>
+  <div class="pattern-grid">
+    <div class="pattern-card"><h3>ReAct</h3><span class="pattern-meta">规划：低 / 隐式　自适应：<span class="stars">★★★★★</span></span><pre class="ascii-chart">[Task]
+  |
+[Thought] -> [Action]
+                 |
+           [Observation]
+                 |
+              [Thought]
+                 |
+              [Action]</pre><p class="pattern-takeaway">开放式任务、搜索、工具调用、故障排查。</p></div>
+    <div class="pattern-card"><h3>Reflection / Self-Critique</h3><span class="pattern-meta">规划：中　自适应：<span class="stars">★★★★★</span></span><pre class="ascii-chart">[Draft / Run]
+      |
+  [Evaluate]
+    /     \
+[Pass]  [Improve]
+  |        |
+[Done] <---+</pre><p class="pattern-takeaway">执行后自己评估并改进，适合 Coding、写作、数据分析。</p></div>
+    <div class="pattern-card"><h3>Tree of Thoughts</h3><span class="pattern-meta">规划：高　自适应：<span class="stars">★★★★☆</span></span><pre class="ascii-chart">[Problem]
+    |
++---+---+
+|   |   |
+[A] [B] [C]
+ \   |   /
+  [Evaluate]
+      |
+ [Best path]</pre><p class="pattern-takeaway">同时探索多个方案，再评估并选择最佳路径。</p></div>
+  </div>
+  <div class="advanced-foot"><span>循环型 Agent 的差异：反馈发生在一次任务内部。</span><span>29</span></div>
+</section>
+
+<section class="slide advanced-slide" data-title="高阶 Agent 模式：编排型">
+  <div class="topline"><span>39 / 44</span><span>高阶 Agent 模式 / 编排型</span></div>
+  <div class="eyebrow">高阶内容 02</div>
+  <h2>再看 Agent 如何<span class="teal">拆任务、分角色、组织状态</span>。</h2>
+  <div class="pattern-grid">
+    <div class="pattern-card"><h3>Plan-and-Execute</h3><span class="pattern-meta">规划：高　自适应：<span class="stars">★★★★☆</span></span><pre class="ascii-chart">[Goal]
+  |
+[Plan]
+  |
++---+---+
+|   |   |
+[S1][S2][S3]
+ \   |   /
+ [Replan?]</pre><p class="pattern-takeaway">目标明确的多步骤任务，先规划，再执行，必要时重规划。</p></div>
+    <div class="pattern-card"><h3>Graph / Workflow Agent</h3><span class="pattern-meta">规划：显式　自适应：<span class="stars">★★★☆☆</span></span><pre class="ascii-chart">[State]
+   |
+[Node A] --> [Node B] --yes--> [Node C]
+   |              |
+   +----- no -----+
+                  |
+              [Human]</pre><p class="pattern-takeaway">企业流程、确定性强的业务规则，状态和分支都可追踪。</p></div>
+    <div class="pattern-card"><h3>Multi-Agent</h3><span class="pattern-meta">规划：分布式　自适应：<span class="stars">★★★★☆</span></span><pre class="ascii-chart">            [Manager]
+           /    |    \
+        [Agent A][Agent B][Agent C]
+           \    |    /
+          [Shared result]
+                |
+             [Deliver]</pre><p class="pattern-takeaway">不同专业能力并行协作，适合角色分工和复杂交付。</p></div>
+  </div>
+  <div class="advanced-foot"><span>编排型 Agent 的差异：把一次回答变成可管理的任务系统。</span><span>30</span></div>
+</section>
+
+<section class="slide judgment-slide" data-title="代码与判断">
+  <div class="topline"><span>40 / 44</span><span>AI 时代的开发者能力</span></div>
+  <div class="eyebrow">AI 越强，人的稀缺价值越集中在判断</div>
+  <h2><span class="accent">代码</span>会越来越便宜，<br>但<span class="teal">判断</span>会越来越贵。</h2>
+  <div class="guardrail">
+    <div class="guard"><div class="guard-label">01 / 需求建模（链接物理世界）</div><h3>把现实目标变成可执行契约</h3><p>把真实业务、用户场景、范围和验收条件讲清楚。输入越含糊，Agent 越容易快速放大错误方向。</p></div>
+    <div class="guard"><div class="guard-label">02 / 架构裁量</div><h3>用约束缩小可选空间</h3><p>把模块边界、数据不变量和架构原则写成 Agent 能执行的规则，把长期经验沉淀为可复用约束。</p></div>
+    <div class="guard"><div class="guard-label">03 / 质量担责（链接物理世界）</div><h3>用证据守住真实后果</h3><p>让测试、评审、发布门禁、线上观测和用户反馈形成证据链。代码可以由 AI 生成，质量风险仍需要人来承担。</p></div>
+  </div>
+  <div class="judgment-note"><strong>投入要按风险分配：</strong>标准化、低风险的小团队项目可以少做架构仪式；复杂系统、关键数据和长期演进仍需要明确约束。AI 会接管越来越多的架构实现，但不会自动替你承担后果。</div>
+</section>
+
+<section class="slide observability-slide communication-slide" data-title="多个 Agent 如何通信">
+  <div class="topline"><span>41 / 44</span><span>Multi-Agent / Distributed Systems</span></div>
+  <div class="eyebrow">不要把多个 Agent 只设计成群聊</div>
+  <h2>多个 Agent 如何通信？<br>先把它当成<span class="accent">分布式系统。</span></h2>
+  <div class="obs-arch">
+    <div class="code-card"><span class="comment"># task and message flow</span>
+User Goal
+   │
+   ▼
+[Router / Manager]
+ ┌─┼──────────┐
+ ▼ ▼          ▼
+Planner Researcher Coder
+    └────┬─────┘
+         ▼
+ [State / Event Log]
+         ▼
+     [Reviewer]
+  pass / retry / stop</div>
+    <div class="panel"><ul class="obs-points">
+      <li><strong>消息契约：</strong><code>task_id</code>、<code>sender</code>、<code>recipient</code>、<code>type</code>、<code>payload</code>、<code>evidence</code>。</li>
+      <li><strong>状态所有权：</strong>一个 Agent 负责写入，其他 Agent 提交建议或只读。</li>
+      <li><strong>失败边界：</strong>超时、重试、重复消息、背压和权限都要显式处理。</li>
+      <li><strong>终止与观测：</strong>定义 DONE 条件，并记录消息、决策、工具、Token。</li>
+    </ul></div>
+  </div>
+  <div class="observability-table-wrap">
+    <table class="observability-table"><thead><tr><th>通信模式</th><th>结构</th><th>适合场景</th><th>主要风险</th></tr></thead><tbody>
+      <tr><td>Point-to-Point</td><td>Agent A → Agent B</td><td>明确的任务交接</td><td>强耦合、单点依赖</td></tr>
+      <tr><td>Broadcast / Group Chat</td><td>一条消息 → 多个 Agent</td><td>共享上下文、多人评审</td><td>上下文膨胀、重复响应</td></tr>
+      <tr><td>Broker / Event Bus</td><td>Agent → Broker → Agent</td><td>事件驱动、异步协作</td><td>消息顺序、重复消费</td></tr>
+      <tr><td>Shared State</td><td>Agent ↔ State Store</td><td>长流程、可恢复任务</td><td>状态竞争、权限混乱</td></tr>
+    </tbody></table>
+  </div>
+  <div class="token-note"><strong>判断标准：</strong>先决定谁能看到消息、谁能修改状态、谁有权继续，再决定通信拓扑。</div>
+</section>
+
+<section class="slide observability-slide runtime-example-slide" data-title="AutoGen：消息协作">
+  <div class="topline"><span>42 / 44</span><span>Multi-Agent / AutoGen</span></div>
+  <div class="eyebrow">Runtime 把参与者、路由和终止条件放在一起管理</div>
+  <h2>AutoGen：把 Agent 协作变成<span class="teal">可管理的消息系统。</span></h2>
+  <div class="obs-arch">
+    <div class="code-card"><span class="comment"># AutoGen: message-oriented team</span>
+Task
+ │
+ ▼
+[Team / Manager]
+ ┌──┼─────────┐
+ ▼  ▼         ▼
+Planner Researcher Reviewer
+       └──┬────┘
+          ▼
+   Runtime topics + tools
+          ▼
+    termination condition</div>
+    <div class="panel"><ul class="obs-points">
+      <li><strong>参与者：</strong>用 <code>AssistantAgent</code> 表示不同角色，按职责接收任务或输出证据。</li>
+      <li><strong>消息路由：</strong>Team / Manager 将消息发布给参与者；参与者共享必要上下文，但不共享所有内部状态。</li>
+      <li><strong>工具边界：</strong>通过 <code>FunctionTool</code>、<code>AgentTool</code> 或 MCP 暴露能力，工具仍需权限、超时和幂等控制。</li>
+      <li><strong>停止条件：</strong><code>TerminationCondition</code>、最大轮次和人工介入共同防止无限协作。</li>
+    </ul></div>
+  </div>
+  <div class="token-equation">message = { task_id, sender, recipient, type, payload, evidence, created_at }<br>trace = run → participant message → tool call → result → next decision → termination</div>
+  <div class="token-note"><strong>分布式映射：</strong>Agent 是服务角色，Team / Manager 是路由层，Runtime topic 是消息地址，termination 是系统停止条件。 <a class="source-link" href="https://github.com/microsoft/autogen" target="_blank" rel="noreferrer">AutoGen 官方仓库</a></div>
+  <div class="chart-caption">AutoGen 当前处于 maintenance mode；这里把它作为多 Agent Runtime 的通信示例，新项目也应评估 Microsoft Agent Framework。</div>
+</section>
+
+<section class="slide observability-slide runtime-example-slide" data-title="LangChain / LangGraph：状态协作">
+  <div class="topline"><span>43 / 44</span><span>Multi-Agent / LangChain</span></div>
+  <div class="eyebrow">把消息交接显式化为状态变化与条件边</div>
+  <h2>LangChain / LangGraph：<br>用<span class="accent">状态图</span>表达 Agent 如何继续、分支和结束。</h2>
+  <div class="obs-arch">
+    <div class="code-card"><span class="comment"># LangGraph: state-oriented workflow</span>
+START
+  │
+  ▼
+[Planner] ── conditional ──┐
+  ├──→ [Researcher] ────────┤
+  └──→ [Coder] ─────────────┘
+             │
+             ▼
+         [Reviewer]
+          /      \
+       pass      fail
+        │          │
+       END  ───→ Coder</div>
+    <div class="panel"><ul class="obs-points">
+      <li><strong>State：</strong>共享 <code>goal</code>、<code>evidence</code>、<code>draft</code>、<code>review</code>、<code>attempts</code>，每次更新都可追踪。</li>
+      <li><strong>Node：</strong>每个节点可以是 Agent、工具或确定性函数，输入状态，返回局部更新。</li>
+      <li><strong>Conditional edge：</strong>根据状态选择下一节点，把路由规则从隐式对话变成显式控制流。</li>
+      <li><strong>观测与评估：</strong><code>@tool</code> 负责能力，LangSmith 负责 trace、数据集和评估，运行时与观测层解耦。</li>
+    </ul></div>
+  </div>
+  <div class="observability-table-wrap">
+    <table class="observability-table"><thead><tr><th>设计层</th><th>AutoGen</th><th>LangChain / LangGraph</th><th>分布式系统考虑</th></tr></thead><tbody>
+      <tr><td>Agent</td><td>AssistantAgent</td><td>Agent / graph node</td><td>服务角色与职责边界</td></tr>
+      <tr><td>Communication</td><td>Team publish / manager route</td><td>State update / graph edge</td><td>广播、直连还是事件</td></tr>
+      <tr><td>State + termination</td><td>Runtime / team state + condition</td><td>StateGraph state + END</td><td>单一写入者、预算、恢复</td></tr>
+      <tr><td>Tools + observability</td><td>FunctionTool / events / callbacks</td><td>@tool / LangSmith tracing</td><td>权限、trace、metrics、eval</td></tr>
+    </tbody></table>
+  </div>
+  <div class="token-note"><strong>选择：</strong>AutoGen 更容易展示“消息如何流动”；LangGraph 更容易把“状态如何变化、下一步为何发生”写成显式图。两者都需要消息契约、状态所有权、失败处理和终止条件。</div>
+</section>
+
+<section class="slide cover final" data-title="结束">
+  <div class="topline"><span>44 / 44</span><span>带走三句话</span></div>
+  <div class="eyebrow">结尾</div>
+  <h2 data-pretext contenteditable="true">AI 不一定替代开发者，<br><span class="accent">但会重新定义开发者每天做什么。</span></h2>
+  <div class="quote" style="color:var(--white);border-color:var(--yellow)">先让 AI 帮你完成一个真实任务。<br>再把经验、SOP 和上下文教给它。<br>在正确的边界里，让它尽可能自动化。</div>
+  <div class="summary-grid">
+    <div class="summary-item"><b>01 / 真实任务</b><p>优先使用 Coding Agent，先让 AI 帮你完成一件真实工作。</p></div>
+    <div class="summary-item"><b>02 / 上下文</b><p>把项目、经验、SOP 和工作方式教给 AI。</p></div>
+    <div class="summary-item"><b>03 / 边界</b><p>明确权限、测试、验收和哪些内容不能直接外包。</p></div>
+    <div class="summary-item"><b>04 / 自动化</b><p>在正确的边界里，让 AI 尽可能自动化并持续反馈。</p></div>
+  </div>
+  <div class="cover-meta"><span>目标</span><span>上下文</span><span>边界</span><span>验证</span></div>
+</section>
+</main>
+<nav class="controls" aria-label="演示控制"><button id="prev" type="button" aria-label="上一页" title="上一页">←</button><span class="counter" id="counter">01 / 44</span><button id="next" type="button" aria-label="下一页" title="下一页">→</button></nav>
+<script>
+(() => {
+  const allSlides = [...document.querySelectorAll('.slide')];
+  allSlides.forEach((slide, i) => { slide.dataset.navPage = String(i + 1); if (i >= 25) slide.remove(); });
+  document.body.dataset.pageTotal = '44';
+})();
+(() => { const slides=[...document.querySelectorAll('.slide')]; const counter=document.querySelector('#counter'); let index=0; const show=(next,behavior='smooth')=>{index=Math.max(0,Math.min(slides.length-1,next)); slides[index].scrollIntoView({behavior,block:'start'}); slides.forEach((s,i)=>s.classList.toggle('active',i===index)); counter.textContent=String(slides[index].dataset.navPage||index+1).padStart(2,'0')+' / '+String(document.body.dataset.pageTotal||slides.length).padStart(2,'0');};
+document.querySelector('#prev').addEventListener('click',()=>show(index-1)); document.querySelector('#next').addEventListener('click',()=>show(index+1));
+document.addEventListener('keydown',e=>{if(['ArrowRight','ArrowDown','PageDown',' '].includes(e.key)){e.preventDefault();show(index+1)} if(['ArrowLeft','ArrowUp','PageUp'].includes(e.key)){e.preventDefault();show(index-1)} if(e.key==='Home')show(0,'auto'); if(e.key==='End')show(slides.length-1,'auto'); });
+const observer=new IntersectionObserver(entries=>entries.forEach(entry=>{if(entry.isIntersecting){index=slides.indexOf(entry.target); slides.forEach((s,i)=>s.classList.toggle('active',i===index)); counter.textContent=String(slides[index].dataset.navPage||index+1).padStart(2,'0')+' / '+String(document.body.dataset.pageTotal||slides.length).padStart(2,'0')}}),{threshold:.55}); slides.forEach(s=>observer.observe(s));
+const relayout=()=>document.querySelectorAll('[data-pretext]').forEach(el=>{el.style.minHeight=''; if(el.scrollHeight>el.clientHeight)el.style.minHeight=el.scrollHeight+'px'}); new ResizeObserver(relayout).observe(document.body); new MutationObserver(relayout).observe(document.body,{subtree:true,characterData:true,childList:true}); document.fonts?.ready.then(relayout); relayout();
+})();
+</script>
+<!-- Pretext fallback hook: the deck remains functional without network access. -->
+<script type="module">try{const {prepare,layout}=await import('https://esm.sh/@chenglou/pretext'); await document.fonts.ready; document.querySelectorAll('[data-pretext]').forEach(el=>{const h=prepare(el.textContent,getComputedStyle(el).font); const r=layout(h,el.clientWidth,parseFloat(getComputedStyle(el).lineHeight)); el.style.minHeight=r.height+'px';});}catch(e){/* local/offline fallback above */}</script>
+</body>
+</html>

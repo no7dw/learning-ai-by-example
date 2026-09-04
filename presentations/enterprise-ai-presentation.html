@@ -1,0 +1,552 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#f2eee6">
+<title>企业 AI 落地：从工具到工作重构</title>
+<style>
+:root{--paper:#f2eee6;--ink:#202321;--muted:#6b736e;--line:#d7d0c3;--soft:#e9e3d8;--orange:#d9653a;--teal:#197875;--yellow:#e7b84f;--blue:#496a91;--white:#fffdf8;--dark:#27302c;--sans:Inter,"PingFang SC","Noto Sans SC","Microsoft YaHei",sans-serif;--mono:"SFMono-Regular",Consolas,"Liberation Mono",monospace}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:#d1c9bd;color:var(--ink);font-family:var(--sans);line-height:1.45}.slide{position:relative;width:min(100%,1600px);min-height:100svh;aspect-ratio:16/9;margin:auto;padding:clamp(34px,5.5vw,92px) clamp(28px,7vw,112px);background:var(--paper);display:flex;flex-direction:column;justify-content:center;overflow:hidden;border-bottom:1px solid var(--line)}.slide:nth-child(even){background:var(--white)}.slide::after{content:"";position:absolute;left:0;right:0;bottom:0;height:5px;background:var(--teal);transform:scaleX(0);transform-origin:left;transition:transform .25s}.slide.active::after{transform:scaleX(1)}.topline{position:absolute;top:24px;left:clamp(28px,7vw,112px);right:clamp(28px,7vw,112px);display:flex;justify-content:space-between;color:var(--muted);font-size:12px;letter-spacing:.08em;text-transform:uppercase}.eyebrow{display:inline-flex;align-items:center;gap:8px;color:var(--teal);font-size:12px;letter-spacing:.16em;text-transform:uppercase;font-weight:800}.eyebrow::before{content:"";width:24px;height:2px;background:var(--orange)}h1,h2,h3,p{margin-top:0}h1{font-size:clamp(44px,6.4vw,104px);line-height:1.02;letter-spacing:0;font-weight:850;max-width:1050px;margin-bottom:22px}h2{font-size:clamp(30px,4.2vw,64px);line-height:1.08;font-weight:820;max-width:1110px;margin-bottom:20px}h3{font-size:clamp(17px,1.8vw,28px);line-height:1.15;font-weight:800;margin-bottom:9px}p{font-size:clamp(15px,1.35vw,22px);color:var(--muted);max-width:960px}.lead{font-size:clamp(19px,2.1vw,32px);line-height:1.32;color:var(--ink);max-width:980px}.accent{color:var(--orange)}.teal{color:var(--teal)}.rule{height:1px;background:var(--line);width:100%;margin:24px 0}.cover{background:var(--dark);color:var(--white)}.cover::before{content:"AI";position:absolute;right:8vw;top:12vh;font:700 clamp(100px,20vw,300px)/1 var(--mono);color:#36403a}.cover::after{background:var(--yellow)}.cover .topline{color:#adb7b0}.cover .eyebrow{color:var(--yellow)}.cover .eyebrow::before{background:var(--yellow)}.cover .lead{color:#d3dbd4}.cover-meta{display:flex;gap:10px;flex-wrap:wrap;margin-top:30px;color:#b4beb6;font-size:14px}.cover-meta span{padding:7px 11px;border:1px solid #4c574f;border-radius:999px}.cover-stamp{position:absolute;right:10vw;bottom:12vh;width:154px;height:154px;border:1px solid #59645c;display:grid;place-items:center;color:var(--yellow);font:22px/1.4 var(--mono);text-align:center}.split{display:grid;grid-template-columns:1fr 1fr;gap:clamp(30px,6vw,100px);align-items:center}.split-wide{display:grid;grid-template-columns:1.15fr .85fr;gap:clamp(30px,5vw,80px);align-items:center}.statement{font-size:clamp(28px,4.4vw,70px);line-height:1.07;font-weight:820;max-width:700px}.statement small{display:block;font-size:.34em;line-height:1.4;color:var(--muted);font-weight:500;margin-top:22px}.quote{font-size:clamp(22px,2.7vw,42px);line-height:1.17;border-left:4px solid var(--orange);padding-left:22px;max-width:980px}.quote strong{color:var(--orange)}.panel{border:1px solid var(--line);background:rgba(255,253,248,.72);padding:clamp(20px,2.5vw,38px);border-radius:4px}.panel p:last-child{margin-bottom:0}.dark-panel{background:var(--dark);border-color:#445049;color:var(--white)}.dark-panel p{color:#c1c9c1}.misconceptions{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:26px}.mis{position:relative;padding:20px 16px;min-height:225px;background:var(--soft);border-top:4px solid var(--orange)}.mis:nth-child(2){border-color:var(--yellow)}.mis:nth-child(3){border-color:var(--teal)}.mis:nth-child(4){border-color:var(--blue)}.mis:nth-child(5){border-color:#8a6370}.mis-num{font:700 12px var(--mono);color:var(--muted)}.mis h3{font-size:17px;margin:26px 0 10px}.mis p{font-size:13px;line-height:1.45}.questions{display:grid;grid-template-columns:repeat(3,1fr);gap:11px;margin-top:25px}.question{padding:19px;background:var(--soft);border-left:3px solid var(--teal);min-height:125px}.question:nth-child(2n){border-color:var(--orange)}.question:nth-child(3n){border-color:var(--yellow)}.question b{display:block;font:700 12px var(--mono);color:var(--muted);margin-bottom:14px}.question span{font-size:clamp(15px,1.4vw,22px);font-weight:750}.abc{display:grid;grid-template-columns:1fr 54px 1fr;align-items:center;gap:18px;margin-top:22px}.abc-card{padding:27px;background:var(--white);border:1px solid var(--line);min-height:160px}.abc-card.hot{background:#fff2e9;border-color:var(--orange)}.abc-card h3{margin-bottom:14px}.abc-card p{font-size:15px}.abc-arrow{font-size:28px;color:var(--orange);text-align:center}.score{display:grid;grid-template-columns:1.2fr .8fr;gap:24px;margin-top:24px}.score-list{display:grid;gap:9px}.score-row{display:grid;grid-template-columns:1.3fr 1fr 1fr 1fr;align-items:center;padding:13px 16px;background:var(--soft);font-size:13px}.score-row.head{background:var(--dark);color:var(--white);font-family:var(--mono);font-size:11px}.score-row span:not(:first-child){text-align:center}.star{color:var(--orange);font-size:20px}.roi{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:27px;align-items:stretch}.roi-card{position:relative;padding:24px 20px 20px;background:var(--soft);border-top:5px solid var(--teal);min-height:225px}.roi-card:nth-child(2){border-color:var(--yellow)}.roi-card:nth-child(3){border-color:var(--orange)}.roi-card .level{font:700 12px var(--mono);color:var(--muted)}.roi-card h3{margin:28px 0 10px;font-size:20px}.roi-card .time{font:700 18px var(--mono);color:var(--orange);position:absolute;right:18px;top:22px}.roi-card p{font-size:14px}.timeline{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;margin-top:28px}.period{padding:22px 20px;border-top:4px solid var(--teal);background:var(--soft);min-height:180px}.period:nth-child(2){border-color:var(--yellow)}.period:nth-child(3){border-color:var(--orange)}.period b{font:700 14px var(--mono);color:var(--muted)}.period h3{margin:20px 0 10px}.period p{font-size:14px}.slots{display:grid;grid-template-columns:repeat(5,1fr);gap:0;margin-top:28px}.slot{padding:19px 15px;background:var(--soft);border:1px solid var(--paper);min-height:175px}.slot:nth-child(1){background:#dcebe6}.slot:nth-child(5){background:#fff0e7}.slot b{font:700 12px var(--mono);color:var(--teal)}.slot h3{font-size:17px;margin:22px 0 9px}.slot p{font-size:13px;line-height:1.4}.path{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:26px}.path-card{padding:21px 18px;border-top:4px solid var(--teal);background:var(--white);min-height:165px}.path-card:nth-child(2){border-color:var(--yellow)}.path-card:nth-child(3){border-color:var(--orange)}.path-card:nth-child(4){border-color:var(--blue)}.path-card b{display:block;font-size:17px;margin-bottom:10px}.path-card p{font-size:14px}.cases{display:grid;grid-template-columns:repeat(3,1fr);gap:11px;margin-top:24px}.case{padding:18px;background:var(--soft);border-left:4px solid var(--teal);min-height:150px}.case:nth-child(2){border-color:var(--orange)}.case:nth-child(3){border-color:var(--yellow)}.case:nth-child(4){border-color:var(--blue)}.case:nth-child(5){border-color:#8a6370}.case:nth-child(6){border-color:#4d9f97}.case b{font-size:16px}.case span{display:block;font-size:12px;font-family:var(--mono);color:var(--muted);margin:8px 0}.case p{font-size:13px;line-height:1.4}.org{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:25px}.org-card{display:grid;grid-template-columns:70px 1fr;gap:17px;align-items:start;padding:20px;background:var(--soft);border-top:3px solid var(--teal)}.org-card:nth-child(2){border-color:var(--orange)}.org-card:nth-child(3){border-color:var(--yellow)}.org-card:nth-child(4){border-color:var(--blue)}.org-card:nth-child(5){border-color:#8a6370}.org-card:nth-child(6){border-color:#4d9f97}.org-num{font:700 30px var(--mono);color:var(--orange)}.org-card b{font-size:16px}.org-card p{font-size:13px;margin-top:6px}.route{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-top:28px}.route-step{padding:20px 16px 0;border-top:4px solid var(--orange);min-height:190px}.route-step:nth-child(2){border-color:var(--yellow)}.route-step:nth-child(3){border-color:var(--teal)}.route-step:nth-child(4){border-color:var(--blue)}.route-step b{font:700 12px var(--mono);color:var(--muted)}.route-step h3{font-size:20px;margin:19px 0 9px}.route-step p{font-size:14px}.checklist{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:23px}.check{padding:16px 18px;background:var(--soft);border-left:3px solid var(--teal);font-size:15px}.check:nth-child(2n){border-color:var(--orange)}.check strong{color:var(--orange)}.footer-line{display:flex;justify-content:space-between;align-items:end;margin-top:28px;color:var(--muted);font-size:13px}.controls{position:fixed;z-index:20;right:20px;bottom:18px;display:flex;gap:6px;align-items:center;padding:6px;background:rgba(32,35,33,.9);border-radius:4px}.controls button{width:34px;height:30px;border:0;background:transparent;color:#f4f0e8;cursor:pointer;font-size:17px}.controls button:hover,.controls button:focus-visible{background:var(--orange);outline:none}.controls .counter{min-width:55px;text-align:center;color:#d9d3c7;font:11px var(--mono)}[contenteditable=true]:focus{outline:2px solid var(--orange);outline-offset:4px}@media(max-width:1024px){.slide{padding:62px 7vw}.misconceptions{gap:7px}.mis{padding:16px 12px;min-height:200px}.score-row{font-size:12px}}@media(max-width:768px){body{background:var(--paper)}.slide{aspect-ratio:auto;min-height:100svh;padding:66px 22px 52px;justify-content:flex-start}.topline{top:20px;left:22px;right:22px}.cover{justify-content:center}.cover::before{font-size:110px;top:17vh;right:12px}.cover-stamp{right:24px;bottom:22px;width:90px;height:90px;font-size:15px}.split,.split-wide,.abc,.score{grid-template-columns:1fr;gap:20px}.abc-arrow{transform:rotate(90deg)}.misconceptions,.questions,.roi,.timeline,.slots,.path,.cases,.org,.route{grid-template-columns:1fr;gap:9px}.mis{min-height:auto}.mis h3{margin:16px 0 8px}.question{min-height:auto}.score-row{grid-template-columns:1.3fr 1fr 1fr 1fr}.score-list{overflow-x:auto}.roi-card,.period,.slot,.path-card,.case,.org-card,.route-step{min-height:auto}.checklist{grid-template-columns:1fr}.footer-line{align-items:start;gap:14px;flex-direction:column}.controls{right:10px;bottom:10px}}@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.slide::after{transition:none}}@media print{body{background:#fff}.slide{width:100%;height:100vh;min-height:0;aspect-ratio:auto;page-break-after:always;border:0}.controls{display:none}.slide.active::after{display:none}}
+</style>
+<style>
+.mis-detail{display:grid;grid-template-columns:.43fr 1fr;gap:clamp(18px,3vw,44px);align-items:stretch;margin-top:24px}.mis-lead{display:flex;flex-direction:column;justify-content:space-between;min-height:330px;padding:clamp(22px,3vw,42px);background:var(--dark);color:var(--white);border-top:5px solid var(--orange)}.mis-detail:nth-of-type(2) .mis-lead{border-color:var(--yellow)}.mis-detail:nth-of-type(3) .mis-lead{border-color:var(--teal)}.mis-detail:nth-of-type(4) .mis-lead{border-color:var(--blue)}.mis-detail:nth-of-type(5) .mis-lead{border-color:#8a6370}.mis-index{font:700 clamp(58px,7vw,110px)/.85 var(--mono);color:var(--yellow)}.mis-lead .eyebrow{color:#b8c1ba}.mis-lead .eyebrow::before{background:var(--yellow)}.mis-lead h3{font-size:clamp(22px,2.5vw,38px);line-height:1.12;margin:16px 0 0}.mis-body{display:grid;grid-template-columns:1fr 1fr;gap:10px}.mis-body .panel{min-height:205px;padding:clamp(20px,2.4vw,34px)}.mis-body .panel.hot{background:#fff2e9;border-color:var(--orange)}.mis-label{font:700 12px var(--mono);letter-spacing:.08em;color:var(--muted);margin-bottom:16px}.mis-body p{font-size:clamp(16px,1.45vw,23px);line-height:1.4}.mis-evidence{grid-column:1 / -1;display:flex;gap:18px;align-items:baseline;padding:19px 22px;background:var(--soft);border-left:4px solid var(--teal)}.mis-evidence strong{font-size:clamp(16px,1.5vw,22px);white-space:nowrap}.mis-evidence span{color:var(--muted);font-size:clamp(15px,1.25vw,20px)}
+.reasons{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:28px}.reason{min-height:265px;padding:24px 20px;background:var(--soft);border-top:5px solid var(--orange)}.reason:nth-child(2){border-color:var(--yellow)}.reason:nth-child(3){border-color:var(--teal)}.reason-num{font:700 13px var(--mono);color:var(--muted)}.reason h3{font-size:clamp(20px,2vw,30px);line-height:1.15;margin:28px 0 12px}.reason p{font-size:clamp(15px,1.25vw,20px);line-height:1.45}.reasons-note{margin-top:24px;padding:20px 22px;background:var(--dark);color:var(--white);font-size:clamp(18px,1.8vw,28px);line-height:1.3}.reasons-note strong{color:var(--yellow)}
+.reasons-layout{display:grid;grid-template-columns:1.08fr .92fr;gap:20px;align-items:stretch;margin-top:22px}.reasons-figure{margin:0;min-height:320px;background:#050505;border:1px solid #242424;display:flex;align-items:center;justify-content:center;overflow:hidden}.reasons-figure img{display:block;width:100%;height:100%;object-fit:contain}.reasons-layout .reasons{grid-template-columns:1fr;gap:9px;margin:0}.reasons-layout .reason{min-height:0;padding:17px 18px}.reasons-layout .reason h3{font-size:clamp(18px,1.65vw,26px);margin:10px 0 6px}.reasons-layout .reason p{font-size:clamp(14px,1.1vw,18px);line-height:1.38}
+.tool-map{display:grid;gap:0;margin-top:18px;max-width:1360px;border-top:1px solid var(--line)}.tool-row{display:grid;grid-template-columns:1.1fr 1.1fr 1.35fr 1.35fr;gap:14px;align-items:start;padding:10px 14px;background:var(--soft);border-bottom:1px solid var(--paper)}.tool-row:nth-child(odd){background:var(--white)}.tool-row.head{background:var(--dark);color:var(--white);font:700 11px var(--mono);letter-spacing:.04em}.tool-cell{font-size:clamp(13px,1.08vw,17px);line-height:1.3}.tool-row:not(.head) .tool-cell:first-child{font-weight:800}.tool-row:not(.head) .tool-cell:nth-child(2){color:var(--teal);font-weight:750}.tool-judgment{margin-top:17px;padding:15px 19px;background:#fff2e9;border-left:4px solid var(--orange);font-size:clamp(16px,1.35vw,22px);line-height:1.35}.tool-judgment strong{color:var(--orange)}
+.scene-principles{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:22px}.scene-principle{min-height:330px;padding:20px 18px;background:var(--soft);border-top:5px solid var(--teal)}.scene-principle:nth-child(2){border-color:var(--yellow)}.scene-principle:nth-child(3){border-color:var(--orange)}.scene-num{font:700 12px var(--mono);color:var(--muted)}.scene-principle h3{font-size:clamp(20px,1.8vw,29px);margin:18px 0 9px}.scene-principle p{font-size:clamp(14px,1.15vw,18px);line-height:1.4}.scene-good,.scene-bad{margin-top:14px;padding:10px 12px;font-size:clamp(13px,1.05vw,16px);line-height:1.55}.scene-good{background:#dcebe6;color:var(--teal)}.scene-bad{background:#fff2e9;color:#a54e32}.scene-good strong,.scene-bad strong{display:block;margin-bottom:2px;font-size:12px;letter-spacing:.06em}
+.deploy-tiers{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:22px}.deploy-tier{min-height:220px;padding:19px 16px;background:var(--soft);border-top:5px solid var(--orange)}.deploy-tier:nth-child(2){border-color:var(--yellow)}.deploy-tier:nth-child(3){border-color:var(--teal)}.deploy-tier:nth-child(4){border-color:var(--blue)}.deploy-tier .tier-label{font:700 12px var(--mono);color:var(--muted)}.deploy-tier .tier-cost{margin-top:14px;font-size:clamp(18px,1.6vw,25px);font-weight:800}.deploy-tier h3{font-size:clamp(17px,1.45vw,23px);margin:9px 0 7px}.deploy-tier p{font-size:clamp(13px,1.05vw,16px);line-height:1.4}.deploy-decision{margin-top:17px;padding:15px 19px;background:var(--dark);color:var(--white);font-size:clamp(15px,1.25vw,20px);line-height:1.4}.deploy-decision strong{color:var(--yellow)}
+.fine-tune-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:22px}.fine-tune-card{padding:20px 19px;background:var(--soft);border-top:5px solid var(--teal);min-height:190px}.fine-tune-card:nth-child(2){border-color:var(--yellow)}.fine-tune-card h3{font-size:clamp(18px,1.55vw,25px);margin:12px 0 8px}.fine-tune-card p{font-size:clamp(14px,1.1vw,18px);line-height:1.4}.fine-tune-card .fine-label{font:700 12px var(--mono);color:var(--muted)}.fine-tune-boundary{margin-top:17px;padding:15px 19px;background:#fff2e9;border-left:4px solid var(--orange);font-size:clamp(15px,1.25vw,20px);line-height:1.4}.fine-tune-boundary strong{color:var(--orange)}
+@media(max-width:768px){.mis-detail,.mis-body,.reasons,.reasons-layout{grid-template-columns:1fr;gap:20px}.reasons-figure{min-height:0;aspect-ratio:1484/724}.mis-lead{min-height:230px}.mis-body .panel{min-height:auto}.mis-evidence{grid-column:auto;display:block}.mis-evidence span{display:block;margin-top:8px}}
+@media(max-width:768px){.tool-map{margin-top:14px}.tool-row.head{display:none}.tool-row{grid-template-columns:1fr 1fr;gap:11px 16px;padding:14px 15px}.tool-cell{font-size:15px}.tool-cell::before{display:block;margin-bottom:3px;color:var(--muted);font:700 10px var(--mono);letter-spacing:.08em;content:attr(data-label)}}
+@media(max-width:768px){.scene-principles{grid-template-columns:1fr;gap:9px}.scene-principle{min-height:auto}}
+@media(max-width:768px){.deploy-tiers{grid-template-columns:1fr;gap:9px}.deploy-tier{min-height:auto}}
+@media(max-width:768px){.fine-tune-grid{grid-template-columns:1fr;gap:9px}.fine-tune-card{min-height:auto}}
+.score-row{grid-template-columns:1.3fr repeat(4,1fr)}
+@media(max-width:768px){.score-row{grid-template-columns:1.3fr repeat(4,1fr);min-width:520px}}
+.privacy-roi{margin-top:12px;display:grid;gap:12px;min-width:0}.privacy-table-wrap{overflow-x:auto;border-top:1px solid var(--line)}.privacy-table{width:100%;border-collapse:collapse;table-layout:fixed}.privacy-table th,.privacy-table td{padding:7px 9px;text-align:left;vertical-align:top;border-bottom:1px solid var(--paper);font-size:clamp(10px,.78vw,13px);line-height:1.25}.privacy-table th{background:var(--dark);color:var(--white);font:700 10px var(--mono);letter-spacing:.03em}.privacy-table tbody tr:nth-child(odd){background:var(--soft)}.privacy-table tbody tr:nth-child(even){background:var(--white)}.privacy-table td:first-child{font-weight:800}.privacy-table td:nth-child(2){color:var(--teal);font-weight:750}.privacy-table.methods th:nth-child(1){width:21%}.privacy-table.methods th:nth-child(2){width:28%}.privacy-table.methods th:nth-child(3),.privacy-table.methods th:nth-child(4){width:25.5%}.privacy-table.models th:nth-child(1){width:29%}.privacy-table.models th:nth-child(2){width:22%}.privacy-table.models th:nth-child(3){width:22%}.privacy-table.models th:nth-child(4){width:27%}.privacy-table-title{font:700 11px var(--mono);letter-spacing:.06em;color:var(--muted);margin:0 0 5px}.privacy-note{margin-top:1px;color:var(--muted);font-size:11px;line-height:1.3}
+@media(max-width:768px){.privacy-roi{margin-top:10px;gap:16px}.privacy-table{min-width:760px}.privacy-table th,.privacy-table td{font-size:12px;padding:8px 9px}.privacy-table.models th,.privacy-table.models td{padding-top:6px;padding-bottom:6px}.privacy-note{font-size:10px}}
+</style>
+<style>
+.privacy-table.models th:nth-child(1){width:20%}.privacy-table.models th:nth-child(2){width:20%}.privacy-table.models th:nth-child(3){width:18%}.privacy-table.models th:nth-child(4){width:23%}.privacy-table.models th:nth-child(5){width:19%}
+</style>
+<style>
+.slide{justify-content:flex-start;padding-top:clamp(76px,7vw,116px)}h1{font-size:clamp(40px,5.2vw,82px);margin-bottom:16px}h2{font-size:clamp(27px,3.25vw,50px);margin-bottom:14px}.cover{justify-content:flex-start;padding-top:clamp(92px,9vw,142px)}
+.summary-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:18px;max-width:1250px}.summary-item{padding:13px 14px;background:#303a35;border-top:3px solid var(--yellow);min-height:104px}.summary-item:nth-child(2){border-color:var(--orange)}.summary-item:nth-child(3){border-color:var(--teal)}.summary-item:nth-child(4){border-color:#9bb8a8}.summary-item b{display:block;color:var(--yellow);font:700 12px var(--mono)}.summary-item p{margin:7px 0 0;color:#d3dbd4;font-size:13px;line-height:1.35}.cover.final{background:var(--paper);color:var(--ink)}.cover.final .topline{color:var(--muted)}.cover.final h2{color:var(--ink);margin-bottom:12px}.cover.final .quote{color:var(--ink)!important}.cover.final .cover-meta{color:var(--muted)}.cover.final .cover-meta span{border-color:var(--line)}
+@media(max-width:768px){.slide{padding-top:74px}.cover{justify-content:flex-start;padding-top:96px}.cover h1{font-size:clamp(38px,11vw,56px)}h2{font-size:clamp(26px,8vw,38px)}.summary-grid{grid-template-columns:1fr;gap:7px}.summary-item{min-height:auto}}
+</style>
+<style>
+.about-page-layout{display:grid;grid-template-columns:260px 1fr;gap:clamp(28px,5vw,76px);align-items:center;margin-top:26px}.about-page-visual{width:100%;max-width:260px;aspect-ratio:1042/1309;object-fit:contain;background:#fff;border:1px solid var(--line)}.about-page-copy h2{margin-bottom:12px}.about-page-copy .lead{margin-bottom:12px}.about-page-copy p{max-width:760px}.about-page-handle{display:inline-block;margin-top:16px;padding:9px 12px;background:var(--soft);color:var(--orange);font:700 13px var(--mono)}
+@media(max-width:768px){.about-page-layout{grid-template-columns:1fr;gap:18px;margin-top:18px}.about-page-visual{width:130px;max-width:none}.about-page-copy h2{font-size:clamp(30px,9vw,44px)}}
+</style>
+<style>
+.capability-layout{display:grid;grid-template-columns:minmax(250px,.72fr) minmax(0,1.28fr);gap:clamp(28px,5vw,84px);align-items:center;margin-top:18px}.capability-visual{width:100%;max-height:69vh;object-fit:contain;object-position:center;background:#082c4c;border:1px solid var(--line)}.capability-copy .lead{margin-bottom:18px}.capability-points{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px}.capability-point{padding:13px 15px;background:var(--soft);border-top:3px solid var(--teal)}.capability-point:nth-child(2){border-color:var(--orange)}.capability-point:nth-child(3){border-color:var(--yellow)}.capability-point:nth-child(4){border-color:var(--blue)}.capability-point b{font-size:15px}.capability-point p{margin:6px 0 0;font-size:13px;line-height:1.4}.capability-source{display:block;margin-top:14px;color:var(--muted);font-size:11px}
+@media(max-width:768px){.capability-layout{grid-template-columns:1fr;gap:18px;margin-top:16px}.capability-visual{width:min(55vw,260px);max-height:none;justify-self:center}.capability-copy h2{font-size:clamp(30px,8.5vw,46px)}.capability-points{grid-template-columns:1fr}.capability-source{font-size:10px}}
+</style>
+<style>
+.toc{margin-top:28px;max-width:900px}.toc-heading{display:flex;justify-content:space-between;align-items:baseline;border-bottom:1px solid var(--line);padding-bottom:6px;color:var(--muted);font:700 11px var(--mono);letter-spacing:.08em}.toc-grid{display:grid;grid-template-columns:1fr 1fr;column-gap:28px}.toc-item{display:grid;grid-template-columns:42px 1fr;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}.toc-item>b{color:var(--orange);font:700 13px var(--mono)}.toc-item strong{display:block;font-size:14px}.toc-item small{display:block;margin-top:3px;color:var(--muted);font-size:11px;line-height:1.3}
+@media(max-width:768px){.toc{margin-top:24px}.toc-grid{grid-template-columns:1fr}.toc-item{padding:8px 0}}
+.toc-page h2{margin-bottom:12px}.toc-page .lead{max-width:760px;margin-bottom:18px}.toc-page .toc{max-width:none;margin-top:16px}.toc-page .toc-item{padding:18px 0}.toc-page .toc-item strong{font-size:17px}.toc-page .toc-item small{font-size:13px}
+@media(max-width:768px){.toc-page .toc-item{padding:12px 0}.toc-page .toc-item strong{font-size:16px}.toc-page .toc-item small{font-size:12px}}
+.toc-grid.toc-grid-five{grid-template-columns:repeat(3,1fr);column-gap:22px}
+.toc-detail-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px 28px}.toc-detail-group{padding:10px 0 8px;border-bottom:1px solid var(--line)}.toc-detail-group h3{margin:0 0 7px;color:var(--teal);font:800 13px var(--sans)}.toc-detail-row{display:flex;justify-content:space-between;gap:12px;padding:3px 0;color:var(--ink);font-size:12px;line-height:1.35}.toc-detail-row span:last-child{flex:0 0 auto;color:var(--orange);font:700 11px var(--mono)}
+.source-note{display:block;margin-top:14px;color:var(--muted);font-size:11px;line-height:1.35}.source-note a{color:inherit;text-decoration:underline;text-underline-offset:2px}
+.skill-build-layout{display:grid;grid-template-columns:1.2fr .8fr;gap:clamp(24px,5vw,76px);align-items:start;margin-top:16px}.skill-steps{display:grid;grid-template-columns:1fr 1fr;gap:10px}.skill-step{padding:18px 16px;background:var(--soft);border-top:4px solid var(--teal);min-height:164px}.skill-step:nth-child(2){border-color:var(--yellow)}.skill-step:nth-child(3){border-color:var(--orange)}.skill-step:nth-child(4){border-color:var(--blue)}.skill-step .step-num{font:700 12px var(--mono);color:var(--muted)}.skill-step h3{font-size:clamp(18px,1.55vw,25px);margin:18px 0 8px}.skill-step p{font-size:clamp(14px,1.1vw,18px);line-height:1.4}.skill-contract{padding:22px;background:var(--dark);color:var(--white);border-top:5px solid var(--yellow)}.skill-contract h3{font-size:clamp(20px,1.7vw,28px);margin-bottom:8px}.skill-contract>p{color:#d3dbd4;font-size:14px}.skill-contract-list{display:grid;gap:7px;margin:17px 0 0;padding:0;list-style:none}.skill-contract-list li{padding:9px 11px;background:#303a35;border-left:2px solid var(--teal);font-size:14px}.skill-contract-list li:nth-child(2n){border-color:var(--orange)}.skill-build-note{margin-top:16px;padding:14px 18px;background:#fff2e9;border-left:4px solid var(--orange);font-size:clamp(15px,1.25vw,20px);line-height:1.4}.skill-build-note strong{color:var(--orange)}
+.context-layout{display:grid;grid-template-columns:.8fr 1.2fr;gap:clamp(24px,5vw,76px);align-items:stretch;margin-top:18px}.context-principle{padding:25px;background:var(--dark);color:var(--white);border-top:5px solid var(--teal);display:flex;flex-direction:column;justify-content:space-between}.context-principle .context-kicker{font:700 12px var(--mono);color:var(--yellow)}.context-statement{font-size:clamp(28px,3.4vw,54px);line-height:1.08;font-weight:820;margin:32px 0 20px}.context-principle p{color:#d3dbd4;font-size:15px;line-height:1.45;margin-bottom:0}.context-items{display:grid;grid-template-columns:1fr 1fr;gap:10px}.context-item{padding:17px 16px;background:var(--soft);border-top:3px solid var(--orange);min-height:120px}.context-item:nth-child(2){border-color:var(--yellow)}.context-item:nth-child(3){border-color:var(--teal)}.context-item:nth-child(4){border-color:var(--blue)}.context-item:nth-child(5){border-color:#8a6370}.context-item b{font:700 12px var(--mono);color:var(--muted)}.context-item h3{font-size:18px;margin:14px 0 6px}.context-item p{font-size:14px;line-height:1.4;margin-bottom:0}.context-method{display:flex;gap:18px;align-items:baseline;margin-top:16px;padding:15px 19px;background:var(--soft);border-left:4px solid var(--orange);font-size:clamp(15px,1.25vw,20px);line-height:1.4}.context-method strong{color:var(--orange);white-space:nowrap}
+.value-trap-layout{display:grid;grid-template-columns:.72fr 1.28fr;gap:clamp(24px,5vw,76px);align-items:stretch;margin-top:20px}.value-trap-lead{padding:26px;background:var(--dark);color:var(--white);border-top:5px solid var(--orange);display:flex;flex-direction:column;justify-content:space-between}.value-trap-lead .trap-kicker{font:700 12px var(--mono);color:var(--yellow)}.value-trap-statement{font-size:clamp(30px,3.5vw,56px);line-height:1.06;font-weight:820;margin:34px 0 20px}.value-trap-lead p{color:#d3dbd4;font-size:15px;line-height:1.45;margin-bottom:0}.value-signals{display:grid;grid-template-columns:1fr 1fr;gap:10px}.value-signal{padding:18px 16px;background:var(--soft);border-top:4px solid var(--teal);min-height:150px}.value-signal:nth-child(2){border-color:var(--yellow)}.value-signal:nth-child(3){border-color:var(--orange)}.value-signal:nth-child(4){border-color:var(--blue)}.value-signal b{font:700 12px var(--mono);color:var(--muted)}.value-signal h3{font-size:clamp(17px,1.5vw,24px);margin:17px 0 8px}.value-signal p{font-size:14px;line-height:1.4;margin-bottom:0}.value-trap-note{margin-top:17px;padding:15px 19px;background:#fff2e9;border-left:4px solid var(--orange);font-size:clamp(15px,1.25vw,20px);line-height:1.4}.value-trap-note strong{color:var(--orange)}
+.process-contrast{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:22px}.process-column{padding:22px;background:var(--soft);border-top:5px solid var(--muted);min-height:290px}.process-column.good{background:#dcebe6;border-color:var(--teal)}.process-column h3{font-size:clamp(21px,2vw,31px);margin:18px 0 13px}.process-column ul{margin:0;padding:0;list-style:none}.process-column li{padding:10px 0;border-bottom:1px solid rgba(107,115,110,.25);font-size:clamp(15px,1.25vw,20px);line-height:1.35}.process-column li:last-child{border-bottom:0}.process-column li strong{display:block;font-size:12px;color:var(--muted);font-family:var(--mono);margin-bottom:2px}.process-column.good li strong{color:var(--teal)}.process-note{margin-top:17px;padding:15px 19px;background:var(--dark);color:var(--white);font-size:clamp(15px,1.25vw,20px);line-height:1.4}.process-note strong{color:var(--yellow)}
+.value-loop{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-top:22px}.loop-step{padding:16px 14px;background:var(--soft);border-top:4px solid var(--teal);min-height:145px}.loop-step:nth-child(2){border-color:var(--yellow)}.loop-step:nth-child(3){border-color:var(--orange)}.loop-step:nth-child(4){border-color:var(--blue)}.loop-step:nth-child(5){border-color:#8a6370}.loop-step:nth-child(6){border-color:#4d9f97}.loop-step:nth-child(7){border-color:#9d7b43}.loop-step b{font:700 12px var(--mono);color:var(--muted)}.loop-step h3{font-size:clamp(17px,1.35vw,22px);margin:16px 0 7px}.loop-step p{font-size:13px;line-height:1.38;margin-bottom:0}.value-loop-note{margin-top:16px;padding:15px 19px;background:var(--dark);color:var(--white);font-size:clamp(15px,1.25vw,20px);line-height:1.4}.value-loop-note strong{color:var(--yellow)}
+@media(max-width:768px){.toc-grid.toc-grid-five,.toc-detail-grid{grid-template-columns:1fr}.skill-build-layout,.context-layout,.value-trap-layout{grid-template-columns:1fr;gap:18px}.skill-step{min-height:auto;padding:14px 15px}.skill-step h3{margin:14px 0 7px}.skill-contract{padding:18px}.skill-contract-list{margin-top:13px}.context-principle{padding:20px}.context-statement{margin:22px 0 16px;font-size:clamp(30px,9vw,44px)}.context-item{min-height:auto;padding:14px 15px}.context-method{display:block}.context-method strong{display:block;margin-bottom:6px}.value-trap-lead{padding:20px}.value-trap-statement{margin:22px 0 16px;font-size:clamp(30px,9vw,44px)}.value-signal{min-height:auto;padding:14px 15px}.value-signal h3{margin:14px 0 7px}.process-contrast{grid-template-columns:1fr;gap:9px}.process-column{min-height:auto;padding:18px}.value-loop{grid-template-columns:1fr 1fr;gap:9px}.loop-step{min-height:auto;padding:14px 13px}.loop-step h3{margin:13px 0 6px}.value-loop-note,.process-note{padding:14px 16px}.toc-detail-group{padding:8px 0}.toc-detail-row{font-size:13px;padding:4px 0}}
+@media(min-width:769px){.process-contrast{margin-top:12px}.process-column{min-height:230px;padding:16px}.process-column h3{margin:12px 0 8px}.process-column li{padding:6px 0;font-size:16px}.process-note{margin-top:12px;padding:12px 16px}}
+@media(min-width:769px){.process-page{padding-bottom:32px}}
+@media(min-width:769px){.value-trap-page{padding-bottom:32px}}
+</style>
+</head>
+<body>
+<main class="deck" id="deck" aria-label="企业 AI 落地：从工具到工作重构">
+<section class="slide cover active" data-title="封面">
+  <div class="topline"><span>01 / 30</span><span>Enterprise AI / Operating model</span></div>
+  <div class="eyebrow">从工具到工作重构</div>
+  <h1 data-pretext contenteditable="true">企业 AI 落地：<br>误区、行动与 ROI</h1>
+  <p class="lead" data-pretext contenteditable="true">不是让员工多用一个工具，而是重新设计工作、流程与组织。</p>
+  <div class="cover-meta"><span>场景选择</span><span>价值衡量</span><span>POC → 生产</span><span>组织能力</span></div>
+  <div class="cover-stamp">WORK<br>→<br>REDESIGN</div>
+</section>
+
+<section class="slide toc-page" data-title="目录">
+  <div class="topline"><span>02 / 30</span><span>Enterprise AI / Content map</span></div>
+  <div class="eyebrow">目录 / TABLE OF CONTENTS</div>
+  <h2>从认识 AI，<br><span class="teal">走到企业落地。</span></h2>
+  <p class="lead">先理解问题，再选择场景，最后把能力放进真实工作。</p>
+  <div class="toc toc-page-list">
+    <div class="toc-heading"><span>CONTENT MAP</span><span>30 PAGES / DETAILED INDEX</span></div>
+    <div class="toc-detail-grid">
+      <div class="toc-detail-group"><h3>01 / 基础与方法</h3><div class="toc-detail-row"><span>About Me</span><span>P3</span></div><div class="toc-detail-row"><span>如何写 Skill</span><span>P4</span></div><div class="toc-detail-row"><span>企业上下文</span><span>P5</span></div><div class="toc-detail-row"><span>核心命题</span><span>P6</span></div><div class="toc-detail-row"><span>落后预期的结构性原因</span><span>P7</span></div><div class="toc-detail-row"><span>试点繁荣、价值虚无</span><span>P8</span></div><div class="toc-detail-row"><span>流程重构</span><span>P9</span></div><div class="toc-detail-row"><span>从试点走向价值</span><span>P10</span></div></div>
+      <div class="toc-detail-group"><h3>02 / 典型误区与企业能力</h3><div class="toc-detail-row"><span>误区一：替代人</span><span>P11</span></div><div class="toc-detail-row"><span>误区二：Demo 等于完成</span><span>P12</span></div><div class="toc-detail-row"><span>误区三：代码生成等于上线</span><span>P13</span></div><div class="toc-detail-row"><span>误区四：外包核心判断</span><span>P14</span></div><div class="toc-detail-row"><span>误区五：AI 什么都做不到</span><span>P15</span></div><div class="toc-detail-row"><span>AI 是企业能力</span><span>P16</span></div><div class="toc-detail-row"><span>AI 冰山模型</span><span>P17</span></div></div>
+      <div class="toc-detail-group"><h3>03 / 场景与工具</h3><div class="toc-detail-row"><span>找到场景</span><span>P18</span></div><div class="toc-detail-row"><span>如何选择场景</span><span>P19</span></div><div class="toc-detail-row"><span>红星场景</span><span>P20</span></div><div class="toc-detail-row"><span>选技术形态</span><span>P21</span></div><div class="toc-detail-row"><span>AI 工具地图</span><span>P22</span></div></div>
+      <div class="toc-detail-group"><h3>04 / 价值与生产</h3><div class="toc-detail-row"><span>三层 ROI</span><span>P23</span></div><div class="toc-detail-row"><span>POC 到生产</span><span>P24</span></div><div class="toc-detail-row"><span>标杆对照</span><span>P25</span></div><div class="toc-detail-row"><span>组织条件</span><span>P26</span></div><div class="toc-detail-row"><span>行动路线</span><span>P27</span></div></div>
+      <div class="toc-detail-group"><h3>05 / 成本、总结与策略</h3><div class="toc-detail-row"><span>隐私控制 ROI</span><span>P28</span></div><div class="toc-detail-row"><span>结束：带走五个判断</span><span>P29</span></div><div class="toc-detail-row"><span>什么时候考虑微调</span><span>P30</span></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-title="About Me">
+  <div class="topline"><span>03 / 30</span><span>RoadToAGI / About Me</span></div>
+  <div class="eyebrow">ABOUT ME / 从技术到真实业务</div>
+  <div class="about-page-layout">
+    <img class="about-page-visual" src="assets/roadtoagi-channel.png" alt="RoadToAGI channel QR code">
+    <div class="about-page-copy">
+      <h2>Wade 邓维</h2>
+      <p class="lead">MaybeAI 联创 &amp; 技术负责人</p>
+      <p>帮助过多家年营收几千万到亿的跨境电商企业落地 AI。</p>
+      <div class="about-page-handle">X &amp; WeChat: @no7wade</div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-title="如何写 Skill">
+  <div class="topline"><span>04 / 30</span><span>效率方法 / 把经验写成能力</span></div>
+  <div class="eyebrow">效率方法 / 把经验沉淀下来</div>
+  <h2>不要重复解释，<br>把经验沉淀成 <span class="teal">可复用的 Skill。</span></h2>
+  <p class="lead">一条成功路径只有被记录、验证、迭代，才会从个人技巧变成团队能力。</p>
+  <div class="skill-build-layout">
+    <div class="skill-steps">
+      <div class="skill-step"><div class="step-num">01 / 收集素材</div><h3>从真实对话开始</h3><p>汇总 Chat History、经验总结和失败案例，保留输入、判断、修改与最终结果。</p></div>
+      <div class="skill-step"><div class="step-num">02 / 抽取规律</div><h3>找出稳定的任务模式</h3><p>明确任务目标、必要输入、判断标准、输出格式，以及哪些情况不能自动处理。</p></div>
+      <div class="skill-step"><div class="step-num">03 / 写成规范</div><h3>把流程写成可执行步骤</h3><p>写清触发条件、执行顺序、工具权限、边界条件和需要人工确认的节点。</p></div>
+      <div class="skill-step"><div class="step-num">04 / 持续评估</div><h3>用失败案例迭代</h3><p>用代表性案例做 Eval，记录失败原因、修复方式和版本变化，避免问题重复发生。</p></div>
+    </div>
+    <div class="skill-contract">
+      <h3>Skill 最少要写清楚</h3>
+      <p>让使用者知道什么时候调用，也让系统知道什么时候停下来。</p>
+      <ul class="skill-contract-list">
+        <li>触发条件 / 什么时候使用</li>
+        <li>输入与步骤 / 需要什么、怎么做</li>
+        <li>输出与验收 / 交付什么、怎样算合格</li>
+        <li>边界与回退 / 不能做什么、何时找人</li>
+      </ul>
+    </div>
+  </div>
+  <div class="skill-build-note"><strong>关键判断：</strong>失败案例不是附录，而是 Skill 最有价值的部分。它告诉我们模型会在哪里误判，以及流程需要增加什么约束。</div>
+</section>
+
+<section class="slide" data-title="企业上下文">
+  <div class="topline"><span>05 / 30</span><span>落地方法 / Context first</span></div>
+  <div class="eyebrow">落地方法 / 先理解上下文</div>
+  <h2>Skill 不是孤立的 Prompt，<br>它必须嵌入 <span class="accent">真实企业流程。</span></h2>
+  <div class="context-layout">
+    <div class="context-principle">
+      <div class="context-kicker">判断标准 / CONTEXT FIRST</div>
+      <div class="context-statement">同一个 Skill，<br><span class="teal">换一个企业，</span><br>结果可能完全不同。</div>
+      <p>目标、角色、数据、权限、系统和责任边界变了，Skill 的输入、输出和风险也会跟着变化。</p>
+    </div>
+    <div class="context-items">
+      <div class="context-item"><b>01 / 业务目标</b><h3>要改善什么指标？</h3><p>节省时间、降低成本，还是提升质量与收入？</p></div>
+      <div class="context-item"><b>02 / 使用角色</b><h3>谁使用、谁负责？</h3><p>明确使用者、最终判断人和结果验收人。</p></div>
+      <div class="context-item"><b>03 / 数据权限</b><h3>模型可以看到什么？</h3><p>定义数据边界、脱敏要求和可调用的系统权限。</p></div>
+      <div class="context-item"><b>04 / 工作流程</b><h3>输出接下来去哪？</h3><p>明确交接系统、后续动作和异常处理路径。</p></div>
+      <div class="context-item"><b>05 / 风险标准</b><h3>什么时候必须停下？</h3><p>设定人工审核、准确率、延迟与合规要求。</p></div>
+    </div>
+  </div>
+  <div class="context-method"><strong>落地方法</strong><span>先画流程 → 再拆任务 → 小范围 POC → 用真实指标 Eval → 明确责任与迭代</span></div>
+</section>
+
+<section class="slide" data-title="核心命题">
+  <div class="topline"><span>06 / 30</span><span>重新思考公司怎么工作</span></div>
+  <div class="eyebrow">核心命题</div>
+  <h2>AI 转型的前沿，<br>不是“给旧公司装 AI”。</h2>
+  <div class="split-wide" style="margin-top:22px">
+    <div class="statement">从<br><span class="muted">岗位 → 流程 → 工具</span><br>走向<br><span class="accent">目标 → 人 / Agent → 结果</span></div>
+    <div class="dark-panel panel"><p class="lead" style="color:var(--white)">如果智能可以被复制，公司最小的经营单位会不会改变？</p><div class="rule" style="background:#4b554e"></div><p>人可能成为系统可调用的一种能力。管理也从“忙不忙”转向“结果、Eval、失败与反馈”。</p></div>
+  </div>
+  <p class="footer-line"><span>真正的终局，是用 AI 重新思考“公司”这一组织形态。</span><span>06</span></p>
+</section>
+
+<section class="slide" data-title="落后预期的结构性原因">
+  <div class="topline"><span>07 / 30</span><span>为什么 AI 落地落后预期？</span></div>
+  <div class="eyebrow">先看技术之外的阻力 / 试点为何失真</div>
+  <h2>试点能跑通，<br>为什么一推广就失灵？</h2>
+  <div class="reasons-layout">
+    <figure class="reasons-figure"><img src="assets/ai-adoption-complexity.png" alt="AI adoption complexity increases with human resources and time-space complexity"></figure>
+    <div class="reasons">
+      <div class="reason"><div class="reason-num">01 / 规模化</div><h3>局部成功，整体失败</h3><p>单条产线、单个部门看起来有效，推广到全公司后，数据、流程、人员和权责不再匹配。</p></div>
+      <div class="reason"><div class="reason-num">02 / 流程</div><h3>技术做加法，流程原地走</h3><p>只把 AI 贴在旧流程上，没有删除冗余、打破壁垒或重新划分人机分工。</p></div>
+      <div class="reason"><div class="reason-num">03 / 价值</div><h3>个体省时间，财务无结果</h3><p>员工确实更快了，但时间没有流向高价值工作，营收、成本和周期仍然没有改变。</p></div>
+    </div>
+  </div>
+  <div class="reasons-note">真正要改变的是：<strong>规模化方式、工作流程，以及价值衡量。</strong></div>
+</section>
+
+<section class="slide value-trap-page" data-title="试点繁荣、价值虚无">
+  <div class="topline"><span>08 / 30</span><span>企业 AI / 从表演走向价值</span></div>
+  <div class="eyebrow">价值陷阱 / 试点不是终点</div>
+  <h2>试点可以很漂亮，<br><span class="accent">价值却可能没有发生。</span></h2>
+  <div class="value-trap-layout">
+    <div class="value-trap-lead">
+      <div class="trap-kicker">CEIBS / VALUE OVER DEMO</div>
+      <div class="value-trap-statement">别把“用上 AI”，<br><span class="teal">当成“创造价值”。</span></div>
+      <p>真正要追问的不是模型能不能回答，而是它有没有改变营收、成本、周期、质量或组织能力。</p>
+    </div>
+    <div class="value-signals">
+      <div class="value-signal"><b>01 / 规模化</b><h3>试点能成功，推广就失灵</h3><p>换到更多部门后，数据、流程、人员和权责不再匹配。</p></div>
+      <div class="value-signal"><b>02 / 流程</b><h3>技术做加法，流程原地走</h3><p>旧流程没有重构，AI 只是贴在系统表面的新工具。</p></div>
+      <div class="value-signal"><b>03 / 财务</b><h3>个体有效率，组织无效益</h3><p>员工省下时间，却没有流向高价值工作，财务结果看不见。</p></div>
+      <div class="value-signal"><b>04 / 衡量</b><h3>技术指标漂亮，商业指标缺席</h3><p>使用率、参数和覆盖率很亮眼，却说不清收入、成本和周期。</p></div>
+    </div>
+  </div>
+  <div class="value-trap-note"><strong>最有价值的转向：</strong>把 AI 项目从“功能上线”改成“业务价值验收”。</div>
+  <a class="source-note" href="https://cn.ceibs.edu/media/press-clippings/faculty/29204" target="_blank" rel="noreferrer">观点来源：方跃《企业AI转型：如何从“表演”走向价值》，中欧国际工商学院，2026-06-01</a>
+</section>
+
+<section class="slide process-page" data-title="流程重构">
+  <div class="topline"><span>09 / 30</span><span>企业 AI / 不要给旧流程贴补丁</span></div>
+  <div class="eyebrow">流程方法 / AI 原生工作</div>
+  <h2>AI 的价值上限，<br>常常由 <span class="teal">流程重构</span> 决定。</h2>
+  <p class="lead">如果只是把 AI 接到旧流程上，效率提升会被冗余、等待和重复审批重新吃掉。</p>
+  <div class="process-contrast">
+    <div class="process-column">
+      <div class="step-num">常见做法 / PATCH THE OLD</div>
+      <h3>在旧流程上叠加 AI</h3>
+      <ul><li><strong>目标</strong>让某个岗位更快完成一个任务</li><li><strong>流程</strong>输入、审批、交接和系统边界保持不变</li><li><strong>结果</strong>局部效率变高，整体周期和成本不变</li><li><strong>风险</strong>AI 变成新的孤岛，越用越复杂</li></ul>
+    </div>
+    <div class="process-column good">
+      <div class="step-num">推荐做法 / REDESIGN THE WORK</div>
+      <h3>围绕目标重写工作</h3>
+      <ul><li><strong>目标</strong>先定义要改善的业务指标</li><li><strong>流程</strong>删除冗余、合并重复，重新划分人机分工</li><li><strong>结果</strong>让时间、质量或收入真正进入经营结果</li><li><strong>边界</strong>人保留判断、决策、创新和异常处理</li></ul>
+    </div>
+  </div>
+  <div class="process-note"><strong>三个重构问题：</strong>哪些环节可以消失？哪些任务可以交给 AI？人只保留哪些高价值判断？</div>
+  <a class="source-note" href="https://cn.ceibs.edu/media/press-clippings/faculty/29204" target="_blank" rel="noreferrer">观点来源：方跃《企业AI转型：如何从“表演”走向价值》，中欧国际工商学院</a>
+</section>
+
+<section class="slide" data-title="从试点走向价值">
+  <div class="topline"><span>10 / 30</span><span>企业 AI / 七步价值闭环</span></div>
+  <div class="eyebrow">落地方法 / 从试点走向价值</div>
+  <h2>每个 AI 项目，<br>都要走完一条 <span class="accent">价值闭环。</span></h2>
+  <div class="value-loop">
+    <div class="loop-step"><b>01</b><h3>锚定价值</h3><p>只选择一个核心业务目标，并由业务负责人验收。</p></div>
+    <div class="loop-step"><b>02</b><h3>重构流程</h3><p>删除冗余，明确人机分工，不给旧流程贴补丁。</p></div>
+    <div class="loop-step"><b>03</b><h3>建立核算</h3><p>上线前估算，上线后实测，规模化后纳入经营分析。</p></div>
+    <div class="loop-step"><b>04</b><h3>小步试点</h3><p>先在最小业务单元验证，稳定后再逐步放量。</p></div>
+    <div class="loop-step"><b>05</b><h3>标准化</h3><p>把模型、数据、流程、权限和运维做成可复制组件。</p></div>
+    <div class="loop-step"><b>06</b><h3>人机协同</h3><p>AI 增强判断与创造，不把员工只当成可替代成本。</p></div>
+    <div class="loop-step"><b>07</b><h3>及时叫停</h3><p>达不到价值、无法复制或只适合演示，就停止投入。</p></div>
+  </div>
+  <div class="value-loop-note"><strong>生产标准：</strong>可衡量、可复制、可规模化；否则只是 Demo，不是企业能力。</div>
+  <a class="source-note" href="https://cn.ceibs.edu/media/press-clippings/faculty/29204" target="_blank" rel="noreferrer">方法来源：方跃《企业AI转型：如何从“表演”走向价值》，中欧国际工商学院</a>
+</section>
+
+<section class="slide" data-title="误区一：替代人">
+  <div class="topline"><span>11 / 30</span><span>02 / 企业 AI 落地的典型误区</span></div>
+  <div class="eyebrow">误区一 / 不要把岗位当成一个任务</div>
+  <h2>AI 会替代一部分工作，<span class="accent">不等于一键替代一个人。</span></h2>
+  <div class="mis-detail">
+    <div class="mis-lead"><div class="mis-index">01</div><div><div class="eyebrow">最容易出现的误判</div><h3>以为 AI 很快就可以取代人</h3></div></div>
+    <div class="mis-body">
+      <div class="panel"><div class="mis-label">误区</div><p>模型能力增长很快，于是从“AI 能做一部分工作”，直接跳到“这个岗位是不是可以不要了”。</p></div>
+      <div class="panel hot"><div class="mis-label">现实</div><p>真正落地时，岗位背后还有任务拆解、流程、数据、权限、验收、责任和异常处理。</p></div>
+      <div class="mis-evidence"><strong>先替代什么？</strong><span>一个岗位里可拆开、可标准化、可验收的部分任务。</span></div>
+    </div>
+  </div>
+  <div class="quote" style="margin-top:25px">先替代任务，<strong>再重构岗位。</strong></div>
+</section>
+
+<section class="slide" data-title="误区二：Demo 等于完成">
+  <div class="topline"><span>12 / 30</span><span>02 / 企业 AI 落地的典型误区</span></div>
+  <div class="eyebrow">误区二 / 看起来会回答，不等于能交付</div>
+  <h2>做出一个 ChatGPT Demo，<br><span class="accent">离完成还很远。</span></h2>
+  <div class="mis-detail">
+    <div class="mis-lead"><div class="mis-index">02</div><div><div class="eyebrow">Demo 只证明一件事</div><h3>某一次输入，得到了一个不错的答案</h3></div></div>
+    <div class="mis-body">
+      <div class="panel"><div class="mis-label">Demo 解决的是</div><p>AI 能不能给出一个看起来不错的答案？</p></div>
+      <div class="panel hot"><div class="mis-label">生产要解决的是</div><p>真实输入进来以后，能不能稳定、重复、可验收地交付？</p></div>
+      <div class="mis-evidence"><strong>差距在这里</strong><span>输入格式、缺失信息、失败分支、输出格式，以及谁来验收。</span></div>
+    </div>
+  </div>
+  <div class="quote" style="margin-top:25px">一次漂亮回答，<strong>不等于一条可靠流程。</strong></div>
+</section>
+
+<section class="slide" data-title="误区三：代码生成等于上线">
+  <div class="topline"><span>13 / 30</span><span>02 / 企业 AI 落地的典型误区</span></div>
+  <div class="eyebrow">误区三 / 速度放大了，责任没有消失</div>
+  <h2>Codex 跑出了 Demo，<br><span class="accent">不代表系统可以稳定上线。</span></h2>
+  <div class="mis-detail">
+    <div class="mis-lead"><div class="mis-index">03</div><div><div class="eyebrow">AI Coding 的错觉</div><h3>代码生成快，生产系统就会快</h3></div></div>
+    <div class="mis-body">
+      <div class="panel"><div class="mis-label">开发阶段</div><p>很快得到能跑的代码和可演示的路径，适合验证想法与拿到反馈。</p></div>
+      <div class="panel hot"><div class="mis-label">上线之后</div><p>测试、边界、监控、权限、异常处理、数据一致性、回滚和长期维护都要补齐。</p></div>
+      <div class="mis-evidence"><strong>生产化清单</strong><span>可观测、可回滚、可追责；出了问题，系统知道如何停下来。</span></div>
+    </div>
+  </div>
+  <div class="quote" style="margin-top:25px">Demo 能跑，<strong>是开始，不是结束。</strong></div>
+</section>
+
+<section class="slide" data-title="误区四：外包核心判断">
+  <div class="topline"><span>14 / 30</span><span>02 / 企业 AI 落地的典型误区</span></div>
+  <div class="eyebrow">误区四 / 像人一样说话，不等于一定是真的</div>
+  <h2>不要把核心判断，<br><span class="accent">直接外包给 LLM。</span></h2>
+  <div class="mis-detail">
+    <div class="mis-lead"><div class="mis-index">04</div><div><div class="eyebrow">幻觉的真实风险</div><h3>输出很像人，事实却可能不成立</h3></div></div>
+    <div class="mis-body">
+      <div class="panel"><div class="mis-label">高风险内容</div><p>事实、数字、权限、法律、财务和业务规则，都不能只靠模型输出。</p></div>
+      <div class="panel hot"><div class="mis-label">合理边界</div><p>AI 可以承担重复方法，但高风险判断、最终责任和授权边界仍然需要人。</p></div>
+      <div class="mis-evidence"><strong>先定义边界</strong><span>什么可以自动做，什么必须核验，什么情况下必须停下来交给人。</span></div>
+    </div>
+  </div>
+  <div class="quote" style="margin-top:25px">让 AI 承担方法，<strong>让人保留责任。</strong></div>
+</section>
+
+<section class="slide" data-title="误区五：AI 什么都做不到">
+  <div class="topline"><span>15 / 30</span><span>02 / 企业 AI 落地的典型误区</span></div>
+  <div class="eyebrow">误区五 / 另一个极端同样危险</div>
+  <h2>很多“做不到”，其实是<span class="teal">任务没有拆对。</span></h2>
+  <div class="mis-detail">
+    <div class="mis-lead"><div class="mis-index">05</div><div><div class="eyebrow">不是模型不行</div><h3>而是把一个太大的任务直接扔给 AI</h3></div></div>
+    <div class="mis-body">
+      <div class="panel"><div class="mis-label">常见卡点</div><p>输入缺失、任务过大、模式不匹配、模型不适合，或者验收标准模糊。</p></div>
+      <div class="panel hot"><div class="mis-label">重新拆解</div><p>把复杂任务拆成目标、子任务、输入、规则、输出和验收，再逐步验证。</p></div>
+      <div class="mis-evidence"><strong>失败通常说明</strong><span>问题没有拆对，流程没有设计好，场景没有选好，结果也没有被清晰定义。</span></div>
+    </div>
+  </div>
+  <div class="quote" style="margin-top:25px">先把问题变小，<strong>再把能力做大。</strong></div>
+</section>
+
+<section class="slide capability-slide" data-title="AI 是企业能力">
+  <div class="topline"><span>16 / 30</span><span>AI 落地的基础</span></div>
+  <div class="capability-layout">
+    <img class="capability-visual" src="assets/ai-is-not-plug-and-play.png" alt="AI 不是即插即用，企业准备度决定真实价值">
+    <div class="capability-copy">
+      <div class="eyebrow">总结 / AI 不是即插即用</div>
+      <h2>AI 不是又一个功能，<br><span class="teal">而是一项企业能力。</span></h2>
+      <p class="lead">AI 能力只是可见的 10%；真正驱动价值的，是水面下的企业准备度。</p>
+      <div class="capability-points">
+        <div class="capability-point"><b>落地底座</b><p>可靠数据、可扩展基础设施、治理、安全、有效模型与专业人才。</p></div>
+        <div class="capability-point"><b>主要障碍</b><p>数据质量不足与组织准备度不够，往往比模型本身更先卡住项目。</p></div>
+        <div class="capability-point"><b>企业架构</b><p>把 AI 对齐业务目标、技术现状与目标运营模型，避免孤立建设。</p></div>
+        <div class="capability-point"><b>变革管理</b><p>推动采用、建立信任，让新能力真正进入日常工作。</p></div>
+      </div>
+      <div class="quote" style="margin-top:18px;font-size:clamp(19px,2.1vw,30px)">AI 不是技术项目，<strong>而是一段企业转型旅程。</strong></div>
+      <a class="capability-source" href="https://www.linkedin.com/posts/imadityars_ai-digitaltransformation-enterprisearchitecture-activity-7469242335307030528-jSRF/" target="_blank" rel="noreferrer">图片与观点来源：LinkedIn / Aditya Sharma</a>
+    </div>
+  </div>
+</section>
+
+<section class="slide capability-slide" data-title="AI 冰山模型">
+  <div class="topline"><span>17 / 30</span><span>AI 落地的三层冰山</span></div>
+  <div class="capability-layout">
+    <img class="capability-visual" src="assets/enterprise-ai-iceberg.png" alt="企业 AI 冰山模型：展示层、工程层与决定成功的治理运营层">
+    <div class="capability-copy">
+      <div class="eyebrow">进一步拆开 / 企业 AI 冰山</div>
+      <h2>用户看到的只是展示层，<br><span class="teal">真正的工作在水面之下。</span></h2>
+      <p class="lead">AI 看起来很小，直到真实用户开始点击。规模化依赖的不只是模型，而是完整的工程、治理与运营体系。</p>
+      <div class="capability-points">
+        <div class="capability-point"><b>展示层</b><p>Dashboard、Copilot、Chatbot、报告，是大家最先看到的 10%。</p></div>
+        <div class="capability-point"><b>工程层</b><p>数据管道、RAG、身份管理与评测系统，支撑真实任务稳定运行。</p></div>
+        <div class="capability-point"><b>治理与风险</b><p>治理模型、风险框架、合规映射，定义谁负责、如何审批与如何追溯。</p></div>
+        <div class="capability-point"><b>运营与责任</b><p>运营模型与责任模型，让 AI 能持续部署、监控、改进并扩大。</p></div>
+      </div>
+      <div class="quote" style="margin-top:18px;font-size:clamp(19px,2.1vw,30px)">展示层带来注意力，<strong>水面下的系统决定能否成功。</strong></div>
+      <a class="capability-source" href="https://www.facebook.com/aimattant/posts/the-ai-iceberg-looks-tinyuntil-real-users-start-clickingmost-beginners-think-ai-/1288551533320005/" target="_blank" rel="noreferrer">图片与观点来源：Facebook / AI Matt</a>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-title="找到场景">
+  <div class="topline"><span>18 / 30</span><span>从真实工作找到高价值场景</span></div>
+  <div class="eyebrow">别从 AI 能做什么开始</div>
+  <h2>从工作痕迹开始，<br>找一件<span class="teal">值得验证的事。</span></h2>
+  <div class="questions">
+    <div class="question"><b>01 / 频率</b><span>哪件事情反复出现？</span></div><div class="question"><b>02 / 时间</b><span>哪一步最耗时间？</span></div><div class="question"><b>03 / 输入</b><span>输入来自哪里？</span></div>
+    <div class="question"><b>04 / 输出</b><span>输出交给谁？</span></div><div class="question"><b>05 / 标准</b><span>什么才算做好？</span></div><div class="question"><b>06 / 反馈</b><span>谁可以给反馈？</span></div>
+  </div>
+  <div class="abc">
+    <div class="abc-card"><h3>把场景写成一句话</h3><p>把 <strong>A</strong> 变成 <strong>B</strong>，交给 <strong>C</strong>。</p></div><div class="abc-arrow">→</div><div class="abc-card hot"><h3>再决定技术</h3><p>AI、Workflow、固定程序，还是人机组合？</p></div>
+  </div>
+</section>
+
+<section class="slide" data-title="如何选择场景">
+  <div class="topline"><span>19 / 30</span><span>选对场景，AI 才有机会落地</span></div>
+  <div class="eyebrow">场景选择 / 不要从最酷的 Demo 开始</div>
+  <h2>选错场景，往往是 AI 项目<span class="accent">失败的第一原因。</span></h2>
+  <div class="scene-principles">
+    <div class="scene-principle"><div class="scene-num">01 / 数据相关优先</div><h3>先看数据有没有积累</h3><p>优先选择已有结构化沉淀的场景，而不是从零收集数据。数据质量决定 AI 效果上限。</p><div class="scene-good"><strong>适合</strong>✓ ERP / MES 数据完整<br>✓ IoT 传感器已部署</div><div class="scene-bad"><strong>避开</strong>× 数据靠人工填报<br>× 大量纸质单据</div></div>
+    <div class="scene-principle"><div class="scene-num">02 / 效果可衡量优先</div><h3>先设可量化的北极星指标</h3><p>“减少 30% 人工坐席”可以考核；“提升体验”无法验收。目标模糊，项目就容易烂尾。</p><div class="scene-good"><strong>适合</strong>✓ 质检漏检率下降<br>✓ 能耗下降 · OEE 提升</div><div class="scene-bad"><strong>避开</strong>× 提升客户满意度<br>× 优化流程</div></div>
+    <div class="scene-principle"><div class="scene-num">03 / 重复繁琐优先</div><h3>先解决高频人工重复劳动</h3><p>高频率、规则明确的工作，是 AI 最擅长、ROI 最高的切入点。频率越高，节省的人力越可观。</p><div class="scene-good"><strong>适合</strong>✓ 质检 / 巡检<br>✓ 数据录入 · 报告生成</div><div class="scene-bad"><strong>避开</strong>× 一次性决策<br>× 高度个性化场景</div></div>
+  </div>
+  <div class="quote" style="margin-top:22px">先看数据，再看指标，最后看频率。<strong>选对场景，才谈得上规模化。</strong></div>
+</section>
+
+<section class="slide" data-title="红星场景">
+  <div class="topline"><span>20 / 30</span><span>选出第一个验证点</span></div>
+  <div class="eyebrow">不要找最酷的场景</div>
+  <h2>选一个<span class="accent">红星场景</span>：<br>真实、可控、很快能跑出结果。</h2>
+  <div class="score">
+    <div class="score-list">
+      <div class="score-row head"><span>候选工作</span><span>频率</span><span>标准化</span><span>反馈</span><span>人工时（Hours）</span></div>
+      <div class="score-row"><span>客服问题归类</span><span>高</span><span>高</span><span>高</span><span>多</span></div><div class="score-row"><span>采购询价整理</span><span>中</span><span>高</span><span>中</span><span>中</span></div><div class="score-row"><span>销售方案生成</span><span>中</span><span>中</span><span>低</span><span>多</span></div><div class="score-row"><span>生产异常判断</span><span>低</span><span>低</span><span>高</span><span>中</span></div>
+    </div>
+    <div class="panel"><div class="star">★</div><h3>红星标准</h3><p>有真实材料。风险可控。结果能在几周内被一个真实的人验收。</p><div class="rule"></div><p><strong>目的：</strong>最快获得外部反馈，而不是最快做出一个漂亮 Demo。</p></div>
+  </div>
+  <p class="footer-line"><span>标准化越高，越容易做替代；决策越复杂，越可能放大人的能力。</span><span>17</span></p>
+</section>
+
+<section class="slide" data-title="选技术形态">
+  <div class="topline"><span>21 / 30</span><span>AI、Workflow 还是程序</span></div>
+  <div class="eyebrow">一个场景不要整包交给 LLM</div>
+  <h2>把流程拆开，<br>每一步选择<span class="teal">最合适的能力。</span></h2>
+  <div class="path">
+    <div class="path-card"><b>固定规则</b><p>输入输出确定、判断稳定。优先用程序，便宜、快、可测试。</p></div><div class="path-card"><b>固定流程</b><p>步骤明确、要调用多个系统。用 Workflow 或 RPA。</p></div><div class="path-card"><b>理解与生成</b><p>自然语言、总结、分类、信息抽取。直接 Call LLM。</p></div><div class="path-card"><b>动态决策</b><p>目标复杂、下一步取决于结果。再考虑 Agent。</p></div>
+  </div>
+  <div class="panel" style="margin-top:22px"><p style="margin:0"><strong>真实业务通常是：</strong>程序 + Workflow + LLM + 人。预测型 AI 也不要默认用 LLM。</p></div>
+</section>
+
+<section class="slide" data-title="AI 工具地图">
+  <div class="topline"><span>22 / 30</span><span>用对的工具帮助落地</span></div>
+  <div class="eyebrow">AI 工具地图 / 先选形态，再选工具</div>
+  <h2>工具要跟着场景走，<br>再决定<span class="teal">谁来用、怎么落地。</span></h2>
+  <div class="tool-map">
+    <div class="tool-row head"><div>场景</div><div>工具</div><div>形态例子</div><div>适合什么人员</div></div>
+    <div class="tool-row"><div class="tool-cell" data-label="场景">写 / 改代码</div><div class="tool-cell" data-label="工具">AI Coding Agent</div><div class="tool-cell" data-label="形态例子">Codex、Claude Code、Trae、WorkBuddy</div><div class="tool-cell" data-label="适合什么人员">开发者、维护型 IT</div></div>
+    <div class="tool-row"><div class="tool-cell" data-label="场景">复杂、多步骤任务</div><div class="tool-cell" data-label="工具">Agent</div><div class="tool-cell" data-label="形态例子">OpenClaw、Hermes Agent</div><div class="tool-cell" data-label="适合什么人员">IT、自动化人员、AI 应用开发者</div></div>
+    <div class="tool-row"><div class="tool-cell" data-label="场景">操作网页 / 电脑</div><div class="tool-cell" data-label="工具">Browser / Computer Use</div><div class="tool-cell" data-label="形态例子">browser-use、Computer Use</div><div class="tool-cell" data-label="适合什么人员">运营、IT、测试、数据人员</div></div>
+    <div class="tool-row"><div class="tool-cell" data-label="场景">重复操作</div><div class="tool-cell" data-label="工具">RPA / Automation</div><div class="tool-cell" data-label="形态例子">UiPath、Power Automate、浏览器自动化</div><div class="tool-cell" data-label="适合什么人员">业务人员、运营、IT</div></div>
+    <div class="tool-row"><div class="tool-cell" data-label="场景">数据 / 文件处理</div><div class="tool-cell" data-label="工具">Python / Shell Script</div><div class="tool-cell" data-label="形态例子">Python、Shell、Excel 自动化</div><div class="tool-cell" data-label="适合什么人员">开发者、数据人员、懂一点代码的业务人员</div></div>
+    <div class="tool-row"><div class="tool-cell" data-label="场景">自己搭 AI 应用</div><div class="tool-cell" data-label="工具">LLM SDK / Agent Framework</div><div class="tool-cell" data-label="形态例子">OpenAI SDK、LangGraph、CrewAI 等</div><div class="tool-cell" data-label="适合什么人员">开发者、AI 应用开发团队</div></div>
+    <div class="tool-row"><div class="tool-cell" data-label="场景">简单 AI 能力</div><div class="tool-cell" data-label="工具">直接 Call LLM</div><div class="tool-cell" data-label="形态例子">LLM API + Prompt</div><div class="tool-cell" data-label="适合什么人员">开发者、数据人员、需要嵌入 AI 的产品团队</div></div>
+  </div>
+  <div class="tool-judgment"><strong>判断方法：</strong>不会写代码 → AI 应用 / RPA / Computer Use；会一点代码 → Python + LLM；开发者 → Coding Agent；复杂自动化 → Agent；自己造系统 → LLM SDK / Agent Framework。</div>
+</section>
+
+<section class="slide" data-title="三层 ROI">
+  <div class="topline"><span>23 / 30</span><span>企业 AI 怎么算</span></div>
+  <div class="eyebrow">价值核算 / 不只看使用率</div>
+  <h2>先定义价值，<br>再用三段核算追踪<span class="teal">兑现结果。</span></h2>
+  <div class="roi">
+    <div class="roi-card"><div class="level">01 / 上线前</div><div class="time">价值假设</div><h3>先算清楚为什么做</h3><p>明确痛点、业务负责人、目标指标和预计收益，没有价值目标就不立项。</p></div>
+    <div class="roi-card"><div class="level">02 / 上线后</div><div class="time">真实数据</div><h3>核算实际改变了什么</h3><p>用真实业务数据验证时间、成本、周期、质量或收入，不能只看使用率。</p></div>
+    <div class="roi-card"><div class="level">03 / 规模化</div><div class="time">经营汇总</div><h3>把项目结果放进经营</h3><p>将多个场景的实际收益汇总，判断是否值得复制、扩张或停止投入。</p></div>
+  </div>
+  <div class="timeline"><div class="period"><b>试点</b><h3>验证假设</h3><p>用最小业务单元验证真实输入、工作流和价值指标。</p></div><div class="period"><b>生产</b><h3>稳定交付</h3><p>补齐权限、监控、验收和异常处理，持续记录真实结果。</p></div><div class="period"><b>规模化</b><h3>复制或叫停</h3><p>能复制就放量，不能复制或无价值就及时止损。</p></div></div>
+  <a class="source-note" href="https://cn.ceibs.edu/media/press-clippings/faculty/29204" target="_blank" rel="noreferrer">价值核算框架参考：方跃《企业AI转型：如何从“表演”走向价值》，中欧国际工商学院</a>
+</section>
+
+<section class="slide" data-title="POC 到生产">
+  <div class="topline"><span>24 / 30</span><span>从 POC 到生产</span></div>
+  <div class="eyebrow">小步试点 / 验证再推广</div>
+  <h2>先让一个最小单元跑通，<br>再把结果变成<span class="accent">可复制标准。</span></h2>
+  <div class="slots">
+    <div class="slot"><b>01</b><h3>Input</h3><p>真实输入从哪里来？格式是什么？缺什么就停。</p></div><div class="slot"><b>02</b><h3>Steps</h3><p>每一步做什么？哪些步骤交给程序，哪些交给 AI？</p></div><div class="slot"><b>03</b><h3>Rules</h3><p>权限、边界、例外和不能继续的条件。</p></div><div class="slot"><b>04</b><h3>Output</h3><p>输出交给谁？格式、时效和可追溯性是什么？</p></div><div class="slot"><b>05</b><h3>Accept</h3><p>什么叫完成？谁验收？失败如何记录和回滚？</p></div>
+  </div>
+  <div class="quote" style="margin-top:28px">先小流量验证价值，<strong>再逐步放量；不能复制，就不要继续加码。</strong></div>
+  <a class="source-note" href="https://cn.ceibs.edu/media/press-clippings/faculty/29204" target="_blank" rel="noreferrer">小步试点与规模化原则参考：方跃《企业AI转型：如何从“表演”走向价值》，中欧国际工商学院</a>
+</section>
+
+<section class="slide" data-title="标杆对照">
+  <div class="topline"><span>25 / 30</span><span>不同规模，不同打法</span></div>
+  <div class="eyebrow">案例不是答案，是对照组</div>
+  <h2>别只问“用了什么模型”，<br>要问<span class="accent">工作被怎样重新组织。</span></h2>
+  <div class="cases">
+    <div class="case"><b>AI Native 小团队</b><span>目标 → Agent / 人 → 工作流</span><p>从一开始就重写工作，不背旧流程。</p></div><div class="case"><b>中型传统企业</b><span>单岗位 / 单流程</span><p>从一个真实场景切入，小步 POC。</p></div><div class="case"><b>大型制造企业</b><span>AI → 生产 / 工艺</span><p>进入设备、工艺、维修等物理流程。</p></div><div class="case"><b>大型互联网</b><span>Agent → 大量岗位</span><p>重点从一个工具变成规模化工作单元。</p></div><div class="case"><b>数据驱动业务</b><span>数据 + Eval + Workflow</span><p>模型放进真实业务系统，持续反馈。</p></div><div class="case"><b>海外大型企业</b><span>降本 / 生产化 / Agent</span><p>不同路径对应不同 ROI，不能只比节省人数。</p></div>
+  </div>
+  <p class="footer-line"><span>真正的企业 AI，不是接入一个大模型，而是把模型放进真实业务系统。</span><span>22</span></p>
+</section>
+
+<section class="slide" data-title="组织条件">
+  <div class="topline"><span>26 / 30</span><span>AI 怎么真正落地</span></div>
+  <div class="eyebrow">组织条件 / 让价值有人负责</div>
+  <h2>AI 转型不是 IT 项目，<br>必须由<span class="accent">业务和财务共同负责。</span></h2>
+  <div class="org">
+    <div class="org-card"><div class="org-num">01</div><div><b>业务主导</b><p>业务部门提出痛点、定义目标并承担验收责任。</p></div></div><div class="org-card"><div class="org-num">02</div><div><b>财务参与</b><p>把投入、收益和规模化结果纳入经营核算。</p></div></div><div class="org-card"><div class="org-num">03</div><div><b>技术支撑</b><p>提供模型、数据、系统、权限和可运维的底座。</p></div></div><div class="org-card"><div class="org-num">04</div><div><b>跨职能协作</b><p>业务、IT、数据、法务和安全共同设计边界。</p></div></div><div class="org-card"><div class="org-num">05</div><div><b>结果验收</b><p>提前定义什么叫成功、失败和应该停止。</p></div></div><div class="org-card"><div class="org-num">06</div><div><b>一把手授权</b><p>为流程重构、试错和持续迭代留出空间。</p></div></div>
+  </div>
+  <div class="quote" style="margin-top:24px">真正的组织能力是：<strong>业务定价值，财务算结果，技术做支撑。</strong></div>
+</section>
+
+<section class="slide" data-title="行动路线">
+  <div class="topline"><span>27 / 30</span><span>企业 AI 落地行动路线</span></div>
+  <div class="eyebrow">回去以后具体做什么 / 价值优先</div>
+  <h2>从一个业务目标开始，<br>走完<span class="teal">验证、复制与止损。</span></h2>
+  <div class="route">
+    <div class="route-step"><b>01 / VALUE</b><h3>只定一个目标</h3><p>明确痛点、业务负责人和可量化的成功指标。</p></div><div class="route-step"><b>02 / PILOT</b><h3>最小单元试点</h3><p>用真实材料跑通工作流，记录结果和失败证据。</p></div><div class="route-step"><b>03 / SCALE</b><h3>标准化再放量</h3><p>把模型、数据、流程、权限和运维做成可复制组件。</p></div><div class="route-step"><b>04 / STOP</b><h3>不行就及时叫停</h3><p>价值不成立、无法复制或只适合演示，就停止投入。</p></div>
+  </div>
+  <div class="checklist"><div class="check"><strong>继续的条件：</strong>价值可衡量、流程可交付、方案可复制。</div><div class="check"><strong>停止的条件：</strong>没有业务价值，或规模化成本超过收益。</div></div>
+  <a class="source-note" href="https://cn.ceibs.edu/media/press-clippings/faculty/29204" target="_blank" rel="noreferrer">行动框架参考：方跃《企业AI转型：如何从“表演”走向价值》，中欧国际工商学院</a>
+</section>
+
+<section class="slide" data-title="隐私控制 ROI">
+  <div class="topline"><span>28 / 30</span><span>企业 AI 怎么算</span></div>
+  <div class="eyebrow">隐私控制 ROI / 成本随模型规模变化</div>
+  <h2>隐私控制不是一个开关，<br>要把<span class="teal">模型规模和部署方式一起算。</span></h2>
+  <div class="privacy-roi">
+    <div>
+      <div class="privacy-table-title">01 / 部署方式比较</div>
+      <div class="privacy-table-wrap">
+        <table class="privacy-table methods">
+          <thead><tr><th>方法</th><th>预计成本</th><th>优点</th><th>缺点</th></tr></thead>
+          <tbody>
+            <tr><td>自部署模型 + vLLM</td><td>30B：50-150 万/年<br>100B：100-300 万/年<br>DeepSeek 671B：400-1,000 万+/年</td><td>数据完全留在企业内部。隐私、权限、日志和部署策略可控。</td><td>初始投入和运维成本高。需要 GPU、网络、存储、安全和专业团队。</td></tr>
+            <tr><td>持续租用 GPU 部署模型</td><td>30B：1.5-2.2 万/月<br>100B：6.1-8.6 万/月<br>671B：24-34 万/月<br><small>约 18-413 万/年</small></td><td>不需要一次性购买硬件，可快速扩容，适合长期在线服务。</td><td>长期费用持续产生，依赖云平台 GPU 供应，仍需自行运维。</td></tr>
+            <tr><td>短期租用 Spot GPU</td><td>约 10-20 元/GPU·小时<br>30B：10-20 元/小时<br>100B：40-80 元/小时<br>671B：160-320 元/小时</td><td>适合 POC、Benchmark、压测和临时任务，按小时付费。</td><td>机器可能被回收或中断，不适合稳定生产，需要自动恢复脚本。</td></tr>
+            <tr><td>PII 脱敏网关<br>+ 本地 30B<br>+ 外部 LLM</td><td>首年约 20-40 万元<br><small>本地 GPU：1.5-2.2 万/月 x 12<br>加轻量网关和中等 API 用量</small></td><td>敏感任务先在本地处理，普通任务使用外部强模型，隐私和质量较平衡。</td><td>系统更复杂。PII 检测可能遗漏敏感信息，脱敏也可能损失上下文。</td></tr>
+            <tr><td>企业级可信 LLM</td><td>首年约 20-200 万+<br><small>按合同、席位和 API 用量变化</small></td><td>模型质量、SLA、审计、权限和合规支持通常更完整。</td><td>持续订阅费用较高，数据治理仍依赖供应商合同和实际执行。</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div>
+      <div class="privacy-table-title">02 / 模型规模成本基线</div>
+      <div class="privacy-table-wrap">
+        <table class="privacy-table models">
+          <thead><tr><th>模型规模</th><th>GPU 规模与测试配置</th><th>纯 GPU 年成本</th><th>企业首年总成本估算</th><th>公开实测（按并发区分）</th></tr></thead>
+          <tbody>
+            <tr><td>30B</td><td>最低约 1 x H100<br>生产建议 2-4 张</td><td>18-26 万元/张/年</td><td>约 50-150 万元</td><td>暂无同口径公开实测<br><small>规划参考：30-80 tokens/s</small></td></tr>
+            <tr><td>约 100B</td><td>最低约 4 x H100<br>生产建议 8 张左右</td><td>约 73-103 万元/年</td><td>约 100-300 万元</td><td>暂无同口径公开实测<br><small>规划参考：15-40 tokens/s</small></td></tr>
+            <tr><td>DeepSeek-V3 / R1<br>671B 总参数<br><small>公开实测：V3/R1 recipe</small></td><td>成本基线：16 x H100<br>公开实测：8 x H200 / MI300X，FP8，TP=8</td><td>约 292-413 万元/年<br><small>16 张 H100</small></td><td>约 400-1,000 万元以上</td><td>vLLM / C=1：61 tok/s<br>SGLang / C=1：34.26 tok/s<br>SGLang / C=100：463.80 tok/s 总吞吐</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="privacy-note">成本估算基于 H100 80GB、约 21-29 元/GPU·小时、全年运行；30B / 约100B 为规划值，暂无同口径公开实测。DeepSeek 公开实测：<a href="https://github.com/vllm-project/recipes/blob/main/DeepSeek/DeepSeek-V3.md" target="_blank">vLLM FP8 / C=1：61 tok/s</a>；<a href="https://docs.sglang.io/basic_usage/deepseek_v3.html" target="_blank">SGLang / C=1：34.26 tok/s，C=100：463.80 tok/s 总吞吐</a>。不同框架、硬件、上下文和并发不可直接横向比较。企业首年总成本另含存储、网络、安全、监控、冗余和运维，不含模型训练成本。</div>
+</section>
+
+<section class="slide cover final" data-title="结束">
+  <div class="topline"><span>29 / 30</span><span>带走五个判断</span></div>
+  <div class="eyebrow">总结 / 从工具到工作重构</div>
+  <h2 data-pretext contenteditable="true">AI 落地不是多买一个工具，<br><span class="accent">而是重新设计工作。</span></h2>
+  <div class="quote" style="color:var(--white);border-color:var(--yellow)">先从一个真实场景开始。<br>用可验收的标准跑通一次。<br>再把结果复制到更多工作。</div>
+  <div class="summary-grid">
+    <div class="summary-item"><b>01 / 从真实工作开始</b><p>不要从 AI 能做什么开始，从公司每天在做什么开始。</p></div>
+    <div class="summary-item"><b>02 / 先设计问题</b><p>许多失败来自问题、流程和验收没有设计好。</p></div>
+    <div class="summary-item"><b>03 / 看完整成本</b><p>Token 不是全部成本，人、数据、流程和组织同样重要。</p></div>
+    <div class="summary-item"><b>04 / 区分 POC 与生产</b><p>POC 成功不是上线成功，上线才是持续反馈的开始。</p></div>
+  </div>
+  <div class="cover-meta"><span>场景</span><span>流程</span><span>Eval</span><span>组织</span></div>
+</section>
+
+<section class="slide" data-title="什么时候考虑微调">
+  <div class="topline"><span>30 / 30</span><span>模型策略：先稳定行为，再考虑微调</span></div>
+  <div class="eyebrow">什么时候考虑微调 / 不要把微调当成第一步</div>
+  <h2>微调不是为了让模型知道更多，<br>而是让它在稳定任务上<span class="teal">做得更一致。</span></h2>
+  <div class="fine-tune-grid">
+    <div class="fine-tune-card"><div class="fine-label">01 / 任务稳定</div><h3>重复量大、输入输出相对固定</h3><p>适合分类、信息抽取、审核、格式转换等长期运行的同类任务。</p></div>
+    <div class="fine-tune-card"><div class="fine-label">02 / 样本充足</div><h3>已经积累高质量示例</h3><p>有经过人工验收的输入 / 输出样本，并覆盖常见情况和边界情况。</p></div>
+    <div class="fine-tune-card"><div class="fine-label">03 / 行为稳定</div><h3>需要固定风格和输出格式</h3><p>希望模型稳定遵循术语、语气、字段结构或业务模板，Prompt 仍然不够稳定。</p></div>
+    <div class="fine-tune-card"><div class="fine-label">04 / 成本优化</div><h3>调用量大，成本或延迟需要下降</h3><p>用更小的微调模型减少上下文、降低单次成本，或提升响应速度。</p></div>
+  </div>
+  <div class="fine-tune-boundary"><strong>先别微调：</strong>知识需要持续更新 → RAG；事实和权限实时变化 → 工具调用；没有高质量样本 → 先做数据积累和 Eval；偶尔使用 → 很难摊平微调成本。</div>
+  <div class="quote" style="margin-top:18px">知识要更新 → RAG；行为要稳定 → 微调；数据要实时 → 工具调用；流程要可靠 → Workflow + Eval。</div>
+</section>
+</main>
+<nav class="controls" aria-label="演示控制"><button id="prev" type="button" aria-label="上一页" title="上一页">←</button><span class="counter" id="counter">01 / 30</span><button id="next" type="button" aria-label="下一页" title="下一页">→</button></nav>
+<script>
+(() => { const slides=[...document.querySelectorAll('.slide')]; const counter=document.querySelector('#counter'); let index=0; const show=(next,behavior='smooth')=>{index=Math.max(0,Math.min(slides.length-1,next)); slides[index].scrollIntoView({behavior,block:'start'}); slides.forEach((s,i)=>s.classList.toggle('active',i===index)); counter.textContent=String(index+1).padStart(2,'0')+' / '+String(slides.length).padStart(2,'0');};
+document.querySelector('#prev').addEventListener('click',()=>show(index-1)); document.querySelector('#next').addEventListener('click',()=>show(index+1));
+document.addEventListener('keydown',e=>{if(['ArrowRight','ArrowDown','PageDown',' '].includes(e.key)){e.preventDefault();show(index+1)} if(['ArrowLeft','ArrowUp','PageUp'].includes(e.key)){e.preventDefault();show(index-1)} if(e.key==='Home')show(0,'auto'); if(e.key==='End')show(slides.length-1,'auto'); });
+const observer=new IntersectionObserver(entries=>entries.forEach(entry=>{if(entry.isIntersecting){index=slides.indexOf(entry.target); slides.forEach((s,i)=>s.classList.toggle('active',i===index)); counter.textContent=String(index+1).padStart(2,'0')+' / '+String(slides.length).padStart(2,'0')}}),{threshold:.55}); slides.forEach(s=>observer.observe(s));
+const relayout=()=>document.querySelectorAll('[data-pretext]').forEach(el=>{el.style.minHeight=''; if(el.scrollHeight>el.clientHeight)el.style.minHeight=el.scrollHeight+'px'}); new ResizeObserver(relayout).observe(document.body); new MutationObserver(relayout).observe(document.body,{subtree:true,characterData:true,childList:true}); document.fonts?.ready.then(relayout); relayout();
+})();
+</script>
+<!-- Pretext fallback hook: the deck remains functional without network access. -->
+<script type="module">try{const {prepare,layout}=await import('https://esm.sh/@chenglou/pretext'); await document.fonts.ready; document.querySelectorAll('[data-pretext]').forEach(el=>{const h=prepare(el.textContent,getComputedStyle(el).font); const r=layout(h,el.clientWidth,parseFloat(getComputedStyle(el).lineHeight)); el.style.minHeight=r.height+'px';});}catch(e){/* local/offline fallback above */}</script>
+</body>
+</html>

@@ -1,0 +1,863 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#f4f0e8">
+<title>AI Agent: Developer's Silicon Teammate</title>
+<link rel="icon" href="data:,">
+<style>
+:root{--paper:#f4f0e8;--ink:#202321;--muted:#68716d;--line:#d9d3c7;--soft:#ebe5da;--orange:#e26d3e;--teal:#177b78;--yellow:#e9b84c;--white:#fffdf8;--mono:"SFMono-Regular",Consolas,"Liberation Mono",monospace;--sans:Inter,"PingFang SC","Noto Sans SC","Microsoft YaHei",sans-serif}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:#d4cec2;color:var(--ink);font-family:var(--sans);line-height:1.45}button{font:inherit}.deck{width:100%}.slide{position:relative;width:min(100%,1600px);min-height:100svh;aspect-ratio:16/9;margin:0 auto;padding:clamp(34px,5.5vw,92px) clamp(28px,7vw,112px);background:var(--paper);border-bottom:1px solid var(--line);display:flex;flex-direction:column;justify-content:center;overflow:hidden}.slide:nth-child(even){background:var(--white)}.slide::after{content:"";position:absolute;left:0;right:0;bottom:0;height:5px;background:var(--orange);transform:scaleX(0);transform-origin:left;transition:transform .25s}.slide.active::after{transform:scaleX(1)}.topline{position:absolute;top:24px;left:clamp(28px,7vw,112px);right:clamp(28px,7vw,112px);display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:12px;letter-spacing:.08em;text-transform:uppercase}.eyebrow{display:inline-flex;align-items:center;gap:8px;color:var(--teal);font-size:12px;letter-spacing:.16em;text-transform:uppercase;font-weight:800}.eyebrow::before{content:"";width:24px;height:2px;background:var(--orange)}h1,h2,h3,p{margin-top:0}h1{font-size:clamp(44px,6.4vw,104px);line-height:1.02;letter-spacing:0;font-weight:850;max-width:940px;margin-bottom:22px}h2{font-size:clamp(30px,4.2vw,64px);line-height:1.08;letter-spacing:0;font-weight:820;max-width:1050px;margin-bottom:20px}h3{font-size:clamp(18px,1.8vw,28px);line-height:1.15;margin-bottom:9px;font-weight:800}p{font-size:clamp(15px,1.35vw,22px);color:var(--muted);max-width:920px}.lead{font-size:clamp(19px,2.1vw,32px);line-height:1.32;color:var(--ink);max-width:930px}.accent{color:var(--orange)}.teal{color:var(--teal)}.muted{color:var(--muted)}.rule{height:1px;background:var(--line);width:100%;margin:24px 0}.cover{background:var(--ink);color:var(--white)}.cover::before{content:"01";position:absolute;right:7vw;top:12vh;font-family:var(--mono);font-size:clamp(90px,18vw,280px);line-height:1;color:#363b38;font-weight:700}.cover::after{background:var(--yellow)}.cover .topline{color:#abb4ae}.cover h1{position:relative;max-width:980px}.cover .lead{color:#d4dbd5}.cover .eyebrow{color:var(--yellow)}.cover .eyebrow::before{background:var(--yellow)}.cover-meta{display:flex;gap:12px;align-items:center;margin-top:30px;color:#abb4ae;font-size:14px}.cover-meta span{padding:7px 10px;border:1px solid #4c544f;border-radius:999px}.cover-mark{position:absolute;right:9vw;bottom:12vh;width:150px;height:150px;border:1px solid #59645d;display:grid;place-items:center;color:var(--yellow);font-family:var(--mono);font-size:36px}.split{display:grid;grid-template-columns:1.05fr .95fr;gap:clamp(30px,6vw,100px);align-items:center}.split-tight{display:grid;grid-template-columns:.8fr 1.2fr;gap:48px;align-items:center}.statement{font-size:clamp(28px,4.5vw,72px);line-height:1.08;font-weight:800;max-width:620px}.statement small{display:block;font-size:.34em;line-height:1.4;color:var(--muted);font-weight:500;margin-top:22px}.panel{border:1px solid var(--line);background:rgba(255,253,248,.66);padding:clamp(20px,2.5vw,38px);border-radius:4px}.dark-panel{background:#2a302d;border-color:#414a44;color:var(--white)}.dark-panel p{color:#bac3bc}.quote{border-left:4px solid var(--orange);padding-left:22px;font-size:clamp(22px,2.6vw,40px);line-height:1.2;color:var(--ink);max-width:860px}.quote strong{color:var(--orange)}.flow{display:grid;grid-template-columns:repeat(5,1fr);gap:0;align-items:stretch;margin-top:26px}.flow-item{position:relative;padding:20px 18px;border:1px solid var(--line);background:var(--white);min-height:150px}.flow-item:not(:last-child)::after{content:"";position:absolute;z-index:2;right:-10px;top:50%;width:18px;height:18px;border-top:2px solid var(--orange);border-right:2px solid var(--orange);transform:translateY(-50%) rotate(45deg);background:var(--white)}.flow-num{font-family:var(--mono);font-size:13px;color:var(--orange);margin-bottom:22px}.flow-item h3{font-size:clamp(16px,1.45vw,22px)}.flow-item p{font-size:clamp(13px,1.1vw,17px);line-height:1.35}.before-after{display:grid;grid-template-columns:1fr 54px 1fr;align-items:center;gap:18px;margin-top:28px}.state{padding:28px;border:1px solid var(--line);background:var(--white);min-height:180px}.state h3{color:var(--muted)}.state.after{border-color:var(--orange);background:#fff5ee}.state.after h3{color:var(--orange)}.arrow{font-size:28px;color:var(--orange);text-align:center}.tool-map{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-top:22px}.tool{border-top:4px solid var(--teal);padding:16px 15px;background:var(--soft);min-height:150px}.tool:nth-child(2){border-color:var(--orange)}.tool:nth-child(3){border-color:var(--yellow)}.tool:nth-child(4){border-color:#5b7195}.tool:nth-child(5){border-color:#8a6370}.tool b{display:block;font-size:15px;margin-bottom:8px}.tool span{font-size:13px;color:var(--muted);line-height:1.4}.task{display:flex;flex-direction:column;justify-content:center;min-height:150px}.task .big{font-size:clamp(30px,4vw,64px);font-weight:850;line-height:1;color:var(--orange)}.task .label{font-size:14px;color:var(--muted);margin-top:8px}.code-card{background:#252b28;color:#eef3ed;border-radius:4px;padding:22px 24px;font:clamp(12px,1.1vw,17px)/1.65 var(--mono);white-space:pre-wrap}.code-card .comment{color:#8a9f92}.code-card .key{color:#f2bd68}.code-card .cmd{color:#85d4c4}.prompt-stack{display:grid;gap:12px;margin-top:22px}.prompt{display:grid;grid-template-columns:36px 1fr;gap:12px;align-items:start;padding:15px 18px;background:var(--soft);border-left:3px solid var(--teal)}.prompt:nth-child(2){border-color:var(--orange)}.prompt:nth-child(3){border-color:var(--yellow)}.prompt .n{font-family:var(--mono);color:var(--muted)}.prompt p{margin:0;color:var(--ink);font:14px/1.55 var(--mono)}.grid-8{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:20px}.mini{background:var(--soft);padding:18px;border-top:3px solid var(--teal);min-height:102px}.mini:nth-child(2n){border-color:var(--orange)}.mini:nth-child(3n){border-color:var(--yellow)}.mini b{font-size:15px;display:block;margin-bottom:6px}.mini span{font-size:13px;color:var(--muted)}.loop{display:flex;justify-content:center;align-items:center;gap:10px;flex-wrap:wrap;margin:34px 0}.loop-item{border:1px solid var(--line);background:var(--white);padding:17px 20px;min-width:120px;text-align:center}.loop-item strong{display:block;font-size:15px}.loop-item span{font-size:12px;color:var(--muted)}.loop-arrow{color:var(--orange);font-size:24px}.evidence{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:24px}.evidence .panel{min-height:118px}.evidence b{font-family:var(--mono);font-size:13px;color:var(--teal)}.evidence p{font-size:14px;margin:8px 0 0}.skill-steps{display:grid;grid-template-columns:repeat(6,1fr);gap:0;margin-top:25px}.skill-step{padding:18px 14px;background:var(--soft);border:1px solid var(--paper);min-height:145px}.skill-step:first-child{background:#dcebe6}.skill-step:last-child{background:#fff0e7}.skill-step b{font-family:var(--mono);font-size:12px;color:var(--teal)}.skill-step h3{font-size:16px;margin:18px 0 7px}.skill-step p{font-size:12px;line-height:1.4}.repo{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:center;margin-top:22px}.tree{font:15px/1.9 var(--mono);padding:22px 28px;background:#252b28;color:#eef3ed}.tree .folder{color:#f2bd68}.tree .file{color:#9bd7ca}.context-list{display:grid;gap:8px}.context-list div{padding:13px 16px;background:var(--soft);font-size:14px;border-left:3px solid var(--teal)}.guardrail{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-top:26px}.guard{padding:22px;border:1px solid var(--line);background:var(--white);min-height:180px}.guard:first-child{border-top:4px solid var(--teal)}.guard:nth-child(2){border-top:4px solid var(--yellow)}.guard:nth-child(3){border-top:4px solid var(--orange)}.guard-label{font-family:var(--mono);color:var(--muted);font-size:12px}.guard h3{margin:18px 0 9px}.guard p{font-size:14px}.ladder{display:flex;align-items:end;gap:8px;height:190px;margin-top:24px}.rung{flex:1;position:relative;background:var(--soft);border-top:4px solid var(--teal);padding:12px;min-height:60px}.rung:nth-child(2){min-height:90px;border-color:#4d9f97}.rung:nth-child(3){min-height:120px;border-color:var(--yellow)}.rung:nth-child(4){min-height:150px;border-color:var(--orange)}.rung:nth-child(5){min-height:180px;border-color:#b34b39}.rung b{display:block;font-size:13px}.rung span{display:block;color:var(--muted);font-size:11px;margin-top:7px}.route{display:grid;grid-template-columns:repeat(5,1fr);gap:0;margin-top:26px}.route-step{border-top:3px solid var(--orange);padding:18px 16px 0;min-height:145px}.route-step:nth-child(2){border-color:var(--yellow)}.route-step:nth-child(3){border-color:var(--teal)}.route-step:nth-child(4){border-color:#5b7195}.route-step:nth-child(5){border-color:#8a6370}.route-step b{font-family:var(--mono);font-size:12px;color:var(--muted)}.route-step h3{font-size:18px;margin-top:14px}.route-step p{font-size:13px}.footer-line{display:flex;justify-content:space-between;align-items:end;margin-top:30px;color:var(--muted);font-size:13px}.controls{position:fixed;z-index:20;right:20px;bottom:18px;display:flex;gap:6px;align-items:center;padding:6px;background:rgba(32,35,33,.9);border-radius:4px}.controls button{width:34px;height:30px;border:0;background:transparent;color:#f4f0e8;cursor:pointer;font-size:17px}.controls button:hover,.controls button:focus-visible{background:var(--orange);outline:none}.controls .counter{min-width:55px;text-align:center;color:#d9d3c7;font:11px var(--mono)}[contenteditable=true]:focus{outline:2px solid var(--orange);outline-offset:4px}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}@media(max-width:1024px){.slide{padding:62px 7vw}.flow-item{min-height:130px}.grid-8{grid-template-columns:repeat(4,1fr)}.tool-map{grid-template-columns:repeat(5,1fr)}.repo{gap:24px}}@media(max-width:768px){body{background:var(--paper)}.slide{aspect-ratio:auto;min-height:100svh;padding:66px 22px 52px;justify-content:flex-start}.topline{top:20px;left:22px;right:22px}.cover{justify-content:center}.cover::before{right:12px;top:17vh;font-size:100px}.cover-mark{right:24px;bottom:22px;width:90px;height:90px;font-size:22px}.split,.split-tight,.before-after,.repo{grid-template-columns:1fr;gap:22px}.flow,.tool-map,.route{grid-template-columns:1fr;gap:8px}.flow-item{min-height:auto}.flow-item:not(:last-child)::after{right:auto;top:auto;bottom:-9px;left:50%;transform:translateX(-50%) rotate(135deg)}.tool{min-height:auto}.grid-8{grid-template-columns:repeat(2,1fr)}.evidence{grid-template-columns:1fr}.skill-steps{grid-template-columns:repeat(2,1fr)}.guardrail{grid-template-columns:1fr}.ladder{height:auto;display:grid;grid-template-columns:1fr}.rung,.rung:nth-child(n){min-height:auto}.footer-line{align-items:start;gap:14px;flex-direction:column}.controls{right:10px;bottom:10px}}@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.slide::after{transition:none}}@media print{body{background:#fff}.slide{width:100%;height:100vh;min-height:0;aspect-ratio:auto;page-break-after:always;border:0}.controls{display:none}.slide.active::after{display:none}}
+</style>
+<style>
+.evolution{display:grid;grid-template-columns:repeat(6,1fr);gap:0;margin-top:24px}.evo{padding:17px 14px;background:var(--soft);border:1px solid var(--paper);min-height:205px}.evo:nth-child(1){background:#e7e1d7}.evo:nth-child(2){background:#dcebe6}.evo:nth-child(3){background:#e2ece8}.evo:nth-child(4){background:#fff0e7}.evo:nth-child(5){background:#f9e5d8}.evo:nth-child(6){background:#ece1e5}.evo b{font:700 11px var(--mono);color:var(--muted)}.evo h3{font-size:17px;margin:20px 0 9px}.evo p{font-size:12px;line-height:1.4}.evo .cap{display:block;margin-top:16px;color:var(--teal);font-size:12px;font-weight:750}.change-table{display:grid;gap:7px;margin-top:24px}.change-row{display:grid;grid-template-columns:.85fr 1.2fr 1.35fr;align-items:stretch}.change-row>div{padding:13px 15px;background:var(--soft);font-size:13px;border-left:1px solid var(--paper)}.change-row.head>div{background:var(--dark);color:var(--white);font:700 11px var(--mono);border:0}.change-row>div:first-child{font-weight:800;color:var(--orange)}.change-row p{font-size:12px;margin:0;line-height:1.4}.change-note{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:20px}.change-note .panel{padding:18px 20px}.change-note p{font-size:14px;margin:0}.change-note strong{color:var(--orange)}
+.tree{white-space:pre-wrap}
+.cases{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:18px}.case{padding:15px;background:var(--soft);border-left:4px solid var(--teal);min-height:100px}.case:nth-child(2){border-color:var(--orange)}.case:nth-child(3){border-color:var(--yellow)}.case:nth-child(4){border-color:#5b7195}.case:nth-child(5){border-color:#8a6370}.case:nth-child(6){border-color:#4d9f97}.case b{font-size:15px}.case span{display:block;font:11px/1.35 var(--mono);color:var(--muted);margin:6px 0}.case p{font-size:12px;line-height:1.35;margin:0}
+.skill-catalog h2{font-size:clamp(30px,3.5vw,54px);margin-bottom:12px}.skill-catalog .split{margin-top:12px!important}.skill-catalog .panel{padding:20px 26px}.skill-catalog .panel h3{font-size:22px}.skill-catalog .panel p{font-size:14px;margin-bottom:10px}.skill-catalog .cases{margin-top:12px}.skill-catalog .case{min-height:86px;padding:12px}.skill-catalog .case span{margin:4px 0}.skill-catalog .footer-line{margin-top:14px}
+.change-row.head>div,.change-row.head>div:first-child{background:#2a302d;color:#fffdf8}
+.model-slide h2{font-size:clamp(30px,3.8vw,58px);margin-bottom:14px}.model-chart{display:block;width:100%;height:auto;max-height:250px;object-fit:contain;object-position:center;border:1px solid var(--line);background:#111923}.model-chart.tall{max-height:430px;background:#fff}.chart-caption{font-size:11px;color:var(--muted);margin-top:7px}.model-points{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:16px}.model-point{padding:15px;background:var(--soft);border-top:3px solid var(--teal);min-height:105px}.model-point:nth-child(2){border-color:var(--orange)}.model-point:nth-child(3){border-color:var(--yellow)}.model-point b{display:block;font-size:14px;margin-bottom:7px}.model-point p{font-size:12px;line-height:1.4;margin:0}.tool-choice{display:grid;grid-template-columns:1.05fr .95fr;gap:28px;align-items:stretch;margin-top:18px}.tool-choice .panel{padding:20px 24px}.tool-choice h3{font-size:21px;margin-bottom:12px}.tool-choice p{font-size:14px}.choice-list{display:grid;gap:9px}.choice-list div{padding:12px 14px;background:var(--soft);border-left:3px solid var(--teal);font-size:14px}.choice-list div:nth-child(2){border-color:var(--orange)}.choice-list div:nth-child(3){border-color:var(--yellow)}.choice-list div:nth-child(4){border-color:#5b7195}.model-foot{margin-top:14px;font-size:13px;color:var(--muted)}
+@media(max-width:768px){.evolution{grid-template-columns:1fr 1fr;gap:8px}.evo{min-height:auto}.change-row{grid-template-columns:1fr;gap:0}.change-row>div{border-left:0;border-bottom:1px solid var(--paper)}.change-row.head{display:none}.change-row>div:first-child{padding-bottom:6px}.change-row>div:nth-child(2),.change-row>div:nth-child(3){padding-top:6px}.change-note{grid-template-columns:1fr}}
+@media(max-width:768px){.cases{grid-template-columns:1fr;gap:9px}.case{min-height:auto}}
+@media(max-width:768px){.model-chart{max-height:none}.model-points,.tool-choice{grid-template-columns:1fr;gap:9px}.tool-choice{margin-top:10px}.model-point{min-height:auto}.tool-choice .panel{padding:18px}.model-slide .footer-line{margin-top:14px}}
+</style>
+<style>
+.source-link{color:var(--teal);text-decoration:underline;text-underline-offset:3px}.hallucination-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:20px}.hall-card{padding:22px;background:var(--soft);border-top:4px solid var(--orange)}.hall-card.fix{border-color:var(--teal);background:#e5efeb}.hall-card h3{font-size:22px;margin-bottom:16px}.hall-item{display:grid;grid-template-columns:88px 1fr;gap:12px;padding:12px 0;border-top:1px solid rgba(32,35,33,.12)}.hall-item:first-of-type{border-top:0}.hall-item b{font-size:14px;color:var(--orange)}.hall-card.fix .hall-item b{color:var(--teal)}.hall-item p{font-size:13px;line-height:1.4;margin:0}.rag-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:22px}.rag-card{padding:20px 17px;background:var(--soft);border-top:4px solid #6aa99d;min-height:250px}.rag-card:nth-child(2){border-color:#6d98d1;background:#edf1f8}.rag-card:nth-child(3){border-color:#987ab3;background:#f0ebf5}.rag-card b{display:block;font-size:18px;margin-bottom:8px}.rag-card>span{display:block;color:var(--muted);font-size:13px;margin-bottom:18px}.rag-steps{display:grid;gap:7px}.rag-steps div{padding:9px 11px;background:rgba(255,255,255,.66);font-size:13px;border-left:3px solid currentColor}.rag-card:nth-child(1) .rag-steps div{color:#4c978c}.rag-card:nth-child(2) .rag-steps div{color:#5b82bd}.rag-card:nth-child(3) .rag-steps div{color:#896ba7}.rag-card p{font-size:12px;line-height:1.4;margin-top:16px}.rag-foot{display:flex;justify-content:space-between;align-items:center;margin-top:18px;color:var(--muted);font-size:13px}.rag-foot .source-link{font-size:12px}
+.content-map{margin-top:20px}.content-map-head{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);padding-bottom:8px;color:var(--muted);font:700 12px var(--mono);letter-spacing:.12em}.content-map-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px 28px;margin-top:12px}.content-map-group{border-bottom:1px solid var(--line);padding-bottom:10px}.content-map-group h3{margin:0 0 7px;color:var(--teal);font:800 14px var(--sans)}.content-map-row{display:flex;justify-content:space-between;gap:12px;padding:3px 0;font-size:12px;line-height:1.25}.content-map-row b{flex:0 0 auto;color:var(--orange);font:700 11px var(--mono)}.content-map-note{margin:14px 0 0;padding-top:10px;border-top:1px solid var(--line);color:var(--muted);font-size:13px;line-height:1.35}.content-map-note strong{color:var(--ink)}
+@media(max-width:768px){.hallucination-grid,.rag-grid{grid-template-columns:1fr;gap:9px}.hall-card{padding:18px}.rag-card{min-height:auto}.rag-foot{align-items:flex-start;gap:12px;flex-direction:column}}
+.slide.toc-slide{justify-content:flex-start;padding-top:58px}.toc-slide .eyebrow,.toc-slide>h2{display:none}.toc-slide .content-map{margin-top:0}.content-map-grid{gap:14px 18px}.content-map-group{padding-bottom:8px}.content-map-group h3{font-size:13px}.content-map-row{font-size:11px;padding:2px 0}
+@media(max-width:768px){.toc-slide{padding-top:72px;padding-bottom:96px}.content-map-head{font-size:10px}.content-map-grid{grid-template-columns:repeat(2,1fr);gap:14px 12px}.content-map-group h3{font-size:12px}.content-map-row{font-size:10px;line-height:1.2}.content-map-row b{font-size:10px}}
+.communication-slide .observability-table-wrap,.runtime-example-slide .observability-table-wrap{flex:0 0 auto}.slide.communication-slide{padding-bottom:40px}.slide.runtime-example-slide{padding-top:clamp(66px,5vw,82px);padding-bottom:42px}.runtime-example-slide .obs-arch{margin-top:12px}.runtime-example-slide .obs-arch .code-card,.runtime-example-slide .obs-arch .panel{padding:14px 16px}.runtime-example-slide .obs-points{gap:5px}.runtime-example-slide .obs-points li{padding:8px 11px}.runtime-example-slide .token-equation{margin-top:12px;padding:10px 14px;font-size:13px;line-height:1.4}.runtime-example-slide .token-note{margin-top:12px;font-size:clamp(17px,1.7vw,23px)}.runtime-example-slide .chart-caption{font-size:10px;margin-top:5px}
+@media(max-width:768px){.slide.toc-slide{padding-top:72px;padding-bottom:96px}.slide.runtime-example-slide{padding-top:74px;padding-bottom:96px}.runtime-example-slide .obs-arch{margin-top:10px}.runtime-example-slide .obs-arch .code-card,.runtime-example-slide .obs-arch .panel{padding:10px 12px}.runtime-example-slide .obs-points li{padding:7px 9px}.runtime-example-slide .token-equation{font-size:10px;padding:8px 10px}.runtime-example-slide .token-note{font-size:16px}.runtime-example-slide .chart-caption{font-size:9px}}
+.loop-image-slide{justify-content:center}.loop-image{display:block;width:100%;max-height:590px;object-fit:contain;background:#fff;border:1px solid var(--line)}.loop-image-slide .chart-caption{margin-top:10px}.rag-image{display:block;width:100%;max-height:500px;object-fit:contain;background:#fff;border:1px solid var(--line)}.rag-image-slide .rag-foot{margin-top:14px}
+@media(max-width:768px){.loop-image{max-height:none}.rag-image{max-height:none}}
+.advanced-slide h2{font-size:clamp(30px,3.6vw,56px);margin-bottom:10px}.pattern-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:16px}.pattern-card{padding:18px 16px;background:var(--soft);border-top:4px solid var(--teal);min-height:330px}.pattern-card:nth-child(2){border-color:var(--orange);background:#fff0e7}.pattern-card:nth-child(3){border-color:#6d98d1;background:#edf1f8}.pattern-card h3{font-size:20px;margin-bottom:7px}.pattern-meta{display:block;color:var(--muted);font-size:12px;line-height:1.4;margin-bottom:12px}.ascii-chart{margin:0;padding:13px 10px;background:#252b28;color:#eaf1eb;border-radius:3px;font:12px/1.45 var(--mono);white-space:pre;overflow:hidden}.pattern-card:nth-child(1) .ascii-chart{color:#9bd7ca}.pattern-card:nth-child(2) .ascii-chart{color:#f2bd68}.pattern-card:nth-child(3) .ascii-chart{color:#9fc1ed}.pattern-takeaway{margin:12px 0 0;font-size:12px;line-height:1.4;color:var(--muted)}.advanced-foot{display:flex;justify-content:space-between;align-items:end;margin-top:16px;color:var(--muted);font-size:13px}.advanced-table-wrap{margin-top:12px;overflow-x:auto;border:1px solid var(--line);background:var(--white)}.advanced-table{width:100%;min-width:940px;border-collapse:collapse;table-layout:fixed;font-size:12px;line-height:1.35}.advanced-table th{padding:10px 11px;background:#2a302d;color:#fffdf8;text-align:left;font:700 11px var(--mono)}.advanced-table td{padding:9px 11px;border-top:1px solid var(--line);vertical-align:top}.advanced-table tbody tr:nth-child(even){background:var(--soft)}.advanced-table td:first-child{width:18%;font-weight:800;color:var(--orange)}.advanced-table td:nth-child(2){width:28%}.advanced-table td:nth-child(3){width:13%;color:var(--teal);font-weight:700}.advanced-table td:nth-child(4){width:13%;color:#5b7195;font-weight:700}.advanced-table td:nth-child(5){width:28%}.stars{letter-spacing:1px;color:var(--orange);white-space:nowrap}.advanced-source{color:var(--teal);text-decoration:underline;text-underline-offset:3px;font-size:12px}.advanced-table-slide h2{font-size:clamp(28px,3.2vw,50px)}
+@media(max-width:768px){.pattern-grid{grid-template-columns:1fr;gap:9px}.pattern-card{min-height:auto;padding:17px 15px}.advanced-foot{align-items:flex-start;gap:12px;flex-direction:column}.advanced-table-slide .advanced-table-wrap{margin-top:8px}.advanced-table{font-size:11px}.advanced-table th{font-size:10px}.advanced-table td{padding:8px 9px}}
+</style>
+<style>
+.slide{justify-content:flex-start;padding-top:clamp(76px,7vw,116px)}h1{font-size:clamp(40px,5.2vw,82px);margin-bottom:16px}h2{font-size:clamp(27px,3.25vw,50px);margin-bottom:14px}.advanced-slide h2,.advanced-table-slide h2,.model-slide h2,.skill-catalog h2{font-size:clamp(27px,3.25vw,50px);margin-bottom:12px}.cover{justify-content:flex-start;padding-top:clamp(92px,9vw,142px)}
+.summary-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:18px;max-width:1250px}.summary-item{padding:13px 14px;background:#303a35;border-top:3px solid var(--yellow);min-height:104px}.summary-item:nth-child(2){border-color:var(--orange)}.summary-item:nth-child(3){border-color:var(--teal)}.summary-item:nth-child(4){border-color:#9bb8a8}.summary-item b{display:block;color:var(--yellow);font:700 12px var(--mono)}.summary-item p{margin:7px 0 0;color:#d3dbd4;font-size:13px;line-height:1.35}.cover.final{background:var(--paper);color:var(--ink)}.cover.final .topline{color:var(--muted)}.cover.final h2{color:var(--ink);margin-bottom:12px}.cover.final .quote{color:var(--ink)!important}.cover.final .cover-meta{color:var(--muted)}.cover.final .cover-meta span{border-color:var(--line)}
+.about-slide h2{margin-bottom:8px}.about-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:clamp(30px,7vw,110px);align-items:center;margin-top:18px}.about-copy{max-width:720px}.about-name{font-size:clamp(30px,3.2vw,48px);font-weight:820;line-height:1.1;margin-bottom:14px}.about-role{font-size:clamp(18px,1.8vw,28px);color:var(--orange);margin-bottom:17px}.about-bio{font-size:clamp(16px,1.5vw,23px);line-height:1.55;color:var(--muted);max-width:720px}.about-contact{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}.about-contact span{padding:8px 12px;border:1px solid var(--line);background:var(--soft);font:13px var(--mono);color:var(--ink)}.about-qr{justify-self:end;width:min(100%,300px);margin:0;padding:10px;background:var(--white);border:1px solid var(--line)}.about-qr img{display:block;width:100%;height:auto}.about-qr figcaption{margin-top:8px;color:var(--muted);font-size:11px;line-height:1.35;text-align:center}
+.toc-block{margin-top:20px}.toc-heading{font:700 12px var(--mono);letter-spacing:.14em;color:var(--teal);margin-bottom:8px}.toc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.toc-item{padding:11px 14px 10px;border-top:3px solid var(--teal);background:var(--soft);min-height:88px}.toc-item:nth-child(2){border-color:var(--orange)}.toc-item:nth-child(3){border-color:var(--yellow)}.toc-item:nth-child(4){border-color:#5b7195}.toc-item:nth-child(5){border-color:#8a6370}.toc-item:nth-child(6){border-color:#4d9f97}.toc-num{font:700 12px var(--mono);color:var(--muted)}.toc-item strong{display:block;margin:9px 0 4px;font-size:15px}.toc-item span{display:block;color:var(--muted);font-size:12px;line-height:1.35}.about-slide .footer-line{margin-top:20px}
+.toc-slide h2{max-width:1050px}.toc-slide .toc-block{margin-top:24px}.toc-slide .toc-item{min-height:118px;padding:14px}.toc-slide .toc-item strong{font-size:18px;margin-top:15px}.spec-slide h2{max-width:1050px}.spec-contract,.spec-template,.spec-goal{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:18px}.spec-contract .panel,.spec-template .panel,.spec-goal .panel{padding:18px 20px}.spec-points{display:grid;gap:8px;margin:0;padding:0;list-style:none}.spec-points li{position:relative;padding-left:20px;font-size:14px;line-height:1.4}.spec-points li::before{content:"•";position:absolute;left:0;color:var(--orange);font-size:20px;font-weight:800}.spec-contract .dark-panel .spec-points li::before{color:var(--yellow)}.spec-template{grid-template-columns:1.15fr .85fr}.spec-template .code-card{font-size:clamp(11px,1vw,15px);line-height:1.5;padding:18px 20px}.spec-template-note{padding:16px 18px;background:#fff0e7;border-left:4px solid var(--orange);font-size:14px;line-height:1.5}.spec-template-note strong{color:var(--orange)}.spec-lifecycle{display:grid;grid-template-columns:repeat(7,1fr);gap:0;margin-top:22px}.spec-step{padding:13px 10px;background:var(--soft);border-top:3px solid var(--teal);min-height:112px}.spec-step:nth-child(2){border-color:#4d9f97}.spec-step:nth-child(3){border-color:var(--yellow)}.spec-step:nth-child(4){border-color:var(--orange)}.spec-step:nth-child(5){border-color:#5b7195}.spec-step:nth-child(6){border-color:#8a6370}.spec-step:nth-child(7){border-color:#b34b39}.spec-step b{font:700 11px var(--mono);color:var(--muted)}.spec-step strong{display:block;margin:14px 0 6px;font-size:14px}.spec-step span{display:block;color:var(--muted);font-size:11px;line-height:1.35}.spec-phase-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px}.spec-file-tree{font:13px/1.65 var(--mono);padding:16px 18px;background:#252b28;color:#eef3ed;white-space:pre-wrap}.spec-file-tree .folder{color:#f2bd68}.spec-file-tree .file{color:#9bd7ca}.spec-goal .code-card{font-size:clamp(11px,1vw,15px);line-height:1.55;padding:18px 20px}.goal-points{display:grid;gap:8px;margin:0;padding:0;list-style:none}.goal-points li{padding:11px 14px;background:var(--soft);border-left:3px solid var(--teal);font-size:14px;line-height:1.4}.goal-points li:nth-child(2){border-color:var(--orange)}.goal-points li:nth-child(3){border-color:var(--yellow)}.goal-points li:nth-child(4){border-color:#5b7195}.goal-note{margin-top:18px;padding-left:18px;border-left:4px solid var(--orange);font-size:clamp(19px,2vw,28px);line-height:1.25;max-width:980px}.goal-note strong{color:var(--orange)}.agent-loop-slide h2,.token-slide h2{max-width:1100px}.agent-loop-track{display:grid;grid-template-columns:repeat(6,1fr);gap:0;margin-top:22px}.agent-loop-step{padding:15px 12px;background:var(--soft);border-top:3px solid var(--teal);min-height:130px}.agent-loop-step:nth-child(2){border-color:#4d9f97}.agent-loop-step:nth-child(3){border-color:var(--yellow)}.agent-loop-step:nth-child(4){border-color:var(--orange)}.agent-loop-step:nth-child(5){border-color:#5b7195}.agent-loop-step:nth-child(6){border-color:#b34b39}.agent-loop-step b{font:700 11px var(--mono);color:var(--muted)}.agent-loop-step strong{display:block;margin:15px 0 6px;font-size:15px}.agent-loop-step span{display:block;color:var(--muted);font-size:12px;line-height:1.35}.agent-iteration{display:grid;grid-template-columns:1.05fr .95fr;gap:14px;margin-top:20px}.agent-iteration .code-card{font-size:clamp(11px,1vw,15px);line-height:1.55;padding:18px 20px}.agent-iteration .panel{padding:18px 20px}.token-budget-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:22px}.token-budget-card{padding:18px;background:var(--soft);border-top:4px solid var(--teal);min-height:190px}.token-budget-card:nth-child(2){border-color:var(--orange)}.token-budget-card:nth-child(3){border-color:var(--yellow)}.token-budget-card strong{display:block;font-size:20px;margin-bottom:9px}.token-budget-card p{font-size:14px;line-height:1.45}.token-budget-card .big{font:700 24px var(--mono);color:var(--orange);display:block;margin-top:16px}.token-equation{margin-top:18px;padding:15px 18px;background:#252b28;color:#eef3ed;font:16px var(--mono)}.token-scenarios{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:20px}.token-scenario{padding:18px 20px;border:1px solid var(--line);background:var(--white)}.token-scenario:first-child{border-top:4px solid var(--orange)}.token-scenario:last-child{border-top:4px solid var(--teal)}.token-scenario h3{font-size:21px;margin-bottom:10px}.token-scenario p{font-size:14px;line-height:1.45}.token-flow{margin-top:14px;font:13px/1.6 var(--mono);color:var(--muted)}.token-flow strong{color:var(--orange)}.token-priority{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:22px}.token-priority-item{padding:15px 12px;background:var(--soft);border-top:3px solid var(--orange);min-height:150px}.token-priority-item:nth-child(2){border-color:var(--teal)}.token-priority-item:nth-child(3){border-color:var(--yellow)}.token-priority-item:nth-child(4){border-color:#5b7195}.token-priority-item:nth-child(5){border-color:#8a6370}.token-priority-item b{font:700 11px var(--mono);color:var(--muted)}.token-priority-item strong{display:block;margin:15px 0 7px;font-size:15px}.token-priority-item span{display:block;color:var(--muted);font-size:12px;line-height:1.4}.token-note{margin-top:20px;padding-left:18px;border-left:4px solid var(--orange);font-size:clamp(19px,2vw,28px);line-height:1.25}.token-note strong{color:var(--orange)}
+.best-practice-slide h2{max-width:980px}.best-practice-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:18px}.best-practice-list{margin:0;padding:0;list-style:none;display:grid;gap:9px}.best-practice-list li{position:relative;padding:13px 16px 13px 37px;background:var(--soft);font-size:14px;line-height:1.42}.best-practice-list li::before{content:"•";position:absolute;left:16px;top:10px;color:var(--orange);font-size:22px;font-weight:800}.best-practice-list li strong{color:var(--ink)}.best-practice-list li:nth-child(2)::before{color:var(--teal)}.best-practice-list li:nth-child(3)::before{color:var(--yellow)}.best-practice-list li:nth-child(4)::before{color:#5b7195}.best-practice-note{margin-top:18px;padding-left:18px;border-left:4px solid var(--orange);font-size:clamp(19px,2vw,28px);line-height:1.2;max-width:940px}.best-practice-note strong{color:var(--orange)}.best-practice-example{display:grid;grid-template-columns:1fr 1.1fr;gap:14px;margin-top:18px;align-items:stretch}.best-practice-example .code-card{padding:16px 18px;font-size:clamp(11px,1vw,15px);line-height:1.5}.best-practice-example-copy{padding:15px 17px;background:#fff0e7;border-left:4px solid var(--orange);font-size:14px;line-height:1.45}.best-practice-example-copy strong{color:var(--orange)}
+@media(max-width:768px){.slide{padding-top:74px}.cover{justify-content:flex-start;padding-top:96px}.cover h1{font-size:clamp(38px,11vw,56px)}h2{font-size:clamp(26px,8vw,38px)}.summary-grid{grid-template-columns:1fr;gap:7px}.summary-item{min-height:auto}.about-grid{grid-template-columns:1fr;gap:22px}.about-qr{justify-self:start;width:min(100%,260px)}.toc-grid{grid-template-columns:repeat(2,1fr);gap:8px}.toc-item{min-height:92px;padding:10px 11px}.toc-item strong{font-size:14px;line-height:1.2}.toc-item span{font-size:11px}.about-slide{padding-bottom:96px}.spec-contract,.spec-template,.spec-goal,.agent-iteration,.token-scenarios{grid-template-columns:1fr}.spec-template .code-card{font-size:10px;line-height:1.3;padding:13px 15px}.spec-template-note{padding:12px 14px;font-size:12px;line-height:1.35}.spec-lifecycle{grid-template-columns:repeat(2,1fr);gap:8px}.spec-step{min-height:80px;padding:9px 10px}.spec-step strong{margin:8px 0 3px;font-size:13px}.spec-step span{font-size:10px}.spec-phase-grid{grid-template-columns:1fr;gap:8px}.spec-file-tree{font-size:9px;line-height:1.1;padding:8px 10px}.spec-phase-grid .panel{padding:8px 10px}.spec-phase-grid .spec-points{grid-template-columns:repeat(2,1fr);gap:2px}.spec-phase-grid .spec-points li{font-size:9px;line-height:1.12;padding-left:14px}.spec-slide,.agent-loop-slide,.token-slide{padding-bottom:96px}.agent-loop-track{grid-template-columns:repeat(2,1fr);gap:8px}.agent-loop-step{min-height:88px;padding:10px}.agent-loop-step strong{margin:8px 0 4px;font-size:13px}.agent-loop-step span{font-size:10px}.agent-iteration .code-card{font-size:10px;line-height:1.35;padding:13px 15px}.agent-iteration .panel{padding:13px 15px}.token-budget-grid,.token-priority{grid-template-columns:1fr;gap:8px}.token-budget-card{min-height:auto;padding:14px 15px}.token-budget-card strong{font-size:18px}.token-budget-card p{font-size:12px}.token-budget-card .big{font-size:20px;margin-top:8px}.token-equation{font-size:12px;line-height:1.4}.token-scenario{padding:14px 15px}.token-scenario h3{font-size:18px}.token-scenario p,.token-flow{font-size:12px}.token-priority-item{min-height:auto;padding:13px 14px}.token-priority-item strong{margin:8px 0 4px}.token-priority-item span{font-size:11px}.token-note{font-size:21px;margin-bottom:110px}.best-practice-grid{grid-template-columns:1fr}.best-practice-example{grid-template-columns:1fr}.best-practice-note{font-size:21px;margin-bottom:110px}.best-practice-slide{padding-bottom:96px}}
+</style>
+<style>
+.observability-slide h2{max-width:1120px}.observability-table-wrap{overflow-x:auto;margin-top:18px;border:1px solid var(--line)}.observability-table{width:100%;min-width:1120px;border-collapse:collapse;font-size:11px;line-height:1.3;background:var(--white)}.observability-table th,.observability-table td{padding:9px 10px;border:1px solid var(--line);text-align:left;vertical-align:top}.observability-table th{background:#2a302d;color:var(--white);font:700 11px var(--mono)}.observability-table td:first-child{font-weight:800;color:var(--orange);white-space:nowrap}.observability-table td:not(:first-child){color:var(--muted)}.obs-arch{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:20px}.obs-arch .code-card{font-size:clamp(11px,1vw,15px);line-height:1.45;padding:18px 20px}.obs-arch .panel{padding:18px 20px}.obs-points{display:grid;gap:8px;margin:0;padding:0;list-style:none}.obs-points li{padding:11px 14px;background:var(--soft);border-left:3px solid var(--teal);font-size:13px;line-height:1.4}.obs-points li:nth-child(2){border-color:var(--orange)}.obs-points li:nth-child(3){border-color:var(--yellow)}.obs-points li:nth-child(4){border-color:#5b7195}.obs-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:20px}.obs-metric{padding:14px;background:var(--soft);border-top:3px solid var(--teal);min-height:116px}.obs-metric:nth-child(2n){border-color:var(--orange)}.obs-metric:nth-child(3n){border-color:var(--yellow)}.obs-metric b{display:block;font-size:14px;margin-bottom:7px}.obs-metric span{display:block;color:var(--muted);font-size:12px;line-height:1.4}.obs-loop{display:grid;grid-template-columns:1.1fr .9fr;gap:14px;margin-top:20px;align-items:stretch}.obs-loop .code-card{font-size:clamp(11px,1vw,15px);line-height:1.5;padding:18px 20px}.obs-principle{padding:18px 20px;background:#fff0e7;border-left:4px solid var(--orange);font-size:clamp(18px,1.9vw,27px);line-height:1.25}.obs-principle strong{color:var(--orange)}
+@media(max-width:768px){.observability-table-wrap{margin-top:12px}.observability-table{min-width:1050px;font-size:10px}.observability-table th,.observability-table td{padding:7px 8px}.obs-arch,.obs-loop{grid-template-columns:1fr;gap:9px}.obs-arch .code-card,.obs-arch .panel,.obs-loop .code-card,.obs-principle{padding:13px 15px}.obs-arch .code-card{font-size:10px;line-height:1.3}.obs-arch .panel{padding:9px 11px}.obs-points{grid-template-columns:repeat(2,1fr);gap:5px}.obs-points li{font-size:10px;padding:8px 9px}.obs-metrics{grid-template-columns:repeat(2,1fr);gap:8px}.obs-metric{min-height:auto;padding:11px 12px}.obs-metric b{font-size:12px}.obs-metric span{font-size:10px}.observability-slide{padding-bottom:96px}.observability-slide .token-equation{font-size:10px;line-height:1.25;margin-top:10px}.observability-slide .token-note{font-size:16px;line-height:1.2;margin-top:10px}.obs-loop{margin-top:12px}.obs-principle{font-size:18px}.token-budget-grid,.token-scenarios{grid-template-columns:repeat(2,1fr);gap:8px}.token-budget-card{padding:12px 11px}.token-budget-card strong{font-size:15px}.token-budget-card p{font-size:10px}.token-budget-card .big{font-size:15px}.token-priority{grid-template-columns:repeat(2,1fr);gap:8px}.token-priority-item{padding:12px 11px}.token-priority-item b{font-size:10px}.token-priority-item strong{font-size:13px}.token-priority-item span{font-size:10px}.token-slide .token-note{font-size:16px}}
+</style>
+<style>
+.judgment-slide h2{max-width:1080px}.judgment-slide .guardrail{margin-top:20px}.judgment-slide .guard{min-height:205px}.judgment-slide .guard h3{font-size:21px}.judgment-slide .guard p{font-size:14px;line-height:1.5}.judgment-note{margin-top:20px;padding-left:18px;border-left:4px solid var(--orange);font-size:clamp(18px,1.9vw,27px);line-height:1.3;max-width:1120px}.judgment-note strong{color:var(--orange)}
+@media(max-width:768px){.judgment-slide .guard{min-height:auto;padding:16px 15px}.judgment-slide .guard h3{font-size:18px;margin:10px 0 6px}.judgment-slide .guard p{font-size:12px;line-height:1.35}.judgment-note{font-size:18px;margin-top:12px;margin-bottom:96px}}
+</style>
+<style>
+@media(max-width:768px){.spec-slide[data-title="Split for Large Spec"] .spec-step{min-height:70px;padding:7px 8px}.spec-slide[data-title="Split for Large Spec"] .spec-step strong{margin:6px 0 2px}}
+</style>
+<style>
+.pattern-reference-slide h2{max-width:1080px}.pattern-reference-layout{display:grid;grid-template-columns:1.08fr .92fr;gap:clamp(22px,4vw,64px);align-items:center;margin-top:8px}.pattern-reference-media{min-width:0}.pattern-reference-media img{display:block;width:100%;height:clamp(300px,34vw,470px);object-fit:contain;background:#fff;border:1px solid var(--line)}.pattern-reference-media .chart-caption{margin-top:7px}.pattern-reference-points{display:grid;gap:10px;margin:0;padding:0;list-style:none}.pattern-reference-points li{padding:14px 16px;background:var(--soft);border-left:3px solid var(--teal);font-size:14px;line-height:1.42}.pattern-reference-points li:nth-child(2){border-color:var(--orange)}.pattern-reference-points li:nth-child(3){border-color:var(--yellow)}.pattern-reference-points li:nth-child(4){border-color:#5b7195}.pattern-reference-points li:nth-child(5){border-color:#8a6370}.pattern-reference-points strong{color:var(--ink)}.pattern-reference-note{margin-top:14px;color:var(--muted);font-size:12px;line-height:1.35}.pattern-reference-note .source-link{margin-left:8px}.rag-pipeline-media{display:grid;gap:10px}.rag-pipeline-media img{height:clamp(150px,15.5vw,220px)}.rag-pipeline-media .chart-caption{margin-top:0}.rag-pipeline-slide .pattern-reference-points li{font-size:13px;padding:12px 14px}.rag-pipeline-slide .pattern-reference-note{margin-top:10px}@media(max-width:768px){.pattern-reference-layout{grid-template-columns:1fr;gap:12px}.pattern-reference-media img{height:auto;max-height:none}.rag-pipeline-media img{height:auto}.pattern-reference-points{gap:7px}.pattern-reference-points li{font-size:12px;padding:10px 12px}.pattern-reference-note{font-size:10px;margin-bottom:96px}}
+</style>
+</head>
+<body>
+<main class="deck" id="deck" aria-label="AI Agent: Developer's Silicon Teammate">
+<section class="slide cover active" data-title="Cover">
+  <div class="topline"><span>AI Agent / Developer workflow</span><span>Developer talk</span></div>
+  <div class="eyebrow">From tools to teammates</div>
+  <h1 data-pretext contenteditable="true">AI Agent:<br>Developer's "Silicon Teammate"</h1>
+  <p class="lead" data-pretext contenteditable="true">From AI tool to AI teammate: AI Coding for Enterprise IT</p>
+  <div class="cover-meta"><span>Real tasks</span><span>Tool Call</span><span>Human review boundaries</span></div>
+  <div class="cover-mark">AI<br>×<br>IT</div>
+</section>
+
+<section class="slide toc-slide" data-title="Contents">
+  <div class="topline"><span>CONTENT MAP</span><span>44 PAGES / DETAILED INDEX</span></div>
+  <div class="content-map">
+    <div class="content-map-grid">
+      <div class="content-map-group"><h3>01 / Foundation and methodology</h3><div class="content-map-row"><span>About me.</span><b>P3</b></div><div class="content-map-row"><span>From answer to task</span><b>P4</b></div><div class="content-map-row"><span>Let's start with the mission.</span><b>P5</b></div><div class="content-map-row"><span>Agent loop</span><b>P6</b></div><div class="content-map-row"><span>First Use</span><b>P7</b></div><div class="content-map-row"><span>It'll work soon.</span><b>P8</b></div><div class="content-map-row"><span>Reliability</span><b>P9</b></div><div class="content-map-row"><span>Maintenance of old systems</span><b>P10</b></div></div>
+      <div class="content-map-group"><h3>02 / Skill and Team Experience</h3><div class="content-map-row"><span>Turn experience into Skill.</span><b>P11</b></div><div class="content-map-row"><span>Skill Best Practise</span><b>P12</b></div><div class="content-map-row"><span>Skill Best Practise / Quality</span><b>P13</b></div></div>
+      <div class="content-map-group"><h3>03 / Spec, Loop and Token</h3><div class="content-map-row"><span>Spec-Driven Development</span><b>P14</b></div><div class="content-map-row"><span>Minimum Spec</span><b>P15</b></div><div class="content-map-row"><span>Split for Large Spec</span><b>P16</b></div><div class="content-map-row"><span>Execute Spec with /goal</span><b>P17</b></div><div class="content-map-row"><span>Agent loop: new functional development</span><b>P18</b></div><div class="content-map-row"><span>Agent Loop: How to advance in an iterative fashion</span><b>P19</b></div><div class="content-map-row"><span>Token Use Optimization: Budget</span><b>P20</b></div><div class="content-map-row"><span>Token use optimization: Codex and Claude Code</span><b>P21</b></div><div class="content-map-row"><span>Token Usage Optimization: Self-build Agent</span><b>P22</b></div></div>
+      <div class="content-map-group"><h3>04 / LLM Observability</h3><div class="content-map-row"><span>On 3rd Layer</span><b>P23</b></div><div class="content-map-row"><span>AutoGen Access Observatories</span><b>P24</b></div><div class="content-map-row"><span>From Trace to Guardrail</span><b>P25</b></div></div>
+      <div class="content-map-group"><h3>05 / Operating boundaries and development modalities</h3><div class="content-map-row"><span>Borders and human trials</span><b>P26</b></div><div class="content-map-row"><span>Prompt Engineering to Graph Engineering</span><b>P27</b></div><div class="content-map-row"><span>Changes in working methods</span><b>P28</b></div><div class="content-map-row"><span>Three product development feedback cycles</span><b>P29</b></div><div class="content-map-row"><span>From tool to work stream</span><b>P30</b></div><div class="content-map-row"><span>LLM hallucinations</span><b>P31</b></div></div>
+      <div class="content-map-group"><h3>06 / Knowledge, Models and Multi-Agent</h3><div class="content-map-row"><span>RAG: Access to knowledge</span><b>P32</b></div><div class="content-map-row"><span>RAG: Distillation Layer</span><b>P33</b></div><div class="content-map-row"><span>LLM Selection</span><b>P34</b></div><div class="content-map-row"><span>Choosing the right agentic pattern</span><b>P35</b></div><div class="content-map-row"><span>Agent Design Pattern Framework</span><b>P36</b></div><div class="content-map-row"><span>Tool selection for domestic developers</span><b>P37</b></div><div class="content-map-row"><span>High Agent mode: circular</span><b>P38</b></div><div class="content-map-row"><span>High Agent mode: layout</span><b>P39</b></div><div class="content-map-row"><span>Code and judgement</span><b>P40</b></div><div class="content-map-row"><span>Multiple Agent how to communicate</span><b>P41</b></div><div class="content-map-row"><span>AutoGen: Information Collaboration</span><b>P42</b></div><div class="content-map-row"><span>LangChain / LangGraph: state collaboration</span><b>P43</b></div><div class="content-map-row"><span>End</span><b>P44</b></div></div>
+    </div>
+    <p class="content-map-note">This AI Agent Developer Team presentation is delivered in two sessions: <strong>Basic</strong> and <strong>Advanced</strong>.</p>
+  </div>
+</section>
+
+<section class="slide about-slide" data-title="About me.">
+  <div class="topline"><span>03 / 44</span><span>About me</span></div>
+  <div class="eyebrow">About me.</div>
+  <h2>From real work,<span class="accent">Turn AI into a teammate.</span></h2>
+  <div class="about-grid">
+    <div class="about-copy">
+      <div class="about-name">Wade Deng Wei.</div>
+      <div class="about-role">MaybeAI Co-founder &amp; Technical Lead</div>
+      <p class="about-bio">Helps many businesses that collect hundreds of millions or millions of dollars a year across borders to land in AI.</p>
+      <div class="about-contact"><span>X: @no7wade</span><span>Wechat: @no7wade</span></div>
+    </div>
+    <figure class="about-qr"><img src="assets/roadtoagi-qr.png" alt="RoadToAGI channel 2D"><figcaption>RoadToAGI · Scan QR code to view my channel</figcaption></figure>
+  </div>
+  <p class="footer-line"><span>AI Agent: Developer's Silicon Teammate</span><span>03</span></p>
+</section>
+
+<section class="slide" data-title="From answer to task">
+  <div class="topline"><span>04 / 44</span><span>Rethinking AI</span></div>
+  <div class="eyebrow">Cognitive change</div>
+  <h2>Chat AI is a good start,<br><span class="accent">but it should not be the end.</span></h2>
+  <div class="before-after">
+    <div class="state"><h3>Past: One question.</h3><p class="lead">I have a question.<br>↓<br>AI, give me an answer.</p></div>
+    <div class="arrow">→</div>
+    <div class="state after"><h3>Now: One thing is done.</h3><p class="lead">I have a goal.<br>↓<br>AI reads, changes, runs, and validates</p></div>
+  </div>
+  <p class="footer-line"><span>Business IT's not "I don't know the answer," but "I have one thing to finish."</span><span>04</span></p>
+</section>
+
+<section class="slide" data-title="Let's start with the mission.">
+  <div class="topline"><span>05 / 44</span><span>Tool Selection</span></div>
+  <div class="eyebrow">No tools first.</div>
+  <h2>First the mission, then the choice.<br><span class="teal">The most appropriate AI way.</span></h2>
+  <div class="tool-map">
+    <div class="tool"><b>Call LLM</b><span>Classification, summary, translation, information extraction</span></div>
+    <div class="tool"><b>Python / Shell</b><span>Documentation, data, logs, batch processing</span></div>
+    <div class="tool"><b>Workflow / RPA</b><span>Fixed processes, cross-system moves</span></div>
+    <div class="tool"><b>Coding Agent</b><span>Read the code, change the bug, fill the test.</span></div>
+    <div class="tool"><b>Agent</b><span>Complex objectives, multi-step dynamic decision-making</span></div>
+  </div>
+  <div class="rule"></div>
+  <div class="split-tight">
+    <div class="statement">Which AI tool is best?<small>Instead: What is this mission? What's the best way to get AI to finish it?</small></div>
+    <div class="panel"><p><strong>Select enough models.</strong><br>Strong reasoning is not equivalent to a high frequency small mission. Codes, speed, context, cost and tool callability are to be compared back to the real job.</p></div>
+  </div>
+</section>
+
+<section class="slide" data-title="Agent loop">
+  <div class="topline"><span>06 / 44</span><span>Rationale</span></div>
+  <div class="eyebrow">Agent, why are you working?</div>
+  <h2>It is not about better conversation.<br>It is an extra<span class="accent">execution loop.</span></h2>
+  <div class="flow">
+    <div class="flow-item"><div class="flow-num">01</div><h3>Objective</h3><p>You say what you want to achieve.</p></div>
+    <div class="flow-item"><div class="flow-num">02</div><h3>Planning</h3><p>AI Dismantling Mission, deciding what to do first.</p></div>
+    <div class="flow-item"><div class="flow-num">03</div><h3>Tools</h3><p>Read files, search, run commands, run tests.</p></div>
+    <div class="flow-item"><div class="flow-num">04</div><h3>Evidence</h3><p>Seeing the real results, not guessing.</p></div>
+    <div class="flow-item"><div class="flow-num">05</div><h3>Next</h3><p>Proceed with the results until acceptance.</p></div>
+  </div>
+  <div class="quote" style="margin-top:34px">Traditional chat:<strong>End of answer.</strong>.<br>Agent:<strong>One step, one result and one next.</strong></div>
+</section>
+
+<section class="slide" data-title="First Use">
+  <div class="topline"><span>07 / 44</span><span>The first real use of Agent</span></div>
+  <div class="eyebrow">Start with a real mission.</div>
+  <h2>Add an export function to the order module<span class="accent">Export function.</span></h2>
+  <div class="split" style="margin-top:20px">
+    <div class="prompt-stack">
+      <div class="prompt"><span class="n">01</span><p>First understand the item and find the relevant code to export the order. Tell me how I'm going to change it. Don't change it.</p></div>
+      <div class="prompt"><span class="n">02</span><p>The programme can be modified. Change only the order module and not the database structure.</p></div>
+      <div class="prompt"><span class="n">03</span><p>Run the test after the change is completed and tell me the results. If you fail, you analyse the causes and fix them.</p></div>
+    </div>
+    <div class="code-card"><span class="comment">/ AI work track</span>
+<span class="cmd">read files</span> → <span class="cmd">search code</span>
+      ↓
+<span class="cmd">edit</span> → <span class="cmd">run tests</span>
+      ↓
+<span class="key">inspect evidence</span> → <span class="key">fix</span>
+      ↓
+<span class="cmd">report result</span></div>
+  </div>
+  <p class="footer-line"><span>Let AI understand first and then allow it to be modified. Give it the task and leave the border in your hands.</span><span>07</span></p>
+</section>
+
+<section class="slide" data-title="It'll work soon.">
+  <div class="topline"><span>08 / 44</span><span>Daily IT Job</span></div>
+  <div class="eyebrow">We can start today.</div>
+  <h2>Put AI in the job you're already doing.</h2>
+  <div class="grid-8">
+    <div class="mini"><b>Check, Bug.</b><span>Analysis of the reasons before proposing changes.</span></div><div class="mini"><b>Read the log.</b><span>Looking for anomalies, categorizing, forming assumptions.</span></div>
+    <div class="mini"><b>Check SQL.</b><span>Parameters, data, implementation results.</span></div><div class="mini"><b>Reconfigure</b><span>Limiting documentation and permissible changes.</span></div>
+    <div class="mini"><b>Look at the old code.</b><span>Explain the call chain, focus no time.</span></div><div class="mini"><b>Write Script</b><span>Let Mr. LLM be a running version.</span></div>
+    <div class="mini"><b>Add Document</b><span>Write down the context of the project.</span></div><div class="mini"><b>Supplementary testing</b><span>Let the results be accepted and accepted.</span></div>
+  </div>
+  <div class="panel" style="margin-top:24px"><p class="lead" style="margin:0"><strong>Three hints:</strong>Understand first. To the border. Let it verify.</p></div>
+</section>
+
+<section class="slide" data-title="Reliability">
+  <div class="topline"><span>09 / 44</span><span>Make AI more reliable.</span></div>
+  <div class="eyebrow">Not once.</div>
+  <h2>I'm not sure if I'm going to write it.<span class="accent">Certification mechanisms</span>Decide if it can be delivered.</h2>
+  <div class="loop">
+    <div class="loop-item"><strong>Requirements</strong><span>Clear results</span></div><div class="loop-arrow">→</div>
+    <div class="loop-item"><strong>AI Changes</strong><span>Change</span></div><div class="loop-arrow">→</div>
+    <div class="loop-item"><strong>Run Test</strong><span>Get the evidence.</span></div><div class="loop-arrow">→</div>
+    <div class="loop-item"><strong>Failed feedback</strong><span>Exposure problems</span></div><div class="loop-arrow">→</div>
+    <div class="loop-item"><strong>Recovery and retesting</strong><span>Until it's accepted.</span></div>
+  </div>
+  <div class="split-tight">
+    <div class="quote">Allow AI to make mistakes,<br><strong>No evidence is allowed.</strong></div>
+    <div class="panel"><h3>The context of the project should also sink.</h3><p>README: What is the project, how it runs.<br>AGENTS.md: Which directories can be modified, how to run, and which operations must be identified.</p></div>
+  </div>
+</section>
+
+<section class="slide" data-title="Maintenance of old systems">
+  <div class="topline"><span>10 / 44</span><span>Maintainer Developer</span></div>
+  <div class="eyebrow">Second eyes.</div>
+  <h2>Debug is not an AI guess.<br>It's about making it.<span class="teal">Position along the chain of evidence.</span></h2>
+  <div class="evidence">
+    <div class="panel"><b>01 / Input</b><p>User phenomena, time of occurrence, request parameters, environment differences.</p></div>
+    <div class="panel"><b>02 / Log</b><p>Error stack, upstream/downstream request, abnormal frequency, association ID.</p></div>
+    <div class="panel"><b>03 / Assumptions</b><p>Possible causes, modules, key points for validation.</p></div>
+    <div class="panel"><b>04 / Validation</b><p>Repeat, query data, run tests, confirm that there are no side effects.</p></div>
+  </div>
+  <div class="quote" style="margin-top:28px">Find evidence and make assumptions and test assumptions.<strong>One solution is to work, and it's the teammates who settle down.</strong></div>
+</section>
+
+<section class="slide" data-title="Skill">
+  <div class="topline"><span>11 / 44</span><span>Turn experience into Skill.</span></div>
+  <div class="eyebrow">From personal to team skills</div>
+  <h2>Skill is not a Prompt collection.<br>It's...<span class="accent">Executable, acceptable, reusable</span>The way.</h2>
+  <div class="skill-steps">
+    <div class="skill-step"><b>01</b><h3>scene</h3><p>When?</p></div><div class="skill-step"><b>02</b><h3>Input</h3><p>What do you need?</p></div>
+    <div class="skill-step"><b>03</b><h3>Process</h3><p>What are the steps to be taken?</p></div><div class="skill-step"><b>04</b><h3>Conditions for discontinuation</h3><p>What can't go on?</p></div>
+    <div class="skill-step"><b>05</b><h3>Output</h3><p>What was the last delivery?</p></div><div class="skill-step"><b>06</b><h3>Receiving and Inspection</h3><p>How do you judge success?</p></div>
+  </div>
+  <p class="footer-line"><span>Turn "I will do" into "the system can stabilize for me."</span><span>11</span></p>
+</section>
+
+<section class="slide best-practice-slide" data-title="Skill Best Practise">
+  <div class="topline"><span>12 / 44</span><span>Skill Best Practise</span></div>
+  <div class="eyebrow">Before the trigger, the model saw only metadata</div>
+  <h2>Skill Best Practice: Right first.<span class="accent">I'm not sure.</span><br>And it's being properly implemented.</h2>
+  <div class="best-practice-grid">
+    <ul class="best-practice-list">
+      <li><strong>Keep it simple.</strong>Delete the common sense already known to the model; each paragraph should be worthy of the context.</li>
+      <li><strong>Matches freedom.</strong>Inspired tasks give a high degree of freedom; there are templates in fixed mode; and vulnerable operations give precise steps.</li>
+      <li><strong>Good metadata.</strong>Starts by preloading name + description; they decide whether Skill will be found and triggered.</li>
+      <li><strong>Let content be maintained.</strong>Quote one layer, which is more descriptive; old methods are archived separately to avoid obsolescence of the main process.</li>
+    </ul>
+    <ul class="best-practice-list">
+      <li><strong>Use progressive disclosure.</strong>Main SKILL.md maintains a streamlined and complete details are placed in the on-demand reference document.</li>
+      <li><strong>Harmonization of terminology and examples.</strong>The same concept is referred to by only one name and the examples are specified; a default path is given and no too many options are listed.</li>
+    </ul>
+  </div>
+  <div class="best-practice-example">
+    <div class="code-card"><span class="comment"># discoverability metadata</span>
+name: analyzing-sales
+description: Analyzes sales data and builds reports. Use when users ask for revenue, pipeline, or performance analysis.</div>
+    <div class="best-practice-example-copy"><strong>Read order:</strong><br>On startup: preload<code>name</code> + <code>description</code><br>After Trigger: Read<code>SKILL.md</code><br>On demand: Read<code>reference/</code>Waiting for documents<br><br><strong>Writing principles:</strong><code>description</code>Writing capability + trigger scene;step, boundary and acceptance In.<code>SKILL.md</code>.</div>
+  </div>
+</section>
+
+<section class="slide best-practice-slide" data-title="Skill Best Practise / Quality">
+  <div class="topline"><span>13 / 44</span><span>Skill Best Practise</span></div>
+  <div class="eyebrow">Turn quality into visible feedback</div>
+  <h2>The real quality comes from<span class="teal">Testing, validation and continuation.</span></h2>
+  <div class="best-practice-grid">
+    <ul class="best-practice-list">
+      <li><strong>Complex task-writing workflow.</strong>Clear, continuous steps and checklist to reduce the probability of missing steps.</li>
+      <li><strong>Create feedback loops.</strong>Executing validation of fixation problems again until acceptance passes.</li>
+      <li><strong>Sets a cessation condition for critical operations.</strong>High-risk, destructive or irreversible actions are planned for further implementation.</li>
+      <li><strong>Output verifiable intermediate results.</strong>Bulk changes, form fillings, etc., are programmed, rechecked, executed, reviewed.</li>
+    </ul>
+    <ul class="best-practice-list">
+      <li><strong>Script to solve the problem.</strong>Visible error of processing, explaining key parameters, listing dependency; do not throw problems back to the model.</li>
+      <li><strong>Determines the operational priority tool.</strong>Directly running utility script is more reliable than every temporary generation code.</li>
+      <li><strong>We'll make an assessment and write a long document.</strong>At least three scenarios are prepared, starting with a Skill baseline, and then testing different models and real missions.</li>
+      <li><strong>Watching real use.</strong>Pay attention to missing references, re-exploring, neglected content and incorporating team feedback for continuous adaptation.</li>
+    </ul>
+  </div>
+  <div class="best-practice-note">Don't write instructions on feelings, use real behavior.<strong>Watch → fix → retest.</strong></div>
+</section>
+
+<section class="slide spec-slide" data-title="Spec-Driven Development">
+  <div class="topline"><span>14 / 44</span><span>Spec-Driven Development</span></div>
+  <div class="eyebrow">Write intent into a verifiable contract.</div>
+  <h2>Spec is not a realization plan.<br>It's...<span class="accent">Receivable mission contract.</span></h2>
+  <div class="spec-contract">
+    <div class="panel"><h3>Spec write what / WHOT</h3><ul class="spec-points"><li>Why: background, goal, user value.</li><li>Where to change: scope, boundaries, clear-cut inaction.</li><li>What to do: behavior, input output, error and non-variant.</li><li>How to judge completion: scenes, acceptance criteria and certification methods.</li></ul></div>
+    <div class="panel dark-panel"><h3 style="color:var(--yellow)">Plan What / HOW</h3><ul class="spec-points"><li>Selection of modules, documents and technical options.</li><li>How to dismantle tasks, sequence and assign responsibilities.</li><li>How to land, move, roll back and publish.</li><li>These decisions should be based on the status of the warehouse, not on the death of Spec.</li></ul></div>
+  </div>
+  <div class="quote" style="margin-top:22px">Write<strong>You can't guess.</strong>Put<strong>The decision to find out from the warehouse.</strong>Leave it to Agent.</div>
+</section>
+
+<section class="slide spec-slide" data-title="Minimum Spec">
+  <div class="topline"><span>15 / 44</span><span>Spec-Driven Development</span></div>
+  <div class="eyebrow">It's tight and easy to maintain.</div>
+  <h2>A good one.<br>First.<span class="teal">"What must be true"</span>Write clearly.</h2>
+  <div class="spec-template">
+    <div class="code-card"><span class="comment"># specs/account-deletion.md</span>
+# Feature: Account deletion
+## Intent
+No valid session is available after the account has been deleted.
+## Scope
+- In: deletion and active sessions
+- Out: registration and billing history
+## Requirement
+- All active sessions expire immediately after deletion.
+## Scenario
+Given active sessions → When deleted → Then reject
+## Acceptance
+- [ ] Existing sessions cannot authenticate
+- [ ] Registration flow is unchanged</div>
+    <div class="spec-template-note"><strong>WHAT:</strong>All active sessions must expire immediately.<br><br><strong>HOW:</strong>Add<code>revokeSessions()</code>Which Service, which storage, Agent checked the warehouse and then proposed Plan.<br><br><strong>Relationship:</strong>Spec — Acceptance Triteria — Tests. Test is an enforceable validation, not Spec itself.</div>
+  </div>
+</section>
+
+<section class="slide spec-slide" data-title="Split for Large Spec">
+  <div class="topline"><span>16 / 44</span><span>Spec-Driven Development</span></div>
+  <div class="eyebrow">Do not write a giant SPEC on a big project.</div>
+  <h2>Dismantling complex targets.<span class="accent">Phases, local documents and verifiable results.</span></h2>
+  <div class="spec-lifecycle">
+    <div class="spec-step"><b>01</b><strong>Intent</strong><span>Why?</span></div><div class="spec-step"><b>02</b><strong>Specify</strong><span>Write the contract.</span></div><div class="spec-step"><b>03</b><strong>Clarify</strong><span>Resolution of differences</span></div><div class="spec-step"><b>04</b><strong>Plan</strong><span>Decide what to do.</span></div><div class="spec-step"><b>05</b><strong>Tasks</strong><span>Other Organiser</span></div><div class="spec-step"><b>06</b><strong>Implement</strong><span>Phased realization</span></div><div class="spec-step"><b>07</b><strong>Validate</strong><span>Contract acceptance</span></div>
+  </div>
+  <div class="spec-phase-grid">
+    <div class="spec-file-tree"><span class="folder">project/</span>
+├── <span class="file">AGENTS.md</span>
+├── <span class="folder">specs/</span>
+│   ├── <span class="file">product.md</span>
+│   ├── <span class="file">architecture.md</span>
+│   ├── <span class="folder">auth/</span>
+│   │   └── <span class="file">auth.md</span>
+│   └── <span class="folder">billing/</span>
+│       ├── <span class="file">billing.md</span>
+│       └── <span class="file">invoice.md</span>
+└── <span class="folder">src/</span>
+    ├── <span class="folder">auth/</span>
+    └── <span class="folder">billing/</span></div>
+    <div class="panel"><ul class="spec-points"><li><code>AGENTS.md</code>(a) Project-level rules;<code>product.md</code>and<code>architecture.md</code>Set a stable global context.</li><li>Field Spec places<code>specs/auth/</code>,<code>specs/billing/</code>Close to the corresponding operational boundaries.</li><li>Agent loads only the documents required in the current phase and field at a time to avoid a huge context.</li><li>Large-scale reorganisation cuts the border first and then removes the batch; no complete system is modified at once.</li></ul></div>
+  </div>
+</section>
+
+<section class="slide spec-slide" data-title="Execute Spec with /goal">
+  <div class="topline"><span>17 / 44</span><span>Spec-Driven Development</span></div>
+  <div class="eyebrow">Let Agent push by stage, not one-off.</div>
+  <h2>Use<span class="teal">/goal</span>Turn Spec into a state-of-the-art implementation cycle.</h2>
+  <div class="spec-goal">
+    <div class="code-card"><span class="comment"># Example: Give goal, scope and authentication together /goal</span>
+/goal
+Read specs/checkout/
+Press Phase 1 → Phase 3 for execution
+Each: Plan Implementing Validate
+Report evidence and residual risks after completion
+Undefined scope or contract: suspension of questions</div>
+    <ul class="goal-points"><li><strong>Assigned entry:</strong>Gives Spec files or directories that do not allow Agent to guess its own context.</li><li><strong>Designation stage:</strong>Push one phace at a time and continue after validation.</li><li><strong>Specified status:</strong>At each stage, completed items, evidence, risks and next steps are recorded.</li><li><strong>Other Organiser</strong>Borders, competencies, data contracts are not clear, and no unauthorized expansion is permitted.</li></ul>
+  </div>
+  <div class="goal-note">/goal is not a magic command to replace Spec; it's worth giving<strong>Objective, phase, certification and cessation conditions</strong>Continuously visible.</div>
+</section>
+
+<section class="slide agent-loop-slide" data-title="Agent loop: new functional development">
+  <div class="topline"><span>18 / 44</span><span>Agent Loop / New Functional Development</span></div>
+  <div class="eyebrow">Turning a delivery into a visible overlap Sub.</div>
+  <h2>The new function is not "one generation at a time."<br>It's...<span class="accent">Target-driven action loops.</span></h2>
+  <div class="agent-loop-track">
+    <div class="agent-loop-step"><b>01 / GOAL</b><strong>Clear objectives</strong><span>Read Spec, confirm scope, acceptance and cessation conditions.</span></div>
+    <div class="agent-loop-step"><b>02 / EXPLORE</b><strong>Explore the warehouse.</strong><span>Search symbols, dependencies and existing tests, only relevant context.</span></div>
+    <div class="agent-loop-step"><b>03 / PLAN</b><strong>Presentation of plans</strong><span>Dismantling into small steps allows for the identification of high-risk decisions.</span></div>
+    <div class="agent-loop-step"><b>04 / IMPLEMENT</b><strong>Execute Changes</strong><span>Edits the code by stage, and each change is held back.</span></div>
+    <div class="agent-loop-step"><b>05 / VERIFY</b><strong>Validation of evidence</strong><span>Run tests, check diff against Acceptance Criteria.</span></div>
+    <div class="agent-loop-step"><b>06 / NEXT</b><strong>Completed or continued</strong><span>The fulfilment of the conditions ceases; the failure leads to the next round with evidence.</span></div>
+  </div>
+  <div class="token-note" style="margin-top:22px"><strong>Core:</strong>Each round answers "what is the current state, why is the next step, and what evidence can stop".</div>
+</section>
+
+<section class="slide agent-loop-slide" data-title="Agent Loop: How to advance in an iterative fashion">
+  <div class="topline"><span>19 / 44</span><span>Agent loop / One-time</span></div>
+  <div class="eyebrow">So that every step can be reset.</div>
+  <h2>Take the example of "order export":<br>Agent, pass.<span class="teal">Evidence, decision-making, validation</span>Push.</h2>
+  <div class="agent-iteration">
+    <div class="code-card"><span class="comment"># iteration 03: implement export endpoint</span>
+goal: add order export
+state: API contract clarified
+read: orders/service.ts, orders.test.ts
+plan: add CSV serializer + endpoint test
+edit: 2 files changed
+run: npm test -- orders
+evidence: 18 passed, diff reviewed
+decision: continue → add permission case</div>
+    <div class="panel"><ul class="obs-points">
+      <li><strong>Entry:</strong>Spec has defined the criteria for input, output, permission and acceptance.</li>
+      <li><strong>Actions:</strong>Searches for symbols and tests without reading the entire warehouse.</li>
+      <li><strong>Feedback:</strong>The result of the tool is to retain only evidence of failure, difference and the next step.</li>
+      <li><strong>Stop:</strong>Functional acceptance is passed or suspended in case of contract, authority, data risk.</li>
+    </ul></div>
+  </div>
+  <div class="agent-loop-track" style="grid-template-columns:repeat(4,1fr);margin-top:18px"><div class="agent-loop-step"><b>INPUT</b><strong>Objectives and context</strong><span>Spec + Current Status</span></div><div class="agent-loop-step"><b>ACTION</b><strong>Tools and Changes</strong><span>One little step.</span></div><div class="agent-loop-step"><b>FEEDBACK</b><strong>Results and evidence</strong><span>Test / diff/ log</span></div><div class="agent-loop-step"><b>DECISION</b><strong>Continue or stop</strong><span>Boundary compliance</span></div></div>
+</section>
+
+<section class="slide token-slide" data-title="Token Use Optimization: Budget">
+  <div class="topline"><span>20 / 44</span><span>Token Engineering</span></div>
+  <div class="eyebrow">First, check the ledger, then improve the sentence.</div>
+  <h2>Token costs more than just Prompt.<br>More from<span class="accent">Repeats the number of context x Agent loops.</span></h2>
+  <div class="token-budget-grid">
+    <div class="token-budget-card"><strong>Input tokens</strong><p>System directives, historical dialogues, tools Schema, codes, RAG results.</p><span class="big">Duplicate = hidden cost</span></div>
+    <div class="token-budget-card"><strong>Output tokens</strong><p>Answers, reasoning, tool parameters and retesting after failure.</p><span class="big">max_output_tokens</span></div>
+    <div class="token-budget-card"><strong>Number of calls</strong><p>Are there really four calls required for classification, extraction, summary, formatting?</p><span class="big">Less cycle, less try again.</span></div>
+  </div>
+  <div class="token-equation">Total cost ≈ input tokens × input price + output tokens × output price × number of calls</div>
+  <div class="token-note"><strong>Priority:</strong>Prompt caching → context compaction → tool filtering → model routing → loop / call reduction.</div>
+</section>
+
+<section class="slide token-slide" data-title="Token use optimization: Codex and Claude Code">
+  <div class="topline"><span>21 / 44</span><span>Token Engineering / Coding Agent</span></div>
+  <div class="eyebrow">You can't control all the loops. You can control the contents of the context.</div>
+  <h2>Codex / Claude Code:<span class="accent">Compress the tool output first.</span></h2>
+  <div class="token-scenarios">
+    <div class="token-scenario"><h3>Location of RTK</h3><div class="token-flow">Agent runs shell command<br>　　　 ↓ hook rewrites<br><strong>RTK</strong> executes the real CLI<br>　　　 ↓ filter / summarize / dedupe<br>compact output<br>　　　 ↓<br>LLM context</div><p>It does not change the model, only changes the shape of Shell output into context: individual Rust binary, 100+ command, low cost.</p></div>
+    <div class="token-scenario"><h3>Why is it shorter?</h3><p><strong>Smart filtering:</strong>Remove comments, blanks, templates and progress noise.</p><p><strong>Grouping:</strong>By file, directory, rule or error type.</p><p><strong>Truncation:</strong>Keep key context and repeat long lines.</p><p><strong>Deduplication:</strong>Duplicate logs fold into one article and attach the number of times they occur; the tests usually keep only failed entries.</p></div>
+  </div>
+  <div class="token-note"><strong>The border is clear:</strong>RRTK officially claims to reduce by up to 90% the Bash output, but this does not amount to a 90% reduction in the bill. It controls only one source of input token;<code>rtk gain</code>Use<code>bytes / 4</code>Token, the percentage is meaningful and the absolute value is not a supplier bill.<a class="source-link" href="https://github.com/rtk-ai/rtk" target="_blank" rel="noreferrer">Official warehouse</a></div>
+</section>
+
+<section class="slide token-slide" data-title="Token Usage Optimization: Self-build Agent">
+  <div class="topline"><span>22 / 44</span><span>Token Engineering / Own Agent</span></div>
+  <div class="eyebrow">Agent controls the entire cycle.</div>
+  <h2>Upgrade the RTK mind to<span class="teal">Token-aware Tool Middleware.</span></h2>
+  <div class="token-priority">
+    <div class="token-priority-item"><b>01 / TOOL OUTPUT</b><strong>Compression result</strong><span>Tuncate, Sumarize, Deduplicate, return only information useful for the next step.</span></div>
+    <div class="token-priority-item"><b>02 / CONTEXT</b><strong>Evidence as required</strong><span>RAG top 3-5, summarizes old history, cache stable prefixes and results.</span></div>
+    <div class="token-priority-item"><b>03 / SCHEMA</b><strong>Filter Tool</strong><span>By task exposure tool group, reduce irrelevant Schema and wrong calls.</span></div>
+    <div class="token-priority-item"><b>04 / MODEL</b><strong>Task route</strong><span>Simple classification uses small models, complex planning and coding uses strong models.</span></div>
+    <div class="token-priority-item"><b>05 / LOOP</b><strong>Control Cycle</strong><span>Parallel call, limit retry, set max turns and specify termination conditions.</span></div>
+  </div>
+  <div class="token-equation">Tool → raw result → token optimizer → diff / cache / structured extraction → agent context</div>
+  <div class="token-note"><strong>The difference between the two scenarios:</strong>Codex / Claude Code mainly returns fewer tools; self-build Agent can also decide "when, what, how many times, when to stop."</div>
+</section>
+
+<section class="slide observability-slide" data-title="LLM Observability: 3rd Layer Run">
+  <div class="topline"><span>23 / 44</span><span>LLM Observability</span></div>
+  <div class="eyebrow">Observe Agent to explain why it's acting like this.</div>
+  <h2>Runtime,Instrumentation,Evaluation<br>Three different floors.<span class="accent">Duties.</span></h2>
+  <div class="observability-table-wrap"><table class="observability-table"><thead><tr><th>Problem / Layer</th><th>Claude Code</th><th>Codex</th><th>AutoGen</th><th>LangChain / LangGraph</th></tr></thead><tbody>
+    <tr><td>Persistent instructions</td><td>CLAUDE.md</td><td>AGENTS.md</td><td>System messages / agent config</td><td>Prompts / system messages</td></tr>
+    <tr><td>Reusable workflows</td><td>Skills</td><td>Skills / instructions</td><td>Agent / workflow / component</td><td>Tools + prompts / LangGraph nodes</td></tr>
+    <tr><td>Agent routing</td><td>Skill descriptions</td><td>Instructions + scope</td><td>Router agent / workflow logic</td><td>Conditional edges / router</td></tr>
+    <tr><td>Tracing</td><td>OpenTelemetry + telemetry</td><td>Less publicly exposed</td><td>Events / callbacks / OTel</td><td>LangSmith Tracing</td></tr>
+    <tr><td>Loop control</td><td>maxTurns + runtime limits</td><td>Runtime limits</td><td>max turns + termination</td><td>recursion limit + state control</td></tr>
+    <tr><td>Evaluation</td><td>External eval tooling</td><td>External eval tooling</td><td>Custom evaluator</td><td>LangSmith Evaluations</td></tr>
+    <tr><td>Guardrails</td><td>Hooks + permissions + sandbox</td><td>Sandbox + approvals</td><td>Tool guards / middleware</td><td>Middleware / guard nodes</td></tr>
+    <tr><td>Cost / tokens</td><td>Telemetry / usage</td><td>Usage reporting</td><td>Instrument LLM calls</td><td>LangSmith token tracking</td></tr>
+  </tbody></table></div>
+  <div class="token-note" style="margin-top:16px"><strong>Key division of labour:</strong>LangGraph control process, LangSmith observation and assessment; AutoGen can also access LangSmith / OpenTelemetry.</div>
+</section>
+
+<section class="slide observability-slide" data-title="LLM Observability: AutoGen Access Observatories">
+  <div class="topline"><span>24 / 44</span><span>LLM Observability / AutoGen</span></div>
+  <div class="eyebrow">Runtme and AgentOps can be decomposed</div>
+  <h2>AutoGen runs,<br><span class="teal">LangSmith / OpenTelemetry sees the running.</span></h2>
+  <div class="obs-arch">
+    <div class="code-card"><span class="comment"># AutoGen runtime</span>
+Your Application
+      ↓
+ AutoGen Runtime
+      │
+ ┌────┼────┐
+ ▼    ▼    ▼
+Agent Tool Workflow
+      │ events
+      ▼
+OpenTelemetry ──→ LangSmith</div>
+    <div class="panel"><ul class="obs-points"><li><strong>Agent / Tool:</strong>Record message, description, parameters, results, errors and time-consuming.</li><li><strong>LLM:</strong>Records model, input/output tokens, latency and cost.</li><li><strong>Trace tree:</strong>Linking LLM, Tool, Hook, Subagent in a run.</li></ul></div>
+  </div>
+  <div class="token-equation">Agent Runtime ≠ Observability ≠ Evaluation<br>AutoGen / LangGraph / Custom → OpenTelemetry → LangSmith / Phoenix → Trace → Eval</div>
+  <div class="token-note"><strong>ActOps:</strong>The self-build system should prioritize the definition of events and trace transactions, and select LangSmith, Phoenix or other backends.</div>
+</section>
+
+<section class="slide observability-slide" data-title="LLM Observability: From Trace to Guardrail">
+  <div class="topline"><span>25 / 44</span><span>LLM Observability / Quality Loop</span></div>
+  <div class="eyebrow">Tracking is not the end. Production quality needs to be closed.</div>
+  <h2>Trace found mode,<span class="accent">Evaluation proves the problem.</span><br>Guardrail prevents recurrence.</h2>
+  <div class="obs-metrics">
+    <div class="obs-metric"><b>Skill Selection Accuracy</b><span>Does the selected Skill/Agent really fit the task?</span></div>
+    <div class="obs-metric"><b>Skill Repetition Rate</b><span>Is the same capability meaningfully duplicated?</span></div>
+    <div class="obs-metric"><b>Skill Churn</b><span>A B B A B B for unstable roads?</span></div>
+    <div class="obs-metric"><b>Agent Loop Length</b><span>How many rounds and tools have been used to complete a goal?</span></div>
+    <div class="obs-metric"><b>Unnecessary Calls</b><span>Which tools/skills calls have not changed the next decision?</span></div>
+    <div class="obs-metric"><b>Successful Termination</b><span>Is it done in accordance with acceptance standards, and not out of compliance with the ceiling?</span></div>
+  </div>
+  <div class="obs-loop"><div class="code-card">Trace: revenue-analysis → data-cleansing → revenue-analysis → data-cleansing<br><span class="comment">Evaluation: unnecessary repetition</span><br><span class="key">Guardrail:</span> max_same_skill_calls = 2<br><span class="cmd">Skill redesign:</span> add explicit exit condition<br><span class="key">Regression:</span> task X ≤ 5 skill invocations</div><div class="obs-principle"><strong>Production closed rings</strong><br>Tracing → Evaluation → Guardrail → Skill redesign → Regression test<br><br><span style="font-size:.72em;color:var(--muted)">Let's not just record what happened, but also document Agent why he chose, why he continued, why he stopped.</span></div></div>
+</section>
+
+<section class="slide" data-title="Borders and human trials">
+  <div class="topline"><span>26 / 44</span><span>Autonomous boundaries</span></div>
+  <div class="eyebrow">Business really has to decide.</div>
+  <h2>It's not "AI can do it."<br>It's "what step do we allow it to make?"</h2>
+  <div class="guardrail">
+    <div class="guard"><div class="guard-label">Development environment</div><h3>Freer.</h3><p>Read the code, change the code, run the test. Allows rapid error.</p></div>
+    <div class="guard"><div class="guard-label">Test Environment</div><h3>Executable</h3><p>Specifies the directory to write, specifies the command to run, and the key results need to be confirmed.</p></div>
+    <div class="guard"><div class="guard-label">Production environment</div><h3>Read-only priority</h3><p>Read the log, check the data, make recommendations. The responsibility for hazardous operations and eventual liability rests with the person.</p></div>
+  </div>
+  <div class="ladder"><div class="rung"><b>All manual</b><span>People do it, AI. Look.</span></div><div class="rung"><b>AI Recommendation</b><span>People decide.</span></div><div class="rung"><b>AI Implementation</b><span>Confirmed</span></div><div class="rung"><b>Critical steps for trial</b><span>Automation within borders</span></div><div class="rung"><b>Full Auto</b><span>Only for low-risk scenarios</span></div></div>
+</section>
+
+<section class="slide" data-title="Prompt Engineering to Graph Engineering">
+  <div class="topline"><span>27 / 44</span><span>From Prompt Engineering to Graph Engineering</span></div>
+  <div class="eyebrow">The next stage is not learning more terms.</div>
+  <h2>LLM is getting better and better.<span class="accent">Understanding, action, synergy</span>,<br>So our work moved from "writing hints" to "design systems."</h2>
+  <div class="evolution">
+    <div class="evo"><b>01 / Prompt Engineering</b><h3>Tell him what to do.</h3><p>Write more clearly.</p><span class="cap">LLM: Follow instructions</span></div>
+    <div class="evo"><b>02 / Context Engineering</b><h3>Let him know where to do it.</h3><p>Projects, rules, information in context.</p><span class="cap">LLM: Using context</span></div>
+    <div class="evo"><b>03 / Spec Engineering</b><h3>Define what's done.</h3><p>Input, output, boundary, acceptance and observation.</p><span class="cap">LLM: Dismantling task</span></div>
+    <div class="evo"><b>04 / Goal + Loop Engineering</b><h3>To target. Allow it to overlap.</h3><p>One step, one result and one next.</p><span class="cap">LLM: Planning and Calling Tool</span></div>
+    <div class="evo"><b>05 / Harness Engineering</b><h3>Give it the fence to run.</h3><p>Tests, privileges, tools and feedback are fixed.</p><span class="cap">LLM: Implementation within Borders</span></div>
+    <div class="evo"><b>06 / Graph Engineering</b><h3>Design taskchart</h3><p>Let's get multiple steps, Agent and people working together.</p><span class="cap">LLM: Coordination of complex systems</span></div>
+  </div>
+  <div class="quote" style="margin-top:24px">Each move up is due to the fact that the upper layer begins to become a bottleneck:<strong>There are not enough reminders, the context is not enough, the specifications and feedback are not enough.</strong></div>
+</section>
+
+<section class="slide" data-title="Changes in working methods">
+  <div class="topline"><span>28 / 44</span><span>Change in capacity and focus</span></div>
+  <div class="eyebrow">From Write Prompt to Design Operating Environment</div>
+  <h2>ILM's ability has risen.<br>The developers are no longer solely responsible for "output text".</h2>
+  <div class="change-table">
+    <div class="change-row head"><div>Phase</div><div>LLM Capacity Change</div><div>Our focus / working methods</div></div>
+    <div class="change-row"><div>Prompt Engineering</div><div><p>From the understanding of a directive to the stable adherence to format and tone.</p></div><div><p>Practice to express tasks, check output, and repeatedly rewrite hints.</p></div></div>
+    <div class="change-row"><div>Context Engineering</div><div><p>Project information, rules and historical information can be put into judgement.</p></div><div><p>Collapse the context and maintain README, AGENTS.md, knowledge boundaries.</p></div></div>
+    <div class="change-row"><div>Spec Engineering</div><div><p>Natural language targets can be broken down into steps, constraints and outcomes.</p></div><div><p>Defines input, output, anomaly and acceptance before AI executes.</p></div></div>
+    <div class="change-row"><div>Goal / Loop Engineering</div><div><p>Can plan, call tools, observe results, fix paths.</p></div><div><p>Change from "writing once" to "management feedback loop" to focus on evidence and state.</p></div></div>
+    <div class="change-row"><div>Harness Engineering</div><div><p>The task can be accomplished in the context of testing, authority and tool constraints.</p></div><div><p>Design operating environment: tests, privileges, tools, rollbacks and human hearings.</p></div></div>
+    <div class="change-row"><div>Graph Engineering</div><div><p>It can coordinate multiple Agent, workflow and dependency relationships.</p></div><div><p>Design task maps, nodal responsibility, handover, Eval and system-level feedback.</p></div></div>
+  </div>
+  <div class="change-note"><div class="panel"><p><strong>LLM change:</strong>From answering questions to fulfilling objectives in context and constraints.</p></div><div class="panel"><p><strong>Human changes:</strong>From doing every step in person to designing objectives, boundaries, feedback and collaborative maps.</p></div></div>
+</section>
+
+<section class="slide loop-image-slide" data-title="Three product development feedback cycles">
+  <div class="topline"><span>29 / 44</span><span>Three product development feedback cycles</span></div>
+  <img class="loop-image" src="assets/product-development-loops.png" alt="Three product development feedback loops: Agency Working Loop, Development Feedback Loop, Extranal Feedback Loop">
+  <p class="chart-caption">The greater the cycle, the slower the feedback, but the closer it is to the real product: the minute level of execution, the hourly calibration, the gradation.</p>
+  <p class="footer-line"><span>Designing the feedback cycle will make Agent change from "can write" to "can deliver".</span><span>29</span></p>
+</section>
+
+<section class="slide" data-title="Next">
+  <div class="topline"><span>30 / 44</span><span>From tool to work stream</span></div>
+  <div class="eyebrow">Next job starts.</div>
+  <h2>Don't learn first.<br><span class="accent">First let AI do a real job for you.</span></h2>
+  <div class="route">
+    <div class="route-step"><b>01</b><h3>Pick a task.</h3><p>HF, repeat, results judged.</p></div><div class="route-step"><b>02</b><h3>To the border.</h3><p>Define directories, commands, environments.</p></div><div class="route-step"><b>03</b><h3>Run validation</h3><p>Test, log, manual acceptance.</p></div><div class="route-step"><b>04</b><h3>Skill</h3><p>Turning the method into a reuseable process.</p></div><div class="route-step"><b>05</b><h3>Continuous improvement</h3><p>With real feedback.</p></div>
+  </div>
+  <p class="footer-line"><span>Complex missions re-enter Spec, Goal, Loop, Multi-Agent.</span><span>30</span></p>
+</section>
+
+<section class="slide" data-title="LLM hallucinations">
+  <div class="topline"><span>31 / 44</span><span>LLM hallucinations: causes and solutions</span></div>
+  <div class="eyebrow">It doesn't make sense. It doesn't make it right.</div>
+  <h2>LLM will "false" not because it wants to lie.<br><span class="accent">It's the generation of gills to verify.</span></h2>
+  <div class="hallucination-grid">
+    <div class="hall-card"><h3>Why did that happen?</h3>
+      <div class="hall-item"><b>Probability generation</b><p>The model gives priority to the generation of text like an answer, which is not automatically endorsed as a fact.</p></div>
+      <div class="hall-item"><b>Context Missing</b><p>Without business rules, real data or up-to-date information, reliance is placed on existing models.</p></div>
+      <div class="hall-item"><b>Border Fuzzy</b><p>Too many problems, incomplete input, unclear acceptance, and models can easily complete information that does not exist.</p></div>
+    </div>
+    <div class="hall-card fix"><h3>How to write a Skill</h3>
+      <div class="hall-item"><b>Give it the basis.</b><p>Access to documents, databases, tools and traceable sources does not allow them to respond in a vacuum.</p></div>
+      <div class="hall-item"><b>Make it acceptable.</b><p>Requires reference, structured output, testing, rule-checking and evidence of failure.</p></div>
+      <div class="hall-item"><b>Reservations</b><p>Facts, figures, competencies, legal, financial and operational rules are not directly outsourced.</p></div>
+    </div>
+  </div>
+  <div class="quote" style="margin-top:22px">High-risk judgements cannot simply ask "like or not answer" but:<strong>On what basis? How to write a Skill Who's responsible?</strong></div>
+  <p class="footer-line"><span>References:<a class="source-link" href="https://x.com/AndrewYNg/status/2071988145667928442" target="_blank" rel="noreferrer">3 key product development loops</a></span><span>31</span></p>
+</section>
+
+<section class="slide rag-image-slide" data-title="RAG">
+  <div class="topline"><span>32 / 44</span><span>RAG: Access to knowledge</span></div>
+  <div class="eyebrow">Let the answer be justified, let the action have context.</div>
+  <h2>Evolution of RAG:<span class="teal">From one search to Agent, take evidence and act as required.</span></h2>
+  <img class="rag-image" src="assets/rag-layers.png" alt="RAG 3rd floor structure: Naive RAG, Retrieva Layer, Agenic Layer">
+  <div class="rag-foot"><span>The key to business landing: freshness of data, traceability of sources, authority and acceptance.</span><a class="source-link" href="https://x.com/akshay_pachaar/status/2083815836003996033" target="_blank" rel="noreferrer">Reference RAG Architecture</a></div>
+</section>
+
+<section class="slide pattern-reference-slide rag-pipeline-slide" data-title="RAG / Distillation Layer">
+  <div class="topline"><span>33 / 44</span><span>RAG: Distillation Layer</span></div>
+  <div class="eyebrow">RAG quality is decided before retrieval</div>
+  <h2>Fix the unit of knowledge<br><span class="accent">before tuning the vector stack.</span></h2>
+  <div class="pattern-reference-layout">
+    <div class="pattern-reference-media rag-pipeline-media">
+      <img src="assets/rag-naive-vs-distillation.png" alt="Naive RAG pipeline compared with a RAG pipeline with a distillation layer">
+      <img src="assets/rag-real-world-pipeline.png" alt="Seven-stage real-world RAG pipeline from ingest through export">
+      <div class="chart-caption">A distillation layer turns documents into smaller, cleaner, governed question-answer units before vectorization.</div>
+    </div>
+    <div>
+      <ul class="pattern-reference-points">
+        <li><strong>The chunk is the hidden assumption.</strong> Token-based chunks have no idea boundary, version context, or access state, so retrieval can return incomplete or conflicting evidence.</li>
+        <li><strong>Use a question-answer packet.</strong> One validated claim plus typed governance fields makes the indexed unit match the way users actually ask questions.</li>
+        <li><strong>Distill before vectorization.</strong> In the supplied benchmark, semantic deduplication cut the corpus by up to 40x, reduced query tokens by 3x, and improved retrieval distance by about 2.3x.</li>
+        <li><strong>Make governance part of the data.</strong> Version state, clearance, privacy, and source metadata travel with each block instead of living as fragile orchestrator logic.</li>
+        <li><strong>Seven stages make failures localizable.</strong> Scope, ingest, extract, deduplicate, auto-tag, validate with SMEs, then export to the vector store.</li>
+      </ul>
+      <div class="pattern-reference-note">The practical rule: clean and structure the knowledge unit upstream; keep retrieval, reranking, and embeddings focused on matching it.</div>
+    </div>
+  </div>
+</section>
+
+<section class="slide model-slide" data-title="LLM Selection">
+  <div class="topline"><span>34 / 44</span><span>LLM Selection</span></div>
+  <div class="eyebrow">The stronger the model, the better.</div>
+  <h2>Picking models, not looking for the strongest.<br><span class="accent">It's looking for the best value for money.</span></h2>
+  <img class="model-chart" src="assets/codex-radar.png" alt="Codex Radar: relative cost of different models versus IQ">
+  <div class="chart-caption">Codex Radar: The cross-axis is the relative aggregate cost and the vertical axis is IQ. The chart is suitable for relative position, not a single absolute list.</div>
+  <div class="model-points">
+    <div class="model-point"><b>Tasks</b><p>Complex Debug, Structure, Spec: Prioritize reasoning and code understanding.</p></div>
+    <div class="model-point"><b>HF missions</b><p>Logging, summary, simple revision: speed and cost are more important.</p></div>
+    <div class="model-point"><b>Real benchmarks</b><p>Compare code, context, tool call, speed and cost with your tasks.</p></div>
+  </div>
+</section>
+
+<section class="slide pattern-reference-slide" data-title="Choosing the right agentic pattern">
+  <div class="topline"><span>35 / 44</span><span>Agentic Design Patterns / Decision Tree</span></div>
+  <div class="eyebrow">Pattern selection starts with the task</div>
+  <h2>Pick the pattern from task properties.<br><span class="accent">Do not start with the architecture.</span></h2>
+  <div class="pattern-reference-layout">
+    <div class="pattern-reference-media"><img src="assets/agentic-design-decision-tree.png" alt="Decision tree for choosing an agentic design pattern"><div class="chart-caption">Decision-tree approach to choosing an agentic design pattern.</div></div>
+    <div>
+      <ul class="pattern-reference-points">
+        <li><strong>1. Start with the path.</strong> If the solution is known and deterministic, use a sequential workflow; use the model only where interpretation or generation is needed.</li>
+        <li><strong>2. Add capability as needed.</strong> For open-ended work, tools and external information provide access to APIs, databases, documents, and system actions.</li>
+        <li><strong>3. Separate planning from exploration.</strong> Use Planning when stages and dependencies are clear; use ReAct when structure emerges through execution.</li>
+        <li><strong>4. Spend for quality deliberately.</strong> Add Reflection when quality criteria are explicit and the cost of errors justifies extra latency.</li>
+        <li><strong>5. Scale only for a real bottleneck.</strong> Use Multi-Agent for specialization or scale; otherwise, a single agent is usually enough.</li>
+      </ul>
+      <div class="pattern-reference-note">Patterns are starting points. Re-evaluate them as feedback, constraints, and failure signals accumulate.<a class="source-link" href="https://machinelearningmastery.com/choosing-the-right-agentic-design-pattern-a-decision-tree-approach/" target="_blank" rel="noreferrer">Source article</a></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide pattern-reference-slide" data-title="Agent Design Pattern Framework">
+  <div class="topline"><span>36 / 44</span><span>Agentic Design Patterns / Framework</span></div>
+  <div class="eyebrow">A pattern is a composition of capability and execution shape</div>
+  <h2>Use two lenses to place the pattern:<br><span class="teal">what the agent does and how work moves.</span></h2>
+  <div class="pattern-reference-layout">
+    <div class="pattern-reference-media"><img src="assets/agent-design-pattern-framework.png" alt="Agent Design Pattern Framework mapping cognitive function to execution topology"><div class="chart-caption">Agent Design Pattern Framework: cognitive function x execution topology.</div></div>
+    <div>
+      <ul class="pattern-reference-points">
+        <li><strong>Cognitive function is the vertical lens.</strong> Perception, memory, reasoning, action, reflection, collaboration, and governance describe the work being performed.</li>
+        <li><strong>Execution topology is the horizontal lens.</strong> Chain, route, parallel, loop, hierarchy, and orchestration describe how work and control flow.</li>
+        <li><strong>Patterns are composable primitives.</strong> Examples include RAG Pipeline, Tool Dispatch, Plan-and-Execute, Fan-Out / Gather, and Hierarchical Delegation.</li>
+        <li><strong>Cross-cutting planes keep the system operable.</strong> Observability, Evaluation &amp; Validation, and Security &amp; Identity apply across the matrix.</li>
+        <li><strong>Design implication:</strong> locate the needed capability and topology first, then combine the smallest set of patterns that solves the task.</li>
+      </ul>
+      <div class="pattern-reference-note">The tree chooses; the matrix composes.</div>
+    </div>
+  </div>
+</section>
+
+<section class="slide model-slide" data-title="Tool selection for domestic developers">
+  <div class="topline"><span>37 / 44</span><span>Tool selection for domestic developers</span></div>
+  <div class="eyebrow">Different environments allow for consistent working methods</div>
+  <h2>We can't use an overseas tool in a stable way.<br><span class="teal">Not the same as not starting AI Coding.</span></h2>
+  <div class="tool-choice">
+    <div><img class="model-chart tall" src="assets/artificial-analysis-index.png" alt="Artificial Analysis Information Index: Model capabilities and cost distribution"><div class="chart-caption">Artificial Analysis Inteligence Index: Using the distribution of capabilities and costs to establish a selection baseline.</div></div>
+    <div class="choice-list">
+      <div><strong>Coding Agent</strong><br>Trae, WorkBuddy, Qwen Code, and Ideas.</div>
+      <div><strong>Model / API</strong><br>Select the "sufficient" model by code, reasoning, context, speed and cost.</div>
+      <div><strong>Model route</strong><br>Multiple models are connected to the same work environment using CC Switch or similar routes.</div>
+      <div><strong>Focus</strong><br>Do not bind a brand; keep mandates, privileges, tests and acceptances stable.</div>
+    </div>
+  </div>
+  <p class="model-foot">Model ranking is input, not decision-making. Run Benchmark on a real mission, then decide on the mix of tools.</p>
+</section>
+
+<section class="slide advanced-slide" data-title="High Agent mode: circular">
+  <div class="topline"><span>38 / 44</span><span>High</span></div>
+  <div class="eyebrow">High content 01</div>
+  <h2>Let's see.<span class="accent">Thinking, acting, correcting.</span>.</h2>
+  <div class="pattern-grid">
+    <div class="pattern-card"><h3>ReAct</h3><span class="pattern-meta">Planning: low / hidden self-adaptation:<span class="stars">★★★★★</span></span><pre class="ascii-chart">[Task]
+  |
+[Thought] -> [Action]
+                 |
+           [Observation]
+                 |
+              [Thought]
+                 |
+              [Action]</pre><p class="pattern-takeaway">Open task, search, tool call, trouble check.</p></div>
+    <div class="pattern-card"><h3>Reflection / Self-Critique</h3><span class="pattern-meta">Planning: Adaptation:<span class="stars">★★★★★</span></span><pre class="ascii-chart">[Draft / Run]
+      |
+  [Evaluate]
+    /     \
+[Pass]  [Improve]
+  |        |
+[Done] <---+</pre><p class="pattern-takeaway">After implementation, they are self-assessed and improved and suitable for coding, writing, data analysis.</p></div>
+    <div class="pattern-card"><h3>Tree of Thoughts</h3><span class="pattern-meta">Planning: Self-adaptation:<span class="stars">★★★★☆</span></span><pre class="ascii-chart">[Problem]
+    |
++---+---+
+|   |   |
+[A] [B] [C]
+ \   |   /
+  [Evaluate]
+      |
+ [Best path]</pre><p class="pattern-takeaway">At the same time, multiple options are explored to assess and choose the best path.</p></div>
+  </div>
+  <div class="advanced-foot"><span>Cycle-based Agent differences: Feedback occurs within a mission.</span><span>29</span></div>
+</section>
+
+<section class="slide advanced-slide" data-title="High Agent mode: layout">
+  <div class="topline"><span>39 / 44</span><span>High Agent Mode / Shape</span></div>
+  <div class="eyebrow">High content 02</div>
+  <h2>Look at Agent. How about that?<span class="teal">Disassembly tasks, roles, organizational status</span>.</h2>
+  <div class="pattern-grid">
+    <div class="pattern-card"><h3>Plan-and-Execute</h3><span class="pattern-meta">Planning: Self-adaptation:<span class="stars">★★★★☆</span></span><pre class="ascii-chart">[Goal]
+  |
+[Plan]
+  |
++---+---+
+|   |   |
+[S1][S2][S3]
+ \   |   /
+ [Replan?]</pre><p class="pattern-takeaway">Targeted multi-step tasks are planned and then implemented and reprogrammed as necessary.</p></div>
+    <div class="pattern-card"><h3>Graph / Workflow Agent</h3><span class="pattern-meta">Planning: Remarkable self-adaptation:<span class="stars">★★★☆☆</span></span><pre class="ascii-chart">[State]
+   |
+[Node A] --> [Node B] --yes--> [Node C]
+   |              |
+   +----- no -----+
+                  |
+              [Human]</pre><p class="pattern-takeaway">Enterprise processes, firm business rules, status and branches can be tracked.</p></div>
+    <div class="pattern-card"><h3>Multi-Agent</h3><span class="pattern-meta">Planning: Distributional self-adaptation:<span class="stars">★★★★☆</span></span><pre class="ascii-chart">            [Manager]
+           /    |    \
+        [Agent A][Agent B][Agent C]
+           \    |    /
+          [Shared result]
+                |
+             [Deliver]</pre><p class="pattern-takeaway">The different professional competencies work in parallel, suited to the division of roles and complex delivery.</p></div>
+  </div>
+  <div class="advanced-foot"><span>Discrepancies in layout Agent: turn one answer into a manageable task system.</span><span>30</span></div>
+</section>
+
+<section class="slide judgment-slide" data-title="Code and judgement">
+  <div class="topline"><span>40 / 44</span><span>AI Age Developer Capacity</span></div>
+  <div class="eyebrow">The stronger AI, the more people's scarce value is judged.</div>
+  <h2><span class="accent">Code</span>It's going to get cheaper.<br>But...<span class="teal">Decision</span>It'll be more expensive.</h2>
+  <div class="guardrail">
+    <div class="guard"><div class="guard-label">01 / Demand modelling (link to physics world)</div><h3>Turning realistic targets into enforceable compacts</h3><p>Clarify real operations, user scenarios, scope and acceptance conditions. The more ambiguous you enter, the easier it is for Agent to quickly magnify the wrong direction.</p></div>
+    <div class="guard"><div class="guard-label">02 / Structure discretion</div><h3>Reduce the optional space with constraints</h3><p>The principles of modular boundaries, data non-variant and architecture are written into rules that Agent can implement, and the long-term experience is deposited as reusable constraints.</p></div>
+    <div class="guard"><div class="guard-label">03 / Quality responsibilities (link to physics world)</div><h3>Use the evidence to protect the real consequences.</h3><p>Tests, reviews, issuance of door closures, online observations and user feedback form the chain of evidence. The code can be generated by AI, and quality risks still need to be borne by people.</p></div>
+  </div>
+  <div class="judgment-note"><strong>Inputs are allocated by risk:</strong>Standardized, low-risk small team projects can be less structured; complex systems, key data and long-term evolution still require clear constraints. AI will take over a growing number of structures, but will not automatically bear the consequences for you.</div>
+</section>
+
+<section class="slide observability-slide communication-slide" data-title="Multiple Agent how to communicate">
+  <div class="topline"><span>41 / 44</span><span>Multi-Agent / Distributed Systems</span></div>
+  <div class="eyebrow">Don't make a lot of Agent just talk in groups.</div>
+  <h2>How do you communicate with each other?<br>Think of it as a first.<span class="accent">Distribution systems.</span></h2>
+  <div class="obs-arch">
+    <div class="code-card"><span class="comment"># task and message flow</span>
+User Goal
+   │
+   ▼
+[Router / Manager]
+ ┌─┼──────────┐
+ ▼ ▼          ▼
+Planner Researcher Coder
+    └────┬─────┘
+         ▼
+ [State / Event Log]
+         ▼
+     [Reviewer]
+  pass / retry / stop</div>
+    <div class="panel"><ul class="obs-points">
+      <li><strong>Message contract:</strong><code>task_id</code>,<code>sender</code>,<code>recipient</code>,<code>type</code>,<code>payload</code>,<code>evidence</code>.</li>
+      <li><strong>State ownership:</strong>One Agent is responsible for writing, other Agent submits proposals or read-only.</li>
+      <li><strong>Failed boundary:</strong>Timeout, retrying, repeating messages, back pressure and permissions are handled visibly.</li>
+      <li><strong>Termination and observation:</strong>Defines the DONE condition and records news, decision making, tools, Token.</li>
+    </ul></div>
+  </div>
+  <div class="observability-table-wrap">
+    <table class="observability-table"><thead><tr><th>Communication mode</th><th>Structure</th><th>It suits the scene.</th><th>Main risks</th></tr></thead><tbody>
+      <tr><td>Point-to-Point</td><td>Agent A → Agent B</td><td>Clear mission handover</td><td>Convergence, single-point dependency</td></tr>
+      <tr><td>Broadcast / Group Chat</td><td>One message, poignant.</td><td>Share context, multiple review</td><td>Context expands, repeats responses</td></tr>
+      <tr><td>Broker / Event Bus</td><td>Agent → Broker → Agent</td><td>Event-driven, step-by-step collaboration</td><td>Message sequence, double consumption</td></tr>
+      <tr><td>Shared State</td><td>Agent ↔ State Store</td><td>Long process, recoverable tasks</td><td>State competition, confusion.</td></tr>
+    </tbody></table>
+  </div>
+  <div class="token-note"><strong>Criteria for judgement:</strong>It's up to you to decide who can see the news, who can change the state, who has the right to continue, and who can expand the communication.</div>
+</section>
+
+<section class="slide observability-slide runtime-example-slide" data-title="AutoGen: Information Collaboration">
+  <div class="topline"><span>42 / 44</span><span>Multi-Agent / AutoGen</span></div>
+  <div class="eyebrow">Runtme manages participants, routers and termination conditions together</div>
+  <h2>AutoGen: Turn Agent collaboration into<span class="teal">Manageable news systems.</span></h2>
+  <div class="obs-arch">
+    <div class="code-card"><span class="comment"># AutoGen: message-oriented team</span>
+Task
+ │
+ ▼
+[Team / Manager]
+ ┌──┼─────────┐
+ ▼  ▼         ▼
+Planner Researcher Reviewer
+       └──┬────┘
+          ▼
+   Runtime topics + tools
+          ▼
+    termination condition</div>
+    <div class="panel"><ul class="obs-points">
+      <li><strong>Participants:</strong>Use<code>AssistantAgent</code>Expressing different roles, receiving assignments or exporting evidence as required.</li>
+      <li><strong>Message route:</strong>Team / Manager sends the message to the participants; participants share the necessary context but do not share all internal status.</li>
+      <li><strong>Tool boundary:</strong>Pass.<code>FunctionTool</code>,<code>AgentTool</code>or MCP exposure capability, tools still need control over privileges, time overruns and thorium.</li>
+      <li><strong>Conditions for discontinuation:</strong><code>TerminationCondition</code>, maximum rotation and manual intervention to prevent unlimited collaboration.</li>
+    </ul></div>
+  </div>
+  <div class="token-equation">message = { task_id, sender, recipient, type, payload, evidence, created_at }<br>trace = run → participant message → tool call → result → next decision → termination</div>
+  <div class="token-note"><strong>Distribution map:</strong>Agent is the service character, Team / Manager is the route layer, Runtime topic is the message address, terminisation is the system suspension condition.<a class="source-link" href="https://github.com/microsoft/autogen" target="_blank" rel="noreferrer">AutoGen official warehouse</a></div>
+  <div class="chart-caption">AutoGen is currently in maintenance mode; this is an example of multiAgent Runtme, and the new project should also be evaluated.</div>
+</section>
+
+<section class="slide observability-slide runtime-example-slide" data-title="LangChain / LangGraph: state collaboration">
+  <div class="topline"><span>43 / 44</span><span>Multi-Agent / LangChain</span></div>
+  <div class="eyebrow">Translating messages into state changes and conditions Side</div>
+  <h2>LangChain / LangGraph:<br>Use<span class="accent">Status Chart</span>Express how Agent continues, branches and ends.</h2>
+  <div class="obs-arch">
+    <div class="code-card"><span class="comment"># LangGraph: state-oriented workflow</span>
+START
+  │
+  ▼
+[Planner] ── conditional ──┐
+  ├──→ [Researcher] ────────┤
+  └──→ [Coder] ─────────────┘
+             │
+             ▼
+         [Reviewer]
+          /      \
+       pass      fail
+        │          │
+       END  ───→ Coder</div>
+    <div class="panel"><ul class="obs-points">
+      <li><strong>State:</strong>Share<code>goal</code>,<code>evidence</code>,<code>draft</code>,<code>review</code>,<code>attempts</code>, each update can be tracked.</li>
+      <li><strong>Node:</strong>Each node can be an Agent, a tool or a certainty function, enter a state and return a local update.</li>
+      <li><strong>Conditional edge:</strong>Select the following section according to status, moving the router rule from hidden conversations to visible control streams.</li>
+      <li><strong>Observation and assessment:</strong><code>@tool</code>Responsible for capacity, LangSmith for track, dataset and assessment, operating at the same time as observations.</li>
+    </ul></div>
+  </div>
+  <div class="observability-table-wrap">
+    <table class="observability-table"><thead><tr><th>Design Layer</th><th>AutoGen</th><th>LangChain / LangGraph</th><th>Distribution system considerations</th></tr></thead><tbody>
+      <tr><td>Agent</td><td>AssistantAgent</td><td>Agent / graph node</td><td>Boundary between service roles and duties</td></tr>
+      <tr><td>Communication</td><td>Team publish / manager route</td><td>State update / graph edge</td><td>Radio, straight line or event?</td></tr>
+      <tr><td>State + termination</td><td>Runtime / team state + condition</td><td>StateGraph state + END</td><td>Single author, budget, recovery</td></tr>
+      <tr><td>Tools + observability</td><td>FunctionTool / events / callbacks</td><td>@tool / LangSmith tracing</td><td>Permissions, trace, metrics, eval</td></tr>
+    </tbody></table>
+  </div>
+  <div class="token-note"><strong>Organisation</strong>AutoGen is easier to show "how news flows", and LangGraph is easier to write "how the state changes and why it happens next." Both require a contract of information, state ownership, failure and termination conditions.</div>
+</section>
+
+<section class="slide cover final" data-title="End">
+  <div class="topline"><span>44 / 44</span><span>Take three sentences.</span></div>
+  <div class="eyebrow">End</div>
+  <h2 data-pretext contenteditable="true">It's not necessarily a substitute for developers.<br><span class="accent">But it will redefine what developers do every day.</span></h2>
+  <div class="quote" style="color:var(--white);border-color:var(--yellow)">First let AI do a real job for you.<br>And teach it experience, SOP and context.<br>Make it as automated as possible within the right borders.</div>
+  <div class="summary-grid">
+    <div class="summary-item"><b>01 / Real Job</b><p>Prioritize Coding Agent, let AI do a real job for you.</p></div>
+    <div class="summary-item"><b>02 / Context</b><p>Teach AI about projects, experiences, SOPs and working methods.</p></div>
+    <div class="summary-item"><b>03 / Boundary</b><p>Clear lines of authority, testing, acceptance and what cannot be directly outsourced.</p></div>
+    <div class="summary-item"><b>04 / Automation</b><p>In the right boundary, make AI as automated and as feedback as possible.</p></div>
+  </div>
+  <div class="cover-meta"><span>Objective</span><span>Context</span><span>Border</span><span>Validation</span></div>
+</section>
+</main>
+<nav class="controls" aria-label="Presentation Control"><button id="prev" type="button" aria-label="Previous Page" title="Previous Page">←</button><span class="counter" id="counter">01 / 44</span><button id="next" type="button" aria-label="Next Page" title="Next Page">→</button></nav>
+<script>
+(() => { const slides=[...document.querySelectorAll('.slide')]; const counter=document.querySelector('#counter'); let index=0; const show=(next,behavior='smooth')=>{index=Math.max(0,Math.min(slides.length-1,next)); slides[index].scrollIntoView({behavior,block:'start'}); slides.forEach((s,i)=>s.classList.toggle('active',i===index)); counter.textContent=String(index+1).padStart(2,'0')+' / '+String(slides.length).padStart(2,'0');};
+document.querySelector('#prev').addEventListener('click',()=>show(index-1)); document.querySelector('#next').addEventListener('click',()=>show(index+1));
+document.addEventListener('keydown',e=>{if(['ArrowRight','ArrowDown','PageDown',' '].includes(e.key)){e.preventDefault();show(index+1)} if(['ArrowLeft','ArrowUp','PageUp'].includes(e.key)){e.preventDefault();show(index-1)} if(e.key==='Home')show(0,'auto'); if(e.key==='End')show(slides.length-1,'auto'); });
+const observer=new IntersectionObserver(entries=>entries.forEach(entry=>{if(entry.isIntersecting){index=slides.indexOf(entry.target); slides.forEach((s,i)=>s.classList.toggle('active',i===index)); counter.textContent=String(index+1).padStart(2,'0')+' / '+String(slides.length).padStart(2,'0')}}),{threshold:.55}); slides.forEach(s=>observer.observe(s));
+const relayout=()=>document.querySelectorAll('[data-pretext]').forEach(el=>{el.style.minHeight=''; if(el.scrollHeight>el.clientHeight)el.style.minHeight=el.scrollHeight+'px'}); new ResizeObserver(relayout).observe(document.body); new MutationObserver(relayout).observe(document.body,{subtree:true,characterData:true,childList:true}); document.fonts?.ready.then(relayout); relayout();
+})();
+</script>
+<!-- Pretext fallback hook: the deck remains functional without network access. -->
+<script type="module">try{const {prepare,layout}=await import('https://esm.sh/@chenglou/pretext'); await document.fonts.ready; document.querySelectorAll('[data-pretext]').forEach(el=>{const h=prepare(el.textContent,getComputedStyle(el).font); const r=layout(h,el.clientWidth,parseFloat(getComputedStyle(el).lineHeight)); el.style.minHeight=r.height+'px';});}catch(e){/* local/offline fallback above */}</script>
+</body>
+</html>
