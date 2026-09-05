@@ -385,7 +385,7 @@ Multi-Space Service 会并发执行选定空间的检索，并把结果映射回
 
 ## 9. 真实代码链路阅读
 
-下面两条链路可以作为课程的主要代码阅读练习。
+下面的链路可以作为课程的主要代码阅读练习。
 
 ### 链路 A：私有知识搜索
 
@@ -427,40 +427,74 @@ Multi-Space Service 会并发执行选定空间的检索，并把结果映射回
 
 ### 链路 B：工具检索
 
+工具检索要拆成两个时机：MCP Server 变化后的索引构建，以及 Agent 发起请求时的候选工具检索。前者是写入链路，后者是读取链路；它们的触发者、延迟目标和故障模式都不同。
+
+#### 链路 B1：MCP Server 变化后的工具索引
+
+这是一个由 Server 生命周期事件触发的异步或后台写入流程：
+
 1. MCP Server 被部署或发生变化。
 2. Server Hook 调用工具索引器。
-3. 工具元数据和生成的查询文本被转换为文档。
-4. Embedding 客户端创建 1536 维向量。
-5. Qdrant 在 `private_knowledge` 中保存 Named Vector 和 Payload 元数据。
-6. 客户端发送一个或多个自然语言工具查询。
-7. Tool Selector 执行批量私有搜索和可选的缓存补充。
-8. 结果被映射为工具元数据并返回给 Agent。
-
-建议首先阅读：
-
-- `src/omnimcp_be/mcp/tool/tool_index.py`（L120:L365, L510:L650）
-- `src/omnimcp_be/mcp/tool/tool_selector.py`（L1394:L1682, L2644:L2960）
-- `src/omnimcp_be/mcp/tool/multi_space_query_service.py`（L52:L245）
-- `src/omnimcp_be/mcp/tool/router.py`（L163:L301）
-- `src/omnimcp_be/mcp/tool/models.py`（L17:L23, L244:L305）
-
-工具检索的主要链路如下：
+3. 工具名称、描述、标签、示例和生成的自然语言查询被格式化为可检索文档。
+4. Embedding 客户端为这些文档创建 1536 维向量。
+5. 索引器构造带 Named Vector 和 Payload 的 Point。
+6. Point 被 Upsert 到 `private_knowledge` Collection，Payload 保存工具和服务元数据。
 
 ```text
-+------------+    +----------+    +----------+    +----------+
-| MCP 变化   | -> | Hook     | -> | Index    | -> | Qdrant   |
-+------------+    +----------+    +----------+    +----------+
-                                                          |
-                                                          v
-+------------+    +----------+    +----------+    +----------+
-| Agent 使用 | <- | Tool    | <- | Selector | <- | API 查询 |
-+------------+    | Schema  |    +----------+    +----------+
-                  +----------+
++------------+    +----------+    +------------+    +-----------+
+| MCP 变化   | -> | Server   | -> | Tool Index | -> | Embedding |
++------------+    | Hook     |    +------------+    +-----------+
+                   +----------+             |
+                                             v
+                                      +-------------+
+                                      | Qdrant      |
+                                      | private_    |
+                                      | knowledge   |
+                                      +-------------+
 ```
+
+这条链路的结果不是“找到一个工具”，而是把当前可用的工具目录转换成后续可以检索的索引。需要关注幂等 Upsert、重复索引、Server 删除、Embedding 失败和索引新鲜度。
+
+#### 链路 B2：Agent 请求时的工具检索
+
+这是由客户端查询触发的在线读取流程：
+
+1. 客户端发送一个或多个自然语言工具查询，或者发送一个直接工具 ID 查询。
+2. `router.py` 校验批量查询请求，并交给 Tool Selector。
+3. Tool Selector 根据查询类型执行直接匹配、批量私有知识搜索，或调用 Multi-Space Service 检索多个工具空间。
+4. Selector 使用缓存和数据库元数据补充候选工具，并保留结果与输入查询的对应关系。
+5. 候选结果被映射为工具元数据和 Schema，返回给 Agent 做下一步选择。
+
+```text
++--------+    +--------+    +----------+    +----------------+
+| Client | -> | Router | -> | Selector | -> | Qdrant Search  |
++--------+    +--------+    +----------+    +----------------+
+                                  |                |
+                                  |                v
+                                  |         +--------------+
+                                  +-------> | Cache/DB     |
+                                            | metadata     |
+                                            +------+-------+
+                                                   |
+                                                   v
+                                            +--------------+
+                                            | Tool Schema  |
+                                            | -> Agent     |
+                                            +--------------+
+```
+
+这条链路的结果是“给当前 Agent 的候选工具”，不是执行工具本身。需要单独评估查询召回、批量顺序、跨空间结果合并、缓存一致性、Schema 完整性和权限过滤。
+
+建议按链路阅读源码：
+
+- B1 索引构建：`src/omnimcp_be/mcp/tool/tool_index.py`（L120:L365, L510:L650）
+- B2 查询入口和路由：`src/omnimcp_be/mcp/tool/router.py`（L163:L301）和 `src/omnimcp_be/mcp/tool/models.py`（L17:L23, L244:L305）
+- B2 候选工具选择：`src/omnimcp_be/mcp/tool/tool_selector.py`（L1394:L1682, L2644:L2960）
+- B2 跨空间检索：`src/omnimcp_be/mcp/tool/multi_space_query_service.py`（L52:L245）
 
 ### 可提升点
 
-将这两条链路画成一张对照图，明确哪些数据存在 MongoDB、哪些数据存在 Qdrant，以及哪个服务负责最终权限判断。
+将 B1 和 B2 画成一张对照图，明确哪些数据存在 MongoDB、哪些数据存在 Qdrant，以及哪个服务负责最终权限判断。
 
 ## 10. 动手实验
 
