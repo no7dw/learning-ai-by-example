@@ -147,18 +147,9 @@ Payload 过滤回答的是："哪些租户、用户、GPT、网站、时间范�
 
 生产环境的查询通常会把两者结合起来。在 `fastestai-api` 中，`QdrantRetriever._create_filters` 支持 Match、Text Match、Any-Value Match、Range、Null Check 和 Empty Check。它会先区分 `must`、`must_not` 和 `should` 条件，再创建 Qdrant Filter。
 
-### `search` 与 `scroll` 的区别
-
-代码库使用两种不同的 Qdrant 操作：
-
-- `search`：根据查询向量检索最近的 Point。
-- `scroll`：根据 Payload 过滤器遍历 Point，常用于重新获取某个父文档的所有文本块，或者检查 Collection 内容。
-
-这个区别是理解 RAG 的关键。最近邻搜索可能只返回几个匹配文本块，而 Full Text 响应可能需要再次执行 `scroll`，加载属于选中文档的所有文本块。
-
 ### 可提升点
 
-为常用 Payload 字段建立索引，并为 `search`、`scroll` 和过滤查询分别记录延迟。不要只优化向量搜索，却忽略过滤和全文重建造成的耗时。
+为常用 Payload 字段建立索引，并分别记录向量检索、过滤和全文重建的延迟。不要只优化向量搜索，却忽略过滤和上下文重建造成的耗时。
 
 ## 5. 数据入库：建立向量索引
 
@@ -301,46 +292,11 @@ API 也支持 `/v1/gpt/private/search_batch`。它会为多个查询创建 Embed
 
 增加 Reranker 或混合检索，把向量分数、关键词分数、时间新鲜度和业务优先级合并排序，再决定哪些上下文进入 Prompt。
 
-## 7. RAG 与 Agent Memory 是不同的系统
+## 7. Agent Memory
 
-RAG 和 Memory 经常都使用 Embedding 与 Qdrant，但它们回答的是不同的问题。
+Agent Memory 已单独整理为一篇教学文档，覆盖记忆分层、外置 Memory 框架、写入内容、过期与冲突处理，以及 Hermes Agent、OpenClaw、Codex 和 Claude Code 的案例：
 
-| 系统 | 要回答的问题 | 典型生命周期 |
-|---|---|---|
-| 知识 RAG | 哪些源文档可以回答这个问题？ | 入库、索引、检索、引用或提供依据 |
-| Agent Memory | Agent 应该记住哪些与用户或历史交互有关的事实？ | 提取、保存、检索、更新、遗忘 |
-| 工具检索 | 哪些工具描述与当前任务匹配？ | 索引工具知识、检索候选工具、执行选中的工具 |
-
-### `fastestai-api` 中的 Agent Memory
-
-`fastestai-api` 使用异步 `Memory` 类包装 `mem0.Memory`。Memory 配置使用 Qdrant，并将 Collection 设置为 `mem0`。由于 mem0 的操作是同步的，包装类会把它们放入 Executor 中执行，避免阻塞异步事件循环。
-
-Memory API 提供：
-
-- `POST /memory/add`：使用 `agent_id`、可选 `user_id` 和元数据保存内容；
-- `POST /memory/search`：检索相关记忆；
-- `POST /memory/list`：按时间范围和可选元数据过滤列出记忆。
-
-在 Auto Chat 流程中，可以分别检索用户 Memory 和 GPT Memory。检索结果会被格式化后放入 Prompt 的用户记忆区和助手记忆区。响应完成后，流程还可以使用本次交互更新 Memory。
-
-这与建立文档知识库索引不是一回事。Memory 是选择性的、与行为相关的系统，应该重点考虑隐私、保留期限、更正和删除。
-
-Agent Memory 的基本链路如下：
-
-```text
-+-----------+    +-----------+    +-----------+    +-----------+
-| 对话内容   | -> | 记忆提取   | -> | Embedding | -> | Qdrant    |
-+-----------+    +-----------+    +-----------+    +-----------+
-                                                          |
-                                                          v
-+-----------+    +-----------+    +-----------+    +-----------+
-| 更新记忆   | <- | 对话生成   | <- | Prompt    | <- | 相关记忆  |
-+-----------+    +-----------+    +-----------+    +-----------+
-```
-
-### 可提升点
-
-为 Memory 增加显式的保留期限、删除接口、用户确认和事实更正机制，避免把一次性对话误当成永久事实。
+请阅读 [`agent-memory-course.md`](agent-memory-course.md)。
 
 ## 8. 工具检索：面向 Agent 的 RAG
 
@@ -748,7 +704,7 @@ Qdrant with_vector 参数
 
 ### 模块 6：Agent Memory
 
-概念：记忆提取、用户 Memory 与 Agent Memory、生命周期、隐私。
+概念：记忆提取、用户 Memory 与 Agent Memory、生命周期、隐私。详见 [`agent-memory-course.md`](agent-memory-course.md)。
 
 练习：使用 Memory API，并检查 Memory 如何进入聊天 Prompt。
 
@@ -1028,30 +984,7 @@ async def batch_retrieve(
 
 返回值的外层列表对应输入查询，内层列表对应该查询的命中结果。这个顺序契约是 `fastestai-api` 私有批量搜索和 `omnimcp-be` 工具批量查询都必须保护的行为。
 
-### 17.6 用 Memory 保存和召回事实
-
-Memory 与文档 RAG 的接口形式相似，但语义不同：
-
-```python
-async def update_and_load_memory(memory, user_id: str, agent_id: str) -> list[dict]:
-    await memory.add(
-        "用户偏好使用中文回答",
-        user_id=user_id,
-        agent_id=agent_id,
-        metadata={"source": "conversation"},
-    )
-
-    return await memory.search(
-        "用户喜欢什么语言？",
-        user_id=user_id,
-        agent_id=agent_id,
-        limit=5,
-    )
-```
-
-这里的 `memory` 可以是 `fastestai-api` 中的异步 Memory 包装器。实际系统还需要决定什么内容值得保存、何时更新、何时删除，以及如何避免把未经确认的推断写成事实。
-
-### 17.7 将工具描述作为可检索文档
+### 17.6 将工具描述作为可检索文档
 
 工具检索可以复用同一套索引和搜索抽象：
 
@@ -1092,7 +1025,7 @@ matches = await retrieve_chunks(
 
 这个简化例子只索引工具名称和描述。真实的 `omnimcp-be` 还会加入标签、样例、生成的自然语言查询和服务元数据，从而提升用户意图与工具名称不一致时的召回率。
 
-### 17.8 一个最小的检索回归测试
+### 17.7 一个最小的检索回归测试
 
 检索测试不应该只断言接口返回了 `200`，还应该验证结果内容和数据边界：
 
@@ -1122,7 +1055,7 @@ async def test_retrieval_respects_tenant(client, embedder) -> None:
 
 这个测试使用固定数据验证租户过滤。课程后续可以继续增加：空结果、错误向量名称、过高阈值、批量顺序、重复索引和 `with_vector` 响应一致性测试。
 
-### 17.9 简化代码与生产代码的对应关系
+### 17.8 简化代码与生产代码的对应关系
 
 ```text
 +----------------------+       +----------------------------------+
@@ -1133,7 +1066,7 @@ async def test_retrieval_respects_tenant(client, embedder) -> None:
 | retrieve_chunks      |  ---> | retrieve_documents / private    |
 | batch_retrieve       |  ---> | batch_retrieve_documents         |
 | tool_chunks          |  ---> | ToolIndex + ToolSelector         |
-| update_and_load      |  ---> | Memory + auto chat               |
+| memory 教学          |  ---> | Agent Memory + auto chat         |
 +----------------------+       +----------------------------------+
 ```
 
