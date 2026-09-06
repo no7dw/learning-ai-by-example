@@ -1535,6 +1535,152 @@ EU
    修改预算
 ```
 
+上面的复杂任务可以用一个 Manager Agent 编排多个 Specialist Agent 来实现。每个 Specialist 负责一个清晰的职责边界，Manager 通过 `as_tool()` 调用它们，并负责整合结果、处理矛盾和输出最终结论：
+
+```python
+from agents import Agent, Runner, WebSearchTool, function_tool
+
+
+# -------------------------
+# 1. Specialist: Web Research
+# -------------------------
+
+web_researcher = Agent(
+    name="Web Researcher",
+    instructions="""
+    You are a web research specialist.
+
+    Find reliable and recent information.
+    Return:
+    - key facts
+    - source URLs
+    - important evidence
+
+    Do not make recommendations.
+    """,
+    tools=[
+        WebSearchTool()
+    ],
+)
+
+
+# -------------------------
+# 2. Specialist: Data Analyst
+# -------------------------
+
+@function_tool
+def query_sales_db(sql: str) -> str:
+    """Query the company's sales database."""
+    # real application would execute SQL here
+    return "Revenue: $12.4M, +18% YoY"
+
+
+data_analyst = Agent(
+    name="Data Analyst",
+    instructions="""
+    You are a data analyst.
+
+    Use the database tool to obtain quantitative evidence.
+    Check the numbers before making conclusions.
+    Return the relevant metrics and calculations.
+    """,
+    tools=[
+        query_sales_db
+    ],
+)
+
+
+# -------------------------
+# 3. Specialist: Business Analyst
+# -------------------------
+
+business_analyst = Agent(
+    name="Business Analyst",
+    instructions="""
+    You are a business analyst.
+
+    Analyze information supplied by the manager.
+    Identify:
+    - business drivers
+    - risks
+    - opportunities
+
+    Do not invent data.
+    Clearly separate facts from inference.
+    """,
+)
+
+
+# -------------------------
+# 4. Manager / Orchestrator
+# -------------------------
+
+manager = Agent(
+    name="Research Manager",
+
+    instructions="""
+    You are the lead research manager.
+
+    Your job is to answer the user's question.
+
+    When external facts are needed:
+        use web_researcher.
+
+    When quantitative company data is needed:
+        use data_analyst.
+
+    When interpretation or business reasoning is needed:
+        use business_analyst.
+
+    You are responsible for combining the specialists'
+    outputs into one final answer.
+
+    Do not blindly trust specialist results.
+    Resolve contradictions before answering.
+    """,
+
+    tools=[
+        web_researcher.as_tool(
+            tool_name="web_research",
+            tool_description=(
+                "Research current information from the web. "
+                "Use this when external facts or sources are needed."
+            ),
+        ),
+
+        data_analyst.as_tool(
+            tool_name="data_analysis",
+            tool_description=(
+                "Query and analyze company quantitative data."
+            ),
+        ),
+
+        business_analyst.as_tool(
+            tool_name="business_analysis",
+            tool_description=(
+                "Analyze business implications, risks and opportunities."
+            ),
+        ),
+    ],
+)
+
+
+# -------------------------
+# 5. Run
+# -------------------------
+
+result = Runner.run_sync(
+    manager,
+    """
+    Analyze whether Company X is a good growth opportunity.
+    Research its latest market position, analyze our sales data,
+    and give me your recommendation.
+    """
+)
+
+print(result.final_output)
+```
+
 ---
 
 ## 7.2 这里其实组合了多个 Pattern
