@@ -1689,3 +1689,162 @@ omnimcp-be/src/omnimcp_be/graph/server/dune_server.py:68-153
 | `omnimcp-be/src/omnimcp_be/mcp/server/mcp_hooks.py` | Server 变化后的索引与缓存链路 |
 
 学习顺序从一个本地函数开始，逐步扩展到远程 API、MCP、工具搜索、权限、重试、缓存和生产治理。
+
+## 26. 实战：用 OpenAI Agents SDK 连接 `omnimcp-be`
+
+前面的手写 Agent 需要自己处理 `message.tool_calls`、参数解析、工具执行和下一轮消息。OpenAI
+Agents SDK 可以把 MCP Server 注册到 Agent，SDK 负责发现 MCP tools，并把它们提供给 LLM；LLM
+选择工具后，SDK 再通过 MCP session 调用对应工具。
+
+`omnimcp-be` 当前的用户级代理入口是 SSE URL：
+
+```text
+https://<omnimcp-host>/api/v1/mcp/<sse_key>/<server_id>/sse
+```
+
+其中 `sse_key` 用于识别和验证用户，不能提交到代码仓库，也不能写入日志。路由会建立 SSE
+连接，并把后续 MCP message 转发给对应的 Server：
+
+```text
+用户问题
+    |
+    v
+Runner.run(agent, question)
+    |
+    v
+Agent + MCPServerSse
+    |
+    +--> list_tools() ------> omnimcp-be /sse ------> MCP Server
+    |                            |
+    |                            +--> 返回工具 schema
+    |
+    +--> LLM 选择工具并生成 arguments
+    |
+    +--> call_tool(name, arguments) -> omnimcp-be -> MCP Server
+    |                                      |
+    |                                      +--> 鉴权 / 审计 / 工具执行
+    |
+    +--> 工具结果返回 LLM
+    |
+    v
+最终回答
+```
+
+### 26.1 安装和配置
+
+```bash
+pip install openai-agents "mcp>=1.19.0,<3"
+
+export OPENAI_API_KEY="..."
+export OMNIMCP_SSE_URL="https://be.omnimcp.ai/api/v1/mcp/<sse_key>/<server_id>/sse"
+```
+
+课程示例使用 SSE 是因为当前 `omnimcp-be` 的路由仍然暴露 `/sse`。OpenAI Agents SDK 同时支持
+`MCPServerStdio`、`MCPServerStreamableHttp` 和 `MCPServerSse`；新部署优先使用 Streamable HTTP
+或 stdio，SSE 主要用于兼容现有 Server。
+
+### 26.2 最小可运行 Agent
+
+下面假设这个 MCP Server 只暴露查询类工具，例如查询订单、读取数据或查看报表。`require_approval`
+设为 `never` 只适用于已经确认无副作用的只读工具；写入、删除、发消息、下单和付款等工具必须
+改成审批流程或拆分到单独的 Agent。
+
+```python
+import asyncio
+import os
+
+from agents import Agent, Runner
+from agents.mcp import MCPServerSse
+
+
+async def main() -> None:
+    async with MCPServerSse(
+        name="omnimcp-be",
+        params={
+            "url": os.environ["OMNIMCP_SSE_URL"],
+            "timeout": 60,
+        },
+        cache_tools_list=True,
+        max_retry_attempts=2,
+        require_approval="never",  # 仅用于已确认的只读工具
+    ) as server:
+        agent = Agent(
+            name="Data Assistant",
+            instructions=(
+                "Use the connected MCP tools when the question requires private data. "
+                "Choose the narrowest read-only tool, validate the result, and never "
+                "invent rows that were not returned by the tool."
+            ),
+            mcp_servers=[server],
+        )
+
+        result = await Runner.run(
+            agent,
+            "查询本月订单数量，并按渠道汇总。如果结果很多，只返回摘要和少量样例。",
+        )
+        print(result.final_output)
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
+```
+
+这里没有手动把每个 MCP tool 转成 OpenAI `tools` JSON，也没有手动编写 `for call in
+message.tool_calls`。SDK 在建立连接后读取 tool schema，把 MCP tools 暴露给 Agent；Agent loop
+仍然遵循同一个基本闭环：
+
+```text
+发现工具 -> LLM 选择工具 -> 生成 arguments -> SDK 调用 MCP
+       -> 返回 tool result -> LLM 生成最终回答
+```
+
+`cache_tools_list=True` 缓存的是工具列表和 schema，不是业务查询结果；`max_retry_attempts=2`
+用于 MCP 的工具发现和调用重试，不能替代业务参数纠错、权限判断或幂等设计。对实时库存、账户
+余额和订单状态等数据，不能因为工具列表命中缓存就缓存查询结果。
+
+### 26.3 在这个例子中，谁负责什么
+
+| 层 | 责任 |
+| --- | --- |
+| LLM | 根据用户意图选择已发现的工具，并生成 arguments |
+| Agents SDK | 维护 Agent loop、MCP session、tool schema、调用和结果回传 |
+| `omnimcp-be` | 校验 SSE key、建立代理、审计请求、转发 MCP message |
+| MCP Server | 真正访问数据库、API、文件或业务系统并返回结果 |
+| 业务应用 | 设计只读/写入边界、审批、租户隔离、结果脱敏和最终降级 |
+
+如果需要把租户 ID、trace ID 或权限上下文传到 MCP Server，不要让 LLM 自己生成这些字段；应由
+应用从已认证的请求上下文注入 header 或 MCP `_meta`。同样，Agent 的 tool list 应按当前用户、
+租户、环境和功能开关过滤，不能把所有 Server 的工具都暴露给模型。
+
+### 26.4 Streamable HTTP 版本的替换点
+
+如果 MCP Server 提供的是标准 Streamable HTTP 端点，例如 `https://example.com/mcp`，只替换连接
+层，Agent 代码基本不变：
+
+```python
+from agents.mcp import MCPServerStreamableHttp
+
+
+async with MCPServerStreamableHttp(
+    name="remote-mcp",
+    params={
+        "url": "https://example.com/mcp",
+        "headers": {"Authorization": f"Bearer {os.environ['MCP_TOKEN']}"},
+        "timeout": 60,
+    },
+    cache_tools_list=True,
+    max_retry_attempts=2,
+) as server:
+    agent = Agent(name="Assistant", mcp_servers=[server])
+    result = await Runner.run(agent, "使用 MCP 工具完成查询")
+```
+
+不要把 `MCPServerSse` 的 URL 形式和 Streamable HTTP 的 URL 形式混用。传输协议、认证方式、
+超时和重试策略应以实际 MCP Server 的契约为准。
+
+本例对应的代码位置：
+
+```text
+omnimcp-be/src/omnimcp_be/app.py:72-93
+omnimcp-be/src/omnimcp_be/mcp/router/api.py:277-332
+```
