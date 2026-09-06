@@ -5,3 +5,4 @@
 - [Agent Memory 教学：从会话记录到可控的长期记忆](agent-memory-course.md)
 - [Chat Agent 开发：从 `/v2/chat/streaming` 追踪完整执行链路](chat-agent.md)
 - [第五步：工具调用与函数调用](tool-calling-course.md)
+- [Agent Pattern：根据场景选择 Single Agent 还是 Multi-Agent](agent-pattern.md)
