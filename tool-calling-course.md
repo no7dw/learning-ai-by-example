@@ -218,6 +218,117 @@ async def chat_with_tools(client: AsyncOpenAI, question: str) -> str:
 
 生产代码必须补上参数模型校验、工具白名单、用户权限、幂等键、超时、重试规则、审计和循环上限。`for _ in range(6)` 防止模型在工具失败时无限调用。
 
+### 3.1 多工具中如何选择工具并生成 arguments
+
+当应用把多个工具放进 `tools` 参数时，LLM 可以根据用户意图在这些候选工具中选择：不调用工具、调用一个工具，或者同时提出多个工具调用。对每一个选中的工具，LLM 还会生成对应的 `arguments`。
+
+```text
+应用提供候选工具
+  get_weather
+  search_product
+  get_order_status
+          |
+          v
+LLM 判断用户意图
+          |
+          +--> 不需要工具 -> 直接返回文本
+          |
+          +--> 需要工具 -> 选择 name + 生成 arguments
+                              |
+                              v
+                      应用解析并校验
+                              |
+                              v
+                          应用执行
+```
+
+例如用户要查询订单物流状态，LLM 可能返回：
+
+```json
+{
+  "tool_calls": [
+    {
+      "id": "call_123",
+      "type": "function",
+      "function": {
+        "name": "get_order_status",
+        "arguments": "{\"order_id\":\"1001\"}"
+      }
+    }
+  ]
+}
+```
+
+在代码中：
+
+```python
+message = response.choices[0].message
+
+if not message.tool_calls:
+    return message.content or ""
+
+messages.append(message)
+for call in message.tool_calls:
+    tool_name = call.function.name
+    arguments = json.loads(call.function.arguments)
+```
+
+这里的责任边界很重要：
+
+```text
+LLM 负责：选择候选工具、生成工具名、生成 arguments
+应用负责：解析 JSON、校验参数、鉴权、审批、限流、真正执行工具
+```
+
+`arguments` 通常是 JSON 字符串，不是已经解析好的 Python 字典。LLM 生成了合法 JSON，也不代表参数在业务上合法；应用仍然要检查工具白名单、JSON Schema、业务规则和当前用户权限。
+
+如果任务需要多个独立工具，`message.tool_calls` 可能包含多个调用：
+
+```json
+{
+  "tool_calls": [
+    {
+      "id": "call_product",
+      "function": {
+        "name": "get_product_info",
+        "arguments": "{\"sku\":\"A100\"}"
+      }
+    },
+    {
+      "id": "call_inventory",
+      "function": {
+        "name": "get_inventory",
+        "arguments": "{\"sku\":\"A100\",\"region\":\"SG\"}"
+      }
+    }
+  ]
+}
+```
+
+当前教学代码会按顺序执行这些调用：
+
+```python
+for call in message.tool_calls:
+    result = await function(**arguments)
+```
+
+LLM 同时提出多个调用，不等于应用必须并行执行。是否并行要由应用根据工具依赖、下游限流、幂等性和资源预算决定。
+
+#### 3.1.1 `tool_choice` 的三种常见行为
+
+```python
+tool_choice="auto"       # LLM 可以不调用，也可以调用一个或多个工具
+tool_choice="required"   # 要求 LLM 至少调用一个工具
+tool_choice={             # 强制调用指定工具
+    "type": "function",
+    "function": {"name": "get_order_status"},
+}
+```
+
+因此，function calling 可以理解为：
+
+> LLM 在应用提供的候选工具中选择合适的工具，并生成调用参数；应用负责校验和执行，再把工具结果交还给 LLM。
+
 ## 4. Function calling 和结构化输出
 
 这两个能力都返回结构化数据，但用途不同。
@@ -356,13 +467,94 @@ return response_model.model_validate_json(
 )
 ```
 
-如果 Pydantic 校验失败，当前实现会把错误和上一次输出发回模型，再尝试一次修正。这是“模型修复”和“服务端最终裁决”结合的例子。
+如果 Pydantic 校验失败，当前实现会把上一次的无效输出发回模型，再尝试一次修正。这是“模型修复”和“服务端最终裁决”结合的例子。
 
 源码：
 
 ```text
 fastestai-api/src/fastestai/core/llm/__init__.py:836-945
 ```
+
+### 5.5 参数校验失败后，是否要把错误反馈给 LLM
+
+需要由应用层显式控制，不能假设 provider 会自动完成。一个典型流程是：
+
+```text
+LLM 返回结构化 arguments
+          |
+          v
+model_validate_json / Pydantic 校验
+          |
+     +----+----+
+     |         |
+   成功       失败
+     |         |
+返回 Model   生成修正消息
+               |
+               v
+           LLM 再调用一次
+               |
+          +----+----+
+          |         |
+        成功       再失败
+          |         |
+      返回 Model   返回失败
+```
+
+`fastestai-api` 的 `structure_output` 确实实现了“一次纠错重试”：第一次调用使用严格的
+`structureOutput` function tool；第一次 `model_validate_json` 抛出 `ValidationError` 后，
+再次调用同一个 tool，并要求模型修正 JSON。第二次仍校验失败时记录错误并返回 `None`。
+
+但要注意，当前重试消息只包含无效的 arguments 和通用提示：
+
+```python
+content = (
+    "The previous tool call had validation errors. "
+    f"Here's the invalid output that needs to be corrected:\n\n"
+    f"{tool_calls[0].function.arguments}\n\n"
+    "Please fix the format and call the structureOutput tool "
+    "with valid JSON that matches the required schema."
+)
+```
+
+代码中的 `ValidationError` 详细信息被用于日志，但没有把具体的字段路径、错误类型和期望值
+放进 retry prompt。因此它是“带无效输出重试”，不是“带字段级错误重试”。更强的实现可以把
+校验错误作为机器可读信息传给模型：
+
+```python
+retry_context = {
+    "invalid_arguments": tool_calls[0].function.arguments,
+    "validation_errors": e.errors(include_url=False),
+}
+```
+
+然后在 prompt 中明确要求只修正这些错误，并再次调用同一个 schema。错误信息也必须经过长度
+限制和脱敏，避免把内部路径、凭证或敏感业务数据直接暴露给模型。
+
+三条相关路径的行为不同：
+
+| 实现 | 结构化约束 | 校验失败后的行为 |
+| --- | --- | --- |
+| `llm_parse_model` | `response_format=json_schema` | 捕获异常、记录 warning、返回 `None`，当前没有纠错重试 |
+| `structure_output` | 严格 function tool + `tool_choice=required` | 携带无效输出重试一次；第二次失败返回 `None` |
+| `IterativeWorkflow.replan` | `response_format=json_schema` | 记录无效响应并抛出 `WorkflowError`，当前没有纠错重试 |
+
+源码：
+
+```text
+fastestai-api/src/fastestai/core/llm/__init__.py:808-948
+fastestai-api/src/fastestai/agents/team/workflow.py:214-240
+```
+
+这里的“参数纠错重试”不要和网络重试混为一谈：
+
+- schema 校验失败：可以有限次数地反馈错误，让 LLM 修正参数。
+- 超时、连接断开、HTTP 429/5xx：按 provider 和请求幂等性设计网络重试。
+- 权限不足、审批未通过、业务状态不允许：不要靠重试绕过，应该返回明确失败或进入审批流程。
+- 参数本身不可恢复或连续失败：达到上限后停止，记录原始输出、校验错误和 trace id，交给上层降级。
+
+生产实现至少要控制最大纠错次数、总 deadline、每次重试的 token 成本，并保证任何工具执行都发生在
+最终校验和权限检查之后。否则“修正参数”可能变成无限循环，或者让未验证的 arguments 直接触发副作用。
 
 其中有一个生产注意点：`llm_parse_model` 和 `structure_output` 是两条不同实现。前者使用 `response_format`，后者使用强制 function call。接入新模型时要分别验证 provider 对两种接口的支持。
 
