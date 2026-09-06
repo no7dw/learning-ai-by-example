@@ -368,25 +368,37 @@ fastestai-api/src/fastestai/core/llm/__init__.py:836-945
 
 ## 6. 工具描述应该包含什么
 
-模型能否正确选择工具，取决于工具描述是否能表达“什么时候用”和“什么时候不要用”。一个生产工具至少需要：
+模型能否正确选择工具，取决于工具描述是否能表达“什么时候用”和“什么时候不要用”。先区分最小可调用定义、可选的语义增强字段，以及只供执行层使用的治理字段。
+
+### 6.1 最小可调用定义
+
+模型要提出一个合法调用，最少需要：
 
 ```text
 ToolDefinition
 ├── name
 ├── description
-├── input_schema
-├── output_schema
-├── use_case
-├── limitation
-├── failure_cases
-├── auth / config requirements
-├── need_approve
-├── timeout / async capability
-├── idempotency behavior
-└── version
+└── input_schema
 ```
 
-`omnimcp-be` 的 `ToolMetaDTO` 和 `ToolMeta` 保存了这些信息的一部分，包括：
+这三个字段是 function calling 的最小核心。`output_schema` 对模型理解结果很有帮助，但很多 provider 的 function calling 并不要求它出现在工具参数定义中。
+
+### 6.2 可选的工具语义增强字段
+
+下面字段不是最小接入要求，应该按工具复杂度逐步增加：
+
+| 字段 | 是否必需 | 作用 |
+| --- | --- | --- |
+| `output_schema` | 可选，推荐 | 说明工具返回的数据形状，方便结果处理 |
+| `samples` | 可选 | 提供典型输入和输出，帮助检索与选择 |
+| `use_case` | 可选 | 补充适用场景和用户意图 |
+| `limitation` | 可选 | 明确不支持的边界，降低误用 |
+| `failure_cases` | 可选 | 告诉 Agent 常见失败和替代动作 |
+| `dependent_tools` | 可选 | 描述前置或后续工具 |
+| `alternative_tools` | 可选 | 工具不可用时提供替代候选 |
+| `tags` | 可选 | 帮助关键词过滤和分类 |
+
+`omnimcp-be` 的 `ToolMetaDTO` 和 `ToolMeta` 保存了这些字段的一部分。`use_case`、`limitation`、`failure_cases` 等属于可选的治理和检索增强信息，不应被误认为每个工具都必须填写：
 
 ```text
 input_schema
@@ -401,6 +413,21 @@ failure_cases
 dependent_tools
 alternative_tools
 ```
+
+### 6.3 执行层治理字段
+
+下面字段通常不直接作为 LLM 的 JSON 参数，而是由 Tool Gateway middleware 使用：
+
+```text
+auth / config requirements
+need_approve
+timeout / async capability
+idempotency behavior
+version
+status / active state
+```
+
+它们仍然应保存在工具元数据中，但不要让模型通过参数修改这些策略。
 
 源码：
 
@@ -425,132 +452,11 @@ up to 60 seconds. The returned row IDs can be passed to the update tool.
 
 工具描述本质上是模型的 API 文档，也是工具路由的训练数据。描述越模糊，工具选择越不稳定。
 
-## 7. 工具元数据到可执行工具
-
-真实 Agent 中，工具一般经历四个状态：
-
-```text
-工具元数据
-   |
-   v
-检索候选
-   |
-   v
-加载 schema 和连接信息
-   |
-   v
-FunctionTool / MCP adapter
-   |
-   v
-可执行工具
-```
-
-在 `fastestai-api` 中，`ReActAgent` 会把工具包装成 `FunctionTool`。动态工具模式下还会增加：
-
-```text
-get_avaliable_tools(queries, limit)
-apply_selected_tools(tools)
-```
-
-源码：
-
-```text
-fastestai-api/src/fastestai/agents/react.py:42-120
-```
-
-### 7.1 工具检索
-
-`get_avaliable_tools` 调用 `search_tools`，再通过 `omnimcp-be` 批量查询候选：
-
-```text
-用户问题
-   |
-   v
-Agent 生成一个或多个检索 query
-   |
-   v
-POST /api/v1/tool/query/batch
-   |
-   v
-omnimcp-be ToolSelector
-   |
-   +--> tool ID / pattern search
-   +--> private_knowledge 向量搜索
-   +--> 多空间并发搜索
-   +--> Redis cache-first 查询
-   +--> inactive / disabled 过滤
-   +--> 去重和排序
-   v
-工具候选及其 metadata
-```
-
-工具服务 router 的 `/query` 和 `/query/batch` 定义在：
-
-```text
-omnimcp-be/src/omnimcp_be/mcp/tool/router.py:162-301
-```
-
-### 7.2 `omnimcp-be` 的批量检索
-
-`ToolSelector.query_tool_batch` 的设计重点是一次请求处理多个 query：
-
-```text
-queries=[q1, q2, q3]
-       |
-       +--> tool ID queries
-       |
-       +--> regular natural-language queries
-                    |
-                    +--> _batch_cache_search
-                    |
-                    +--> MultiSpaceQueryService
-                            |
-                            +--> browserscraper
-                            +--> ai_field_template
-                            +--> dataframe
-                            +--> Others
-```
-
-缓存搜索和多空间向量搜索并发执行。`MultiSpaceQueryService` 会对四个空间并发调用 `_batch_private_search`，查询 `private_knowledge` 相关数据，再由 `ToolSelector` 合并结果。
-
-源码：
-
-```text
-omnimcp-be/src/omnimcp_be/mcp/tool/tool_selector.py:1394-1682
-omnimcp-be/src/omnimcp_be/mcp/tool/multi_space_query_service.py:39-223
-```
-
-单个查询的合并关系：
-
-```text
-                 +------------------+
-                 | User query       |
-                 +--------+---------+
-                          |
-             +------------+------------+
-             |                         |
-             v                         v
-       Redis cache                Vector search
-       tool/server data           private_knowledge
-             |                         |
-             +------------+------------+
-                          v
-                deduplicate / rank
-                          |
-                          v
-                active + filter check
-                          |
-                          v
-                     ToolMeta
-```
-
-`private_knowledge` 搜索结果只是候选，不代表用户已经拥有执行权限。候选结果里可能包含 `need_config_key`、`need_approve`、`active` 等执行前需要处理的元数据。
-
-## 8. 工具索引不是请求时检索
+## 7. 工具索引不是请求时检索
 
 工具系统应该把“工具变化后的索引链路”和“用户请求时的检索链路”分开。
 
-### 8.1 工具变化后的链路
+### 7.1 工具变化后的链路
 
 当 MCP Server 的工具列表或 schema 发生变化时，`refresh_tool_list` 会重新连接 MCP Server 并调用 `list_tools()`，保存最新工具列表，然后异步触发 hook：
 
@@ -593,7 +499,7 @@ omnimcp-be/src/omnimcp_be/mcp/tool/tool_index.py:510-690, 716-835
 
 `ToolIndex` 会为每个工具生成文档，使用 embedding 写入 Qdrant。索引任务有固定次数重试，但这只解决索引过程的瞬时错误，不等于用户请求执行时也可以无限重试。
 
-### 8.2 用户请求时的链路
+### 7.2 用户请求时的链路
 
 ```text
 用户输入
@@ -620,7 +526,7 @@ Agent 选择 tool_id
 
 索引是写侧，检索是读侧。写侧失败应该报警并保留旧索引，读侧失败可以降级到缓存、pattern search 或无工具回答，但不能把旧索引当成永久正确。
 
-## 9. 从工具 ID 到 MCP 调用
+## 8. 从工具 ID 到 MCP 调用
 
 在 `fastestai-api` 中，选中的 tool ID 会经过 `load_tools`：
 
@@ -679,7 +585,7 @@ fastestai-api/src/fastestai/tools/tool_adapter/mcp/base.py:139-204
 
 这里的 `McpTool` 是描述，`FunctionTool` 才是 Agent framework 能够调用的对象。两者之间需要 adapter 层，因为远程 MCP 的连接、认证、超时和返回格式都不是模型能处理的事情。
 
-## 10. 一个基础 Agent 如何选择正确工具
+## 9. 一个基础 Agent 如何选择正确工具
 
 不要让模型在几千个工具里直接猜。推荐分层：
 
@@ -760,7 +666,7 @@ calculator_tool:
   match = none
 ```
 
-### 10.1 基础选择器伪代码
+### 9.1 基础选择器伪代码
 
 ```python
 async def select_tool(question: str, user: User) -> Tool | None:
@@ -783,78 +689,74 @@ async def select_tool(question: str, user: User) -> Tool | None:
 
 生产版本应把 `is_authorized` 放在候选召回后和最终执行前各做一次。原因是元数据可能过期，用户权限也可能在两次检查之间变化。
 
-## 11. 权限怎么决定
+## 10. Advanced：Tool Gateway Middleware
 
-权限不能只由“模型想调用什么”决定。一个实用的决策矩阵至少考虑五个维度：
+第 1 到第 9 节解决的是“LLM 如何提出工具调用”和“Agent 如何找到合适工具”。从本节开始进入生产治理：模型的 tool call 只是请求，真正的执行必须经过一组中间件（middleware）。
 
 ```text
-风险 = side_effect
-     + data_sensitivity
-     + user_scope
-     + financial_impact
-     + reversibility
+Agent / LLM
+    |
+    | tool name + JSON arguments
+    v
++---+------------------------------------------------------+
+|                 Tool Gateway Middleware                  |
+| Auth -> Approval -> Rate/Quota -> Timeout -> Retry      |
+|                                      -> Cache -> Audit    |
++---+------------------------------------------------------+
+    |
+    v
+Local function / HTTP API / MCP Server
 ```
 
-### 11.1 建议的权限等级
+推荐顺序和职责：
 
-| 等级 | 示例 | 默认策略 |
+| Middleware | 主要问题 | 是否可以让模型绕过 |
 | --- | --- | --- |
-| L0 | 计算、格式转换、公开知识查询 | 自动执行 |
-| L1 | 读取用户已授权的私有数据 | 登录和资源授权后自动执行 |
-| L2 | 发送消息、创建任务、写入文档 | 明确用户意图，必要时确认 |
-| L3 | 删除、支付、发布、修改权限 | 每次确认，强幂等和审计 |
-| L4 | 管理员操作、批量删除、跨租户访问 | 禁止由普通 Agent 直接调用 |
+| Auth | 谁在调用？能访问哪个资源？ | 不能 |
+| Approval | 这次副作用是否需要用户确认？ | 不能 |
+| Rate / Quota | 是否超出速度、并发或预算？ | 不能 |
+| Timeout | 最多允许执行多久？ | 不能 |
+| Retry | 失败后是否安全地再试？ | 不能由模型自由决定 |
+| Cache | 结果是否可以复用？ | 不能绕过权限检查 |
+| Audit | 谁在什么时候调用了什么？ | 不能关闭 |
 
-判断一个工具是否需要确认，可以问：
+模型可以建议工具和参数，但不能决定“跳过鉴权”“无限重试”或“读取别人的缓存”。
+
+## 11. Auth Middleware：身份、配置和资源权限
+
+Auth middleware 解决三个不同问题，不要把它们混成一个 `is_authenticated`：
 
 ```text
-1. 是否产生外部副作用？
-2. 是否写入、删除或发送数据？
-3. 是否涉及金钱、账号、权限或隐私？
-4. 操作是否容易撤销？
-5. 用户是否已经明确表达了最终动作？
-6. 是否允许批量执行？
+Authentication: 你是谁？
+Authorization: 你能不能做这件事？
+Configuration: 你是否提供了调用该 Server 所需的凭证？
 ```
 
-### 11.2 `omnimcp-be` 中的权限相关信息
-
-`MCPToolMeta` 和 `ToolMetaDTO` 会携带：
+执行前至少验证：
 
 ```text
-need_approve
-need_config_key
-app_scope
-mcp_activestatus
-tool.status
+current user_id / tenant_id
+current app scope
+current tool_id
+current resource and arguments
+server active / tool active
+user authorization and server configuration
 ```
 
-`need_config_key` 表示工具所在 Server 需要用户或公开配置。`need_approve` 表示调用前需要确认。它们是工具治理的输入，但最终执行层仍要验证：
+`omnimcp-be` 将用户 Server 配置分为 `private` 和 `public`，并根据 `user_id` 查找用户私有配置、外部授权配置或公开配置：
 
 ```text
-当前 user_id
-当前 app
-当前 tool_id
-当前参数
-当前 server 状态
-当前授权配置
-```
-
-### 11.3 public/private 和认证
-
-`omnimcp-be` 将用户 Server 配置分为 `private` 和 `public`，并根据 `user_id` 查找用户私有配置、外部授权配置或公开配置。
-
-```text
-请求 user_id
+request user_id
     |
     v
-优先读取 private user config
+private user config
     |
-    +--> 没有 -> external auth config
+    +--> miss -> external auth config
     |
-    +--> 仍没有 -> public config
+    +--> miss -> public config
     |
     v
-检查 server.config_fields 是否全部满足
+check server.config_fields are satisfied
 ```
 
 源码：
@@ -863,8 +765,6 @@ tool.status
 omnimcp-be/src/omnimcp_be/mcp/server/user_server_config.py:153-174, 218-313
 omnimcp-be/src/omnimcp_be/mcp/models.py:188-217
 ```
-
-### 11.4 一个真实的安全边界
 
 `fastestai-api` 的直接工具接口支持无会话执行，但要求 `run-task-token` 与服务端 token 使用常量时间比较：
 
@@ -885,9 +785,243 @@ if not request.requires_chat_session:
 fastestai-api/src/fastestai/tools/call_tool/router.py:297-321
 ```
 
-这类 internal token 只能用于服务间调用，不能当作面向用户的通用授权方案。面向用户的调用应使用用户身份、资源权限和工具 scope 做授权。
+internal token 只能用于服务间调用，不能当作面向用户的通用授权方案。面向用户的调用应使用用户身份、资源权限和工具 scope 做授权。候选检索中出现了 `need_config_key`，也不代表配置和权限在真正执行时仍然有效，执行层必须重新检查。
 
-## 12. 健康检查和可用性
+## 12. Approval Middleware：副作用确认
+
+权限决定“能不能调用”，Approval middleware 决定“这一次是否还要用户确认”。判断风险时至少考虑：
+
+```text
+risk = side_effect
+      + data_sensitivity
+      + user_scope
+      + financial_impact
+      + reversibility
+```
+
+建议的默认等级：
+
+| 等级 | 示例 | 默认策略 |
+| --- | --- | --- |
+| L0 | 计算、格式转换、公开知识查询 | 自动执行 |
+| L1 | 读取用户已授权的私有数据 | 登录和资源授权后自动执行 |
+| L2 | 发送消息、创建任务、写入文档 | 明确用户意图，必要时确认 |
+| L3 | 删除、支付、发布、修改权限 | 每次确认，强幂等和审计 |
+| L4 | 管理员操作、批量删除、跨租户访问 | 禁止由普通 Agent 直接调用 |
+
+`omnimcp-be` 的 `MCPToolMeta` 和 `ToolMetaDTO` 会携带 `need_approve`、`need_config_key`、`app_scope`、Server active 状态和 tool status。`need_approve` 是治理元数据，不是最终授权结果。
+
+确认请求应该绑定到具体版本的动作，而不是只显示工具名：
+
+```text
+approval_id
+user_id / tenant_id
+tool_id + tool_version
+normalized arguments
+human-readable summary
+expires_at
+```
+
+用户确认后仍要重新做 Auth、参数、Rate 和状态检查，因为确认和执行之间可能已经过期或发生权限变化。确认消息应让用户看懂目标、范围、对象、金额和不可逆后果，不能把原始 JSON 直接当成用户界面。
+
+## 13. Rate Limit Middleware：速率、并发和预算
+
+Rate limit 不只是防止请求太快，还要保护模型预算、工具配额和下游 MCP Server。建议分别限制：
+
+```text
+per user      requests / minute, concurrent runs
+per tenant    total calls and daily budget
+per agent     maximum tool loop and token budget
+per tool      calls / minute, concurrent calls
+per server    connection and downstream concurrency
+```
+
+```text
+tool call request
+       |
+       v
++------+-------+
+| quota check  |-- denied --> structured RATE_LIMITED result
++------+-------+
+       |
+       | allowed
+       v
+ acquire concurrency slot
+       |
+       v
+ execute and release slot
+```
+
+429 需要告诉客户端和 Agent 是“稍后可以再试”，并尽量返回 `Retry-After`。超过每日预算、工具被管理员禁用或用户没有权限时，不能用 retry 解决。并发限制要在缓存命中前后都考虑：缓存命中成本较低，但仍不能成为绕过用户级配额的通道。
+
+## 14. Timeout Middleware：deadline 和取消
+
+Timeout 是执行边界，不应让模型决定。一次请求应该有总 deadline，每一层只能使用剩余时间：
+
+```text
+request deadline = 30s
+    |
+    +--> tool retrieval      2s
+    +--> approval wait       not inside request deadline
+    +--> MCP connect         5s
+    +--> tool execution     remaining budget
+    +--> final LLM answer   remaining budget
+```
+
+超时至少分成：连接超时、读取超时、工具执行超时和总请求超时。取消上层任务时，要把 cancellation 传给 HTTP client、MCP session 和后台任务；不能只停止等待而让下游继续执行写操作。
+
+`fastestai-api` 的 MCP adapter 对单次工具调用设置 timeout，并把失败封装为 `McpToolCallResult(is_error=True)`。这让 Agent 可以看到工具失败并决定修正或换工具，但 Agent 不应自由决定无限等待或重试。
+
+## 15. Retry Middleware：什么时候可以重试
+
+重试不是“失败就再来一次”。先判断错误是否具有瞬时性，以及重复执行是否安全。
+
+| 错误 | 通常重试？ | 条件 |
+| --- | --- | --- |
+| 连接超时、DNS 短暂失败 | 是 | 指数退避，有上限 |
+| HTTP 408、429 | 是 | 读取 `Retry-After`，遵守限流 |
+| HTTP 500、502、503、504 | 是 | provider 明确是暂时故障 |
+| 认证失败 401 | 否 | 刷新 token 后只允许受控重试 |
+| 权限失败 403 | 否 | 应重新授权，不要重复请求 |
+| 参数错误 400/422 | 原参数不重试；修正后可重试一次 | 先读取错误字段，修正并重新做 schema + 业务校验 |
+| schema 校验失败 | 最多一次 | 把具体错误反馈给模型再校验 |
+| 工具业务拒绝 | 通常否 | 除非错误明确要求等待或刷新 |
+| MCP Server 不存在 | 否 | 更新元数据或选择替代工具 |
+
+参数错误不是 transient retry。不能把同一个错误 JSON 原样发送第二次；但参数错误通常可以进入“修正参数后再执行”的受控流程：
+
+```text
+tool call with args
+        |
+        v
+parse + schema validation
+        |
+        +--> valid ------------------------------+
+        |                                        |
+        +--> invalid                            v
+                 |                         execute once
+                 v
+          return field-level error
+                 |
+                 v
+       LLM/app fixes arguments
+                 |
+                 v
+       validate again, at most once
+                 |
+                 +--> still invalid -> stop and ask user
+```
+
+这个重试不是网络层 retry，而是一次新的参数生成流程。应保留 `attempt_number` 和前后参数摘要；如果错误来自权限、资源不存在或业务规则拒绝，修正参数也不能绕过 Auth middleware。
+
+```text
+read/search
+   +--> 大多数 transient error 可以重试
+
+create/send/update/delete/payment
+   +--> 只有有幂等键、状态查询或 provider 保证幂等时才重试
+```
+
+例如“发送邮件”第一次请求可能已经成功，但响应在网络中丢失。直接重试可能发送两封邮件：
+
+```text
+generate idempotency_key
+       |
+       v
+send request with key
+       |
+       +--> timeout
+       |
+       v
+query status or retry with the same key
+       |
+       v
+ensure one side effect
+```
+
+`omnimcp-be` 的工具索引中，`request_index_api` 使用固定次数、固定间隔的 retry。索引写入失败不会把用户正在执行的工具重复运行，因此风险较低。
+
+每一次工具调用都应有：
+
+```text
+max_attempts
+deadline
+retryable_errors
+idempotency_key
+attempt_number
+```
+
+## 16. Cache Middleware：什么时候应该缓存
+
+Cache middleware 应放在鉴权之后、真实执行之前。它只减少可复用查询的成本，不能成为权限事实源。
+
+```text
+request
+   |
+   v
+Auth + policy check
+   |
+   v
+cache lookup
+   +--> hit  -> return data, audit cache hit
+   +--> miss -> execute -> store eligible result
+```
+
+适合缓存：
+
+```text
+MCP Server metadata
+Tool metadata and schema
+featured/frequently-used tool list
+tool search candidates
+static documentation and tool knowledge
+short-lived read-only results
+```
+
+`omnimcp-be` 的 `MCPSimpleToolCacheManager` 使用 Redis 缓存 Server、tool metadata、disabled server 和 inactive tool keys，默认 TTL 是一个月；Server 变化后会主动刷新对应缓存。
+
+源码：
+
+```text
+omnimcp-be/src/omnimcp_be/mcp/server/mcp_simple_tool_cache_manager.py:23-77, 402-518
+```
+
+不要默认缓存：
+
+```text
+send/write/delete/payment results
+current balance, inventory, price, or permission state
+requests or results containing user secrets
+private data without user/tenant isolation
+one-time tokens
+time-sensitive data with high staleness cost
+```
+
+```text
+cache_key = hash(
+    tenant_id,
+    user_id,
+    app_scope,
+    tool_id,
+    tool_version,
+    normalized_arguments,
+    permission_version,
+)
+```
+
+不要把 access token、refresh token 或完整敏感参数直接放进 key。需要考虑用户和租户隔离、参数归一化、schema/version 变化、权限变化和 Server/tool disable 主动失效。
+
+工具元数据适合 stale-while-revalidate：返回旧值并后台刷新；但执行前仍要确认 active、权限和配置。
+
+```text
+metadata request
+       |
+       +--> fresh cache -> return
+       +--> stale cache -> return old value + refresh in background
+       +--> miss -> DB/MCP query -> write cache
+```
+
+## 17. 健康检查和可用性
 
 工具系统至少需要三种健康状态：
 
@@ -929,163 +1063,7 @@ per-tool health
 - 记录最近成功时间、失败次数、延迟和错误类型。
 - 对长任务使用异步状态，不要让健康检查等待业务任务完成。
 
-## 13. 重试：什么时候可以重试
-
-重试不是“失败就再来一次”。先判断错误是否具有瞬时性，以及重复执行是否安全。
-
-| 错误 | 通常重试？ | 条件 |
-| --- | --- | --- |
-| 连接超时、DNS 短暂失败 | 是 | 指数退避，有上限 |
-| HTTP 408、429 | 是 | 读取 `Retry-After`，遵守限流 |
-| HTTP 500、502、503、504 | 是 | provider 明确是暂时故障 |
-| 认证失败 401 | 否 | 刷新 token 后只允许受控重试 |
-| 权限失败 403 | 否 | 应重新授权，不要重复请求 |
-| 参数错误 400/422 | 否 | 修正参数或换工具 |
-| schema 校验失败 | 最多一次 | 把具体错误反馈给模型再校验 |
-| 工具业务拒绝 | 通常否 | 除非错误明确要求等待或刷新 |
-| MCP Server 不存在 | 否 | 更新元数据或选择替代工具 |
-
-### 13.1 读操作和写操作
-
-```text
-read/search
-   +--> 大多数 transient error 可以重试
-
-create/send/update/delete/payment
-   +--> 只有有幂等键、状态查询或 provider 保证幂等时才重试
-```
-
-例如“发送邮件”第一次请求可能已经成功，但响应在网络中丢失。直接重试可能发送两封邮件。正确做法是：
-
-```text
-生成 idempotency_key
-       |
-       v
-发送请求带 key
-       |
-       +--> 超时
-       |
-       v
-用同一个 key 查询或重试
-       |
-       v
-确保只产生一次副作用
-```
-
-### 13.2 两个项目里的重试例子
-
-`omnimcp-be` 的工具索引中，`request_index_api` 使用固定次数、固定间隔的 retry。索引写入失败不会把用户正在执行的工具重复运行，因此风险较低。
-
-`fastestai-api` 的 MCP adapter 对单次工具调用设置 timeout，并把错误封装为 `McpToolCallResult(is_error=True)`。这让 Agent 可以看到工具失败并决定修正或换工具，但不应该由 Agent 自由决定无限重试。
-
-课程实现时应给每一次工具调用增加：
-
-```text
-max_attempts
-deadline
-retryable_errors
-idempotency_key
-attempt_number
-```
-
-## 14. 缓存：什么时候应该缓存
-
-缓存最适合放在工具目录和工具描述层，而不是默认放在所有工具结果上。
-
-### 14.1 适合缓存的内容
-
-```text
-适合缓存
-├── MCP Server metadata
-├── Tool metadata
-├── tool schema
-├── featured/frequently-used tool list
-├── 工具搜索候选
-├── 静态文档和工具知识
-└── 短时间的只读结果
-```
-
-`omnimcp-be` 的 `MCPSimpleToolCacheManager` 使用 Redis 缓存 Server、tool metadata、disabled server 和 inactive tool keys，默认 TTL 是一个月；Server 变化后会主动刷新对应缓存。
-
-```text
-初始化缓存
-   |
-   +--> all_servers
-   +--> all_tool_meta
-   +--> disabled_servers
-   +--> inactive_tool_meta
-
-MCP Server 更新
-   |
-   v
-刷新该 Server 和它的工具 metadata
-```
-
-源码：
-
-```text
-omnimcp-be/src/omnimcp_be/mcp/server/mcp_simple_tool_cache_manager.py:23-77, 402-518
-```
-
-### 14.2 不要默认缓存的内容
-
-```text
-不应默认缓存
-├── 发送消息、写入、删除、支付等副作用结果
-├── 当前余额、库存、价格、权限状态
-├── 包含用户 secret 的请求或结果
-├── 未按 user/tenant 隔离的私有数据
-├── 一次性 token
-└── 依赖当前时间且过期代价高的数据
-```
-
-搜索结果是否可缓存，要看问题：
-
-```text
-“如何使用 Google Sheets API？” -> 可以缓存较久
-“我的账户现在余额多少？”     -> 短 TTL 或不缓存
-“发送这封邮件”                -> 不缓存执行结果
-```
-
-### 14.3 Cache key 必须隔离用户
-
-```text
-cache_key = hash(
-    tenant_id,
-    user_id,
-    app_scope,
-    tool_id,
-    tool_version,
-    normalized_arguments,
-    permission_version,
-)
-```
-
-不要把 access token、refresh token 或完整敏感参数直接放进 key。需要考虑：
-
-- 用户和租户隔离。
-- 参数排序和默认值归一化。
-- schema/version 变化自动失效。
-- 权限变化主动失效。
-- Server/tool disable 时主动删除。
-
-### 14.4 stale-while-revalidate
-
-工具元数据适合使用旧值快速返回，同时后台刷新：
-
-```text
-请求工具 metadata
-       |
-       +--> fresh cache -> 立即返回
-       |
-       +--> stale cache -> 返回旧值 + 后台刷新
-       |
-       +--> miss -> DB/MCP 查询 -> 写缓存
-```
-
-但执行前应再次确认工具 active、权限和配置。缓存只能减少查询延迟，不能成为授权事实源。
-
-## 15. 工具执行返回值
+## 18. 工具执行返回值
 
 不要只返回一个字符串。推荐统一 envelope：
 
@@ -1134,7 +1112,7 @@ cache_key = hash(
 
 如果所有失败都变成普通文本，Agent 很难决定是修参数、重试、换工具还是向用户提问。
 
-## 16. Streaming 场景下的工具调用
+## 19. Streaming 场景下的工具调用
 
 工具 Agent 通常有两条流：
 
@@ -1174,7 +1152,7 @@ fastestai-api/src/fastestai/agents/utils.py:238-378, 787-822
 - 处理连接中断、重复 chunk 和结束事件。
 - 对工具执行中的敏感参数做脱敏。
 
-## 17. 生产总流程图
+## 20. 生产总流程图
 
 ```text
                               +----------------+
@@ -1183,7 +1161,7 @@ fastestai-api/src/fastestai/agents/utils.py:238-378, 787-822
                                       |
                                       v
                          +------------+-------------+
-                         | Normalize and authenticate|
+                         | Normalize request        |
                          +------------+-------------+
                                       |
                                       v
@@ -1214,20 +1192,21 @@ fastestai-api/src/fastestai/agents/utils.py:238-378, 787-822
                  |                                         |
                  |                                         v
                  |                            +------------+-------------+
-                 |                            | Validate again          |
-                 |                            | auth / approval / quota |
+                 |                            | Tool Gateway Middleware   |
+                 |                            | auth / approval / rate    |
+                 |                            | timeout / retry / cache   |
+                 |                            | audit                     |
                  |                            +------+------------------+
                  |                                   |
                  |                    +--------------+--------------+
                  |                    |                             |
                  |                    v                             v
-                 |             confirmation needed              execute
+                 |             confirmation needed              execute path
                  |                    |                             |
                  |                    v                             v
-                 |             user approval             timeout / retry policy
-                 |                                                  |
-                 |                                                  v
-                 |                                      local / API / MCP call
+                 |             user approval               local / API / MCP call
+                 |                    |                             |
+                 |                    +-------------> re-enter middleware
                  |                                                  |
                  |                                                  v
                  |                                      result envelope + audit
@@ -1240,7 +1219,7 @@ fastestai-api/src/fastestai/agents/utils.py:238-378, 787-822
                                   SSE / HTTP response
 ```
 
-## 18. 从 basic 到 advanced 的课程路线
+## 21. 从 basic 到 advanced 的课程路线
 
 建议按下面的顺序实现，每一级都能运行和测试，再进入下一级：
 
@@ -1273,15 +1252,15 @@ Level 5: 生产治理
 `get_avaliable_tools` 搜索候选，再调用 `apply_selected_tools` 加载实际工具。
 Level 4 对应 `load_tools` 创建 MCP 连接和 `FunctionTool` 包装器。
 
-## 19. 生产中还会遇到的典型问题
+## 22. 生产中还会遇到的典型问题
 
-### 19.1 选错工具怎么办
+### 22.1 选错工具怎么办
 
 不能只看 top-1。保留 top-k 候选，并设置最低分数；候选太接近时，让 Agent
 澄清问题或拒绝执行。线上应记录：用户意图、候选列表、最终选择、选择理由、
 工具结果和最终结果，才能分析是召回错、排序错还是 schema 描述不清。
 
-### 19.2 参数是合法 JSON，但业务上不合法
+### 22.2 参数是合法 JSON，但业务上不合法
 
 JSON Schema 只能保证类型和形状，不能代替业务校验。例如金额可以是数字，
 但不能是负数；日期格式正确，也可能早于当前账期。执行前必须再做：
@@ -1299,7 +1278,7 @@ JSON parse -> Pydantic/schema validation -> business validation
                                   execute
 ```
 
-### 19.3 工具结果包含 prompt injection
+### 22.3 工具结果包含 prompt injection
 
 网页、邮件、文档和第三方 API 的内容都是不可信数据。工具返回值只能作为
 `tool` 数据交给模型，不能把其中的“新指令”直接升级为系统指令。建议：
@@ -1308,13 +1287,13 @@ JSON parse -> Pydantic/schema validation -> business validation
 - 对外部文本做长度限制、字段过滤和敏感信息脱敏。
 - 对“发送、删除、付款、修改权限”等动作再次要求用户确认。
 
-### 19.4 工具 schema 发生漂移
+### 22.4 工具 schema 发生漂移
 
 MCP Server 更新了参数名，但索引、缓存或 Agent 仍使用旧 schema，会导致持续
 失败。为工具保存 `schema_hash` 或版本；发现变化时重新拉取 `list_tools`、
 更新索引、刷新缓存，并在短时间内避免重复触发同一失败任务。
 
-### 19.5 同一请求重复调用工具
+### 22.5 同一请求重复调用工具
 
 流式重连、模型重试、网络超时都可能让服务端收到两次请求。读操作通常问题较小，
 写操作必须使用幂等键：
@@ -1332,25 +1311,108 @@ request_id / idempotency_key
       执行一次并持久化结果
 ```
 
-### 19.6 工具结果太大或工具执行太久
+### 22.6 工具结果太大或工具执行太久：以 `omnimcp-be` 数据结果为例
 
-结果应有最大字节数、最大行数和字段白名单。大结果先存对象存储，只把摘要、
-引用 ID 或分页数据返回给模型。长任务要返回 `task_id`，提供查询、取消和进度
-事件，避免占用一次 HTTP 请求直到完成。
+假设用户通过一个数据分析工具查询 12 万行交易记录，结果还有嵌套字段、列说明和聚合信息。如果把完整 JSON 放进 tool result，模型上下文、SSE 传输和 Redis 都会被大对象占满。正确目标不是“把所有行交给 LLM”，而是返回一个可继续查询的结果句柄。
 
-### 19.7 成本、速率和并发怎么控制
+`omnimcp-be` 的 `ToolResponseOptimizerManager` 已经体现了这个方向：它识别 `data`、`records`、`rows`、`values`、`results` 等 dataframe-like 字段，保留 schema、首尾样本，并返回 `total_rows` 和 `shown_rows`。相关默认限制和实现位于：
+
+```text
+omnimcp-be/src/omnimcp_be/mcp/tool/tool_response_optimizer.py:410-424, 678-768
+```
+
+一个适合交给 Agent 的小结果可以是：
+
+```json
+{
+  "ok": true,
+  "data": {
+    "dataset_id": "dataset_abc123",
+    "schema": {
+      "columns": ["day", "symbol", "volume", "price"]
+    },
+    "sample_rows": [
+      {"day": "2026-01-01", "symbol": "AAA", "volume": 1200, "price": 10.2},
+      {"day": "2026-04-30", "symbol": "ZZZ", "volume": 9800, "price": 12.8}
+    ],
+    "summary": {"total_rows": 120000, "shown_rows": 2},
+    "detail_query": "Use dataset_id to request filtered or paginated rows"
+  }
+}
+```
+
+这里的 `dataset_id` 不是所有 MCP 工具都自动拥有的字段，而是具体数据工具提供的二次查询句柄。`omnimcp-be` 的 Dune 查询元数据中就有 `dataset_id`；其他工具可以使用自己的 `task_id`、`result_id`、对象存储 key 或临时表 ID。句柄必须绑定 user/tenant、工具版本和过期时间，不能只是一个公开可猜的字符串。
+
+二次查询的 Agent 链路：
+
+```text
+large result from MCP tool
+          |
+          v
+optimizer: schema + sample + summary + dataset_id
+          |
+          v
+LLM answers from the sample
+          |
+          +--> need exact rows?
+                    |
+                    v
+       detail tool(dataset_id, filter, columns, limit, cursor)
+                    |
+                    v
+       Auth -> Rate -> Timeout -> Cache policy -> MCP/data source
+                    |
+                    v
+       small page / aggregate / export link
+```
+
+如果用户问“哪一天的 volume 最大”，不要让模型从两行 sample 猜答案。Agent 应调用 detail tool 请求聚合结果；如果用户要下载完整数据，则返回异步 `task_id` 或受权限保护的导出链接，而不是把 12 万行继续塞回上下文。
+
+### 22.6.1 `omnimcp-be` 的传输优化启示
+
+`ToolSelector` 在组装工具元数据时会把 `samples` 设为空以减少数据传输，批量查询也提供 `with_sample` 控制。这说明“检索工具能力”和“返回大数据结果”应分开：工具搜索阶段只返回必要 metadata；真正执行阶段返回受限 sample；需要细节时再按句柄取数。
+
+```text
+tool discovery       -> tool_id + schema + capability metadata
+tool execution       -> summary + sample + dataset_id
+detail retrieval     -> filtered page / aggregate / export
+```
+
+相关代码：
+
+```text
+omnimcp-be/src/omnimcp_be/mcp/tool/tool_selector.py:896-926, 1401-1402, 1958-1965, 2738-2739
+omnimcp-be/src/omnimcp_be/graph/server/dune_server.py:68-153
+```
+
+长任务仍应返回 `task_id`，提供查询、取消和进度事件，避免占用一次 HTTP 请求直到完成。
+
+### 22.7 成本、速率和并发怎么控制
 
 对每个用户、Agent、工具和 MCP Server 分别设置 timeout、并发上限、速率限制、
 每日预算和最大 tool loop 次数。模型可以连续调用工具，但必须有总步数上限，
 否则一个错误的计划会无限循环。
 
-### 19.8 如何排查“工具调用成功但用户体验失败”
+以大数据结果为例，成本指标应分别统计 tool execution 和 detail retrieval：
+
+```text
+一次分析请求
+   +--> first call: summary + sample + dataset_id
+   +--> follow-up: filtered page / aggregate / export
+
+分别记录每一段的
+   token 数、响应字节、行数、耗时、缓存命中和下游调用次数
+```
+
+`with_sample` 或类似开关可以控制是否带回样本，但不能用它代替分页、聚合和导出接口。把完整数据藏在一次 tool response 里，既不能降低真实数据源成本，也会增加模型 token 成本。
+
+### 22.8 如何排查“工具调用成功但用户体验失败”
 
 把一次请求串成同一个 trace：`request_id`、`conversation_id`、`tool_call_id`、
 `mcp_id`、`tool_id`、schema 版本、重试次数、缓存命中、耗时、结果大小和错误类型。
-日志中不要直接写 API key、用户私密配置或完整敏感 payload。
+对于大结果，还应记录 `dataset_id/result_id`、`total_rows`、`shown_rows`、sample/detail 阶段、分页 cursor、原始和优化后的字节数。日志中不要直接写 API key、用户私密配置或完整敏感 payload。
 
-## 20. 测试应该覆盖什么
+## 23. 测试应该覆盖什么
 
 至少需要下面四类测试：
 
@@ -1364,9 +1426,9 @@ request_id / idempotency_key
 关键用例应固定模型输出或使用 mock，避免测试结果被模型随机性影响。模型本身
 另做离线评测：工具选择准确率、参数正确率、无工具时的拒答率和危险操作拦截率。
 
-## 21. 源码阅读顺序
+## 24. 源码阅读顺序
 
-### 21.1 fastestai-api
+### 24.1 fastestai-api
 
 1. `src/fastestai/core/llm/__init__.py`
    - `llm_parse_model`：JSON Schema structured output。
@@ -1380,7 +1442,7 @@ request_id / idempotency_key
 5. `src/fastestai/agents/maf_runtime.py`
    - Agent 流式事件和 tool-call 事件如何返回给上层。
 
-### 21.2 omnimcp-be
+### 24.2 omnimcp-be
 
 1. `src/omnimcp_be/mcp/tool/models.py`
    - 工具元数据、输入输出 schema、配置和审批字段。
@@ -1395,7 +1457,7 @@ request_id / idempotency_key
 6. `src/omnimcp_be/mcp/tool/tool_index.py`
    - 工具文档、查询文本、Embedding、Qdrant 和索引重试。
 
-## 22. 章节总结
+## 25. 章节总结
 
 工具调用的核心不是“让模型调用一个函数”，而是建立一个可验证的闭环：
 
