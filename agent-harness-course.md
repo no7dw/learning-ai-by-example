@@ -570,6 +570,12 @@ self._stage_price_update()
 
 ## 9. Stage、Guardrail、Approval、Apply
 
+下面这张图把 merchant-agent 的运行时控制面放在一张图里：Claude 负责提出请求，`MerchantToolExecutor` 统一承接读取、分析委托、展示和 staged changes；只有通过 provenance、record-read / variant、guardrail、approval 和 apply-time re-check 的 `apply_change` 才能触达 live backend。
+
+![Merchant Agent Harness architecture](assets/merchant-agent-harness-overview.png)
+
+图中虚线框可以理解为 Agent Harness 的边界。`merchant_data` fence 保护模型看到的数据，把第三方文本当作信息而不是指令；右上角的 Analysis Delegate 只有 read tools、read-only SQL、code execution 和结构化 `AnalysisResult`，没有写入 live state 的路径。
+
 ### 9.1 为什么不能直接 update_price
 
 ~~~text
