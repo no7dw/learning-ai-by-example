@@ -388,6 +388,218 @@ OpenCode agent loop
 | 多租户难度 | 应用自己建设 | Gateway + runtime 可分层 | 需要自己补 | 需要自己补 |
 | 最适合 | 业务 Agent | Codex 平台 | 可改的个人/研究型 coding agent | 开源自托管 coding agent |
 
+## 7.1 从 Harness 角度重新分类
+
+### Harness 是什么？
+
+Harness 可以翻译成“运行支架”或“执行框架”。它不是单纯的 prompt，也不是单纯的模型 SDK，而是把模型变成一个可以持续完成任务的 Agent 所需要的那一层。
+
+一个 coding harness 通常至少包含：
+
+~~~text
+Coding Harness
+  ├── Agent loop
+  ├── context/session history
+  ├── compaction 或上下文恢复
+  ├── coding tools
+  │   ├── read
+  │   ├── write/edit
+  │   ├── shell
+  │   └── test/build
+  ├── workspace/cwd
+  ├── permission/approval/sandbox
+  ├── Skill/extension loading
+  ├── error/timeout/retry
+  └── UI 或 machine-facing protocol
+~~~
+
+因此，Harness 关注的不只是“模型能不能调用工具”，而是：
+
+> 一个 Agent 如何在真实工作环境里持续工作、失败恢复、维护上下文并最终交付结果。
+
+### 不是所有 Runtime 都是完整 Harness
+
+“Runtime”经常被宽泛地使用，但可以分成三层：
+
+| 层次 | 负责什么 | 例子 |
+|---|---|---|
+| Model runtime | 调用模型、生成 response/tool call | model SDK、Responses API |
+| Agent runtime | loop、tool call、history、handoff | Agents SDK Runner、Pi agent-core |
+| Coding harness | Agent runtime + workspace、编辑、shell、测试、权限、恢复 | Codex、Pi coding-agent、OpenCode |
+
+Server 也不是第四种 Harness。Server 只是暴露 Harness 的方式：
+
+~~~text
+Coding Harness
+  ├── local CLI/TUI
+  ├── library embedding
+  └── app-server / HTTP server
+~~~
+
+### 四个系统在 Harness 中的位置
+
+| 系统 | 是否属于 Harness | 更准确的判断 |
+|---|---|---|
+| OpenAI Agents SDK | 部分属于 | 它提供通用 Agent runtime 和编排能力，但不是完整 coding harness |
+| Codex app-server | 是，但名称指的是集成入口 | app-server 背后是完整 Codex coding harness；app-server 本身是协议边界 |
+| Pi agent | 分层看 | Pi agent-core 是部分 harness；Pi coding-agent 是较完整的 coding harness |
+| OpenCode | 是 | OpenCode 应用本身是完整 coding harness；server mode 是它的外部接入面 |
+
+### OpenAI Agents SDK：通用 Agent Harness 的一部分
+
+Agents SDK 已经包含一些 harness 能力：
+
+- Agent loop；
+- tool call 和 tool result；
+- handoff；
+- guardrails；
+- session 或上下文接口；
+- tracing；
+- streaming。
+
+所以把它说成“只有 prompt + tools”并不准确。它已经是通用 Agent runtime，甚至可以叫通用 Agent harness 的基础层。
+
+但它通常不直接提供完整 coding harness：
+
+- 不替你定义 coding workspace；
+- 不自动提供完整 read/write/edit/shell/test 工具链；
+- 不替你决定 shell sandbox；
+- 不替你实现 Skill filesystem discovery；
+- 不替你实现代码编辑后的验证和恢复流程。
+
+因此更准确的写法是：
+
+~~~text
+Agents SDK
+  = 通用 Agent harness primitives
+  ≠ 完整 coding harness
+~~~
+
+如果应用自己补齐 workspace、shell、patch、测试、权限和 Skill loader，那么它当然可以用 Agents SDK 构建出完整 coding harness。
+
+### Codex app-server：完整 Coding Harness 的协议入口
+
+Codex app-server 不是一个“只负责转发模型请求的 server”。它背后已经有完整的 coding harness：
+
+~~~text
+Codex coding harness
+  ├── Codex agent loop
+  ├── thread/turn/item state
+  ├── coding tools
+  ├── workspace/cwd
+  ├── permissions/sandbox
+  ├── Skills
+  └── interactive control
+          ↑
+     app-server protocol
+~~~
+
+所以在当前项目中，CodexRuntime 更准确的含义是：
+
+~~~text
+CodexRuntime
+  = Gateway 对 Codex coding harness 的 runtime adapter
+~~~
+
+Gateway 没有自己实现 coding harness，而是把 Codex harness 包装成统一的 Session → Run → Item API。
+
+### Pi：一个分层的 Harness
+
+Pi 不能只归类为“框架”或“应用”。需要看使用的是哪一层：
+
+~~~text
+pi-agent-core
+  = 通用 Agent runtime / harness 基础层
+
+pi-coding-agent
+  = 在 core 之上加入 coding tools、session、上下文管理和 CLI 的 coding harness
+
+Pi TUI / CLI
+  = harness 的客户端和交互面
+~~~
+
+Pi 的重要特点是这些层通常在同一个开源代码库中，开发者可以继续修改和组合它们。它既可以拿来使用，也适合拿来学习 harness 的内部实现。
+
+### OpenCode：完整 Coding Application Harness
+
+OpenCode 更适合看成一个完整的 coding application harness：
+
+~~~text
+OpenCode
+  ├── model/provider layer
+  ├── Agent loop
+  ├── coding tools
+  ├── session/context
+  ├── permissions
+  ├── MCP/plugins/skills
+  ├── TUI/Web client
+  └── server mode
+~~~
+
+因此 OpenCode server 不是独立于 OpenCode 的另一个 Agent。它是 OpenCode harness 提供给外部客户端的服务入口。
+
+### Harness 完整度排序
+
+如果只按照“现成 coding harness 的完整度”排序，可以粗略理解为：
+
+~~~text
+Agents SDK
+  → 通用 Agent harness 基础层，需要自行补 coding 能力
+
+Pi agent-core
+  → 可组合 Agent harness 基础层
+
+Pi coding-agent
+  → 较完整、可修改的 coding harness
+
+OpenCode
+  → 完整开源 coding application harness
+
+Codex app-server
+  → 完整 Codex coding harness 的产品化集成入口
+~~~
+
+这不是质量排名，而是“开箱即用的 coding 能力”和“应用控制权”之间的区别：
+
+~~~text
+应用控制权高  ←────────────────────→  开箱即用能力高
+Agents SDK / Pi core                  Codex / OpenCode
+                 Pi coding-agent
+~~~
+
+### 对 Agent Gateway 的意义
+
+如果 Gateway 只是接入一个已经完成的 coding harness，它的职责应是：
+
+~~~text
+Gateway
+  ├── 用户、Agent 和租户隔离
+  ├── runtime 生命周期
+  ├── session/run 公共协议
+  ├── SSE/event translation
+  ├── Skill 安装和来源管理
+  ├── 配额、审计和业务权限
+  └── 选择 Codex/Pi/OpenCode runtime
+~~~
+
+Gateway 不需要再实现第二套 coding harness。
+
+如果 Gateway 改用 Agents SDK，则职责会变成：
+
+~~~text
+Gateway + Agents SDK
+  ├── Agents SDK loop
+  ├── coding tools
+  ├── workspace
+  ├── shell sandbox
+  ├── Skill loader
+  ├── session persistence
+  ├── recovery/compaction
+  └── public API
+~~~
+
+这会让 Gateway 从“runtime adapter”升级成“coding harness owner”，灵活性更高，但需要维护的代码和安全边界也更多。
+
 ## 8. Skill 在四种系统里的不同落地方式
 
 最重要的概念是：Skill 不是“一个 prompt 字符串”，而是一套可复用的工作方法。
