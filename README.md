@@ -7,3 +7,4 @@
 - [第五步：工具调用与函数调用](tool-calling-course.md)
 - [Agent Pattern：根据场景选择 Single Agent 还是 Multi-Agent](agent-pattern.md)
 - [Agent Harness：从 Agent Loop 到受控执行系统](agent-harness-course.md)
+- [防止 LLM Hallucination：从 RAG 到 Grounding、Verification 和 Repair](llm-hallucination-prevention.md)
