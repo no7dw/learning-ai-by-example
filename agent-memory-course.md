@@ -479,6 +479,24 @@ for item in store.search(scope="user:alice", query="preferred answer language"):
 
 个人助手的特点是跨很多渠道、跨很多天持续工作。它们通常需要“少量始终可见的个人资料”加上“可按需检索的历史记录”，否则每次都把所有聊天放入 Prompt，成本和隐私风险都会快速上升。
 
+### 与 fastestai `/v2/chat/streaming` 的对比
+
+下面的 `fastestai` 对应本项目当前 `/api/v2/chat/streaming` 的实现；Hermes 和 OpenClaw 对应其官方内置 Memory。OpenClaw 的可选 Mem0 插件是另一条实现路径，不能和 OpenClaw 默认的文件/SQLite Memory 混为一谈。
+
+| 维度 | fastestai `/v2/chat/streaming` + Mem0 | Hermes Agent 内置 Memory | OpenClaw 内置 Memory |
+|---|---|---|---|
+| 写入触发 | `memory=true` 且同时有 `gpt_id`、`user_id`，并且没有走 simple-task fast path；生成完整回答后写入 | Agent 在对话中主动判断是否值得保存；回合后的 background review 也可以提取长期事实或经验 | Agent 直接写 `USER.md`、`MEMORY.md` 或每日笔记；后台 dreaming 再从短期信号中筛选并晋升 |
+| 写入什么 | 对 user store 写入最新用户消息原文；对 GPT store 写入 `User: ...` + `Assistant: ...` 作为 Mem0 输入，custom prompt 只要求抽取 Assistant facts。应用层没有先生成结构化 `key/kind/source/TTL` | `user` 目标保存身份、偏好、沟通方式；`memory` 目标保存环境、项目约定、纠正、完成事项和经验。跳过琐碎信息、原始大段数据和一次性上下文 | `USER.md` 保存稳定用户模型；`MEMORY.md` 保存耐久事实、决策和摘要；`memory/YYYY-MM-DD.md` 保存工作上下文、观察和会话细节 |
+| 谁决定“值得写” | 应用层基本不筛选，主要交给 Mem0 的 `add()` 推理；实际抽取、去重或更新取决于 Mem0 版本和配置 | Agent 的 memory 工具和回合后的 review 负责筛选；可用 `write_approval=true` 把自动写入变成待审批 | Agent 负责记录候选；dreaming 使用相关性、召回频率、查询多样性、近期性、跨日重复和概念丰富度等信号，再晋升到 `MEMORY.md` |
+| 去重 | 应用层没有去重键；重复和相似事实由 Mem0 处理，不能假设一定产生一个 canonical fact | 自动拒绝完全相同的条目；语义冲突通常需要 Agent 用 `replace`，按唯一子串替换旧内容 | 索引层有去重和 MMR；dreaming 的 deep 阶段可以合并或 supersede；用户模型要求把新偏好原地标记为 superseded，而不是保留两个 active 指令 |
+| 过期 | 应用调用没有传 `expiration_date`，也没有 `expires_at` 或读取时的 TTL 过滤；需要额外业务层或 Mem0 管理逻辑 | 内置 Markdown Memory 没有面向条目的 TTL 机制；通过 `replace`/`remove`、容量整理或外部 Provider 管理旧事实。会话历史与长期 Memory 分开 | 每日笔记按日期分层；dreaming 的候选有默认 `maxAgeDays=30` 和 recency half-life，但这主要控制晋升，不是自动删除全部旧 Memory。长期条目需重写/删除；有来源链的自动产物可用 `memory forget` 清理 |
+| 冲突事实 | user store 和 GPT store 还是两个不同 scope；应用没有事实键、来源优先级或 supersession 链。冲突是否更新由 Mem0 推理决定 | 没有内置事实图或时间版本模型；Agent 需要识别冲突并 `replace`，用户可开启审批防止错误假设进入下一会话 | 通过 active/superseded 指令、带来源的 dreaming 重写、provenance gate 和可选 Memory Wiki 的 contradiction/freshness tracking 处理；不可信或 system 来源不会晋升 |
+| 知识与来源 | 更像“对话个性化 Memory”，不是带引用的知识库；最新 Assistant 回复可能成为 GPT Memory 的输入，但没有 source reference | `session_search` 保存并检索真实历史消息；内置 Memory 是小型启动上下文，不是完整知识库。需要外部 Provider 或项目文件承载更大知识 | `memory_search` 对 Markdown 做关键词/向量混合检索；可选 `memory-wiki` 才提供结构化 claims、evidence、contradiction 和 freshness。Memory 仍不能替代权限和权威源 |
+| 读取时机 | 请求中先按最新用户消息检索 user/GPT Memory；完成回答后才写入本轮内容 | 两个文件在 session start 以 frozen snapshot 注入；本轮写入要到下一会话才进入 system prompt | `USER.md`/`MEMORY.md` 在启动时注入；每日笔记按需检索，active memory 可对“过去发生了什么”做更深召回 |
+| 主要风险 | 过度写入用户原话、缺少 TTL/来源/冲突审计；流式中断时可能来不及写入 | Agent 自己维护文件，容易漏记或写入错误；共享同一 Hermes home 的多个进程会互相污染 | 体系更完整但复杂度更高；长期文件、索引、短期晋升和导入副本都必须一起维护 |
+
+这张表最重要的结论是：`fastestai` 当前是“每轮把消息交给 Mem0 推理”的轻量接入；Hermes 是“Agent 主动维护两个有界文件”；OpenClaw 是“每日工作层 + 启动摘要 + 带 provenance 的后台晋升”。三者都不能仅凭向量相似度判断事实真伪、权限或当前有效性。
+
 ### Hermes Agent
 
 Hermes 的内置方案是两个有界的 Markdown 文件：
@@ -488,7 +506,7 @@ Hermes 的内置方案是两个有界的 Markdown 文件：
 
 两者位于 `~/.hermes/memories/`，在会话开始时作为固定快照注入；当前文档给出的默认字符上限分别是 2,200 和 1,375。内置 Memory 工具可以 `add`、`replace` 和删除条目。超过容量时不会静默压缩，而是返回错误，要求先合并或删减。
 
-Hermes 还把会话搜索与长期 Memory 分开：历史会话存入 SQLite FTS5，通过 `session_search` 按需查找，适合回答“上周我们讨论过什么”，不适合把所有历史自动放进每个 Prompt。Hermes 的外部 Provider 还包括 Mem0、Honcho、Hindsight 等，可与内置文件并行使用。
+Hermes 默认允许 Agent 直接保存 Memory；如果打开 `memory.write_approval`，写入会先进入待审批列表。它还把会话搜索与长期 Memory 分开：历史会话存入 SQLite FTS5，通过 `session_search` 按需查找，适合回答“上周我们讨论过什么”，不适合把所有历史自动放进每个 Prompt。Hermes 的外部 Provider 还包括 Mem0、Honcho、Hindsight 等，可与内置文件并行使用。
 
 Hermes 的分层可以这样理解：
 
@@ -517,7 +535,7 @@ OpenClaw 选择“工作区文件 + Memory 工具”的个人助手模式，默�
 这个设计有两个重要提醒：
 
 1. `MEMORY.md` 不是原始聊天归档，太大时启动时注入的副本会被截断，应把细节放回每日文件。
-2. Memory 可以记录“某个批准何时有效”，但不能代替权限、沙箱和审批设置。硬约束必须放在策略系统里。
+2. Memory 可以记录“某个批准何时有效”，但不能代替权限、沙箱和审批设置。硬约束必须放在策略系统里。对精确时间提醒和到期动作，应使用 scheduled task，而不是只写一条 Memory。
 
 OpenClaw 的 [Memory overview](https://docs.openclaw.ai/concepts/memory) 还说明了从 Codex、Claude Code 和 Hermes 导入 Markdown Memory 的方式。导入文件保持独立，不会自动覆盖目标 Agent 的长期 Memory，这正是处理跨工具冲突时应该保留的边界。
 
@@ -644,6 +662,10 @@ Memory 的核心不是“把更多文本塞进上下文”，而是建立一个�
 - [LangGraph Persistence](https://docs.langchain.com/oss/python/langgraph/persistence)
 - [Hermes Agent Persistent Memory](https://hermes-agent.nousresearch.com/docs/user-guide/features/memory)
 - [OpenClaw Memory overview](https://docs.openclaw.ai/concepts/memory)
+- [OpenClaw Dreaming](https://docs.openclaw.ai/concepts/dreaming)
+- [OpenClaw Memory provenance and deletion](https://docs.openclaw.ai/concepts/memory-provenance)
+- [OpenClaw User model](https://docs.openclaw.ai/concepts/user-model)
+- [OpenClaw Memory search](https://docs.openclaw.ai/concepts/memory-search)
 - [Codex AGENTS.md](https://developers.openai.com/codex/guides/agents-md)
 - [Codex Memories](https://developers.openai.com/codex/customization/memories)
 - [Claude Code Memory](https://docs.anthropic.com/en/docs/claude-code/memory)

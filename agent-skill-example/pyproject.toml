@@ -1,0 +1,12 @@
+[project]
+name = "agent-skill-example"
+version = "0.1.0"
+description = "The same SKILL.md protocol implemented with LangChain, LangGraph, and Microsoft Agent Framework"
+requires-python = ">=3.11"
+dependencies = [
+    "langchain>=1.0.0",
+    "langchain-openai>=1.0.0",
+    "langgraph>=1.0.0",
+    "agent-framework>=1.0.0",
+]
+
